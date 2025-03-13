@@ -1,0 +1,6 @@
+site_name: Baby Monitor Documentation
+repo_url: https://github.com/Qicoco97/UofG-RTEP
+pages:
+- Home: 'index.md'
+- Step-by-step Setup Instructions: 'setup/setup.md'
+theme: readthedocs
