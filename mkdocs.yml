@@ -1,7 +1,10 @@
-site_name: Baby Monitor Documentation
+site_name: A contactless, video-based baby monitor
 site_url: https://Qicoco97.github.io/UofG-RTEP/
 repo_url: https://github.com/Qicoco97/UofG-RTEP
 nav:
   - Home: 'index.md'
-  - Step-by-step Setup Instructions: 'setup/setup.md'
+  - Software Setup Instructions: 'setup/sw-setup.md'
+  - Hardware Setup Instructions: 'setup/hw-setup.md'
+  - Software Configuration Parameters: 'setup/config.md'
+  - Troubleshooting: 'setup/troubleshooting.md'
 theme: readthedocs

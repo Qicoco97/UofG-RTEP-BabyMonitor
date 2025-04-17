@@ -1,10 +1,14 @@
+/**
+ * This file is released is under the Patented Algorithm with Software released
+ * Agreement. See LICENSE.md for more information, and view the original repo
+ * at https://github.com/tbl3rd/Pyramids
+ */
+
 #include "CommandLine.hpp"
-#include "MainDialog.hpp"
 #include "RieszTransform.hpp"
 #include "VideoSource.hpp"
 
 #include <sys/time.h>
-
 
 const char *CommandLine::acknowlegements()
 {
@@ -31,48 +35,14 @@ const char *CommandLine::acknowlegements()
     return result;
 }
 
-static std::string percentageOption(const char *o, const std::string &program)
-{
-    std::stringstream oss;
-    if (program != "") oss << std::endl << program << ": ";
-    oss << o << " takes a percentage 0 to 100." << std::endl;
-    return oss.str();
-}
-static std::string amplifyOption(const std::string &program = "")
-{
-    return percentageOption("--amplify", program);
-}
-static std::string thresholdOption(const std::string &program = "")
-{
-    return percentageOption("--threshold", program);
-}
-
-
 void CommandLine::showUsage(const std::string &program, std::ostream &os)
 {
     os << std::endl << program << ": Amplify motion in a video." << std::endl
        << std::endl
-       << "Usage: " << program << " [--about] [--gui] [--repeat] [<source>] "
-       << "[--output <file>] [--amplify %] [--threshold %]"
-       << "[--low-cutoff <Hz>] [--high-cutoff <Hz>]" << std::endl
+       << "Usage: " << program << " [--config] <path>" << std::endl
        << std::endl
-       << "Where: " << "--about shows acknowledgements." << std::endl
-       << "       " << "--gui opens the GUI controls window." << std::endl
-       << "       " << "--repeat loops an input video file." << std::endl
-       << "       " << "--output sends processed video to <file>." << std::endl
-       << "       " << amplifyOption()
-       << "       " << thresholdOption()
-       << "       " << "--low-cutoff is frequency in <Hz>." << std::endl
-       << "       " << "--high-cutoff is frequency in <Hz>." << std::endl
-       << "  and  " << std::endl
-       << "       " << "<source> is either '--camera <id>' or '--input <file>'"
-       << std::endl
-       << "       " << "         where <id> is an integer camera ID"
-       << std::endl
-       << "       " << "         and <file> is a video file to process."
-       << std::endl << std::endl
-       << "Example: " << program << " --gui --input in.avi --output out.avi "
-       << "         " << "--amplify 18 --low-cutoff 1.3 --high-cutoff 2.7"
+       << "Where: " << "--config specifies the path to the config INI." << std::endl
+       << "Example: " << program << " --config config.ini"
        << std::endl << std::endl;
 }
 
@@ -80,14 +50,11 @@ void CommandLine::showUsage(const std::string &program, std::ostream &os)
 std::ostream &operator<<(std::ostream &os, const CommandLine &cl)
 {
     os << cl.av0;
-    if (cl.gui) os << " --gui";
-    if (cl.repeat) os << " --repeat";
     if (cl.inFile.empty()) {
         if (cl.cameraId >= 0) os << " --camera " << cl.cameraId;
     } else {
         os << " --input " << cl.inFile;
     }
-    if (!cl.outFile.empty()) os << " --output "      << cl.outFile;
     if (cl.amplify    >= 0)  os << " --amplify "     << cl.amplify;
     if (cl.lowCutoff  >  0)  os << " --low-cutoff "  << cl.lowCutoff;
     if (cl.highCutoff >  0)  os << " --high-cutoff " << cl.highCutoff;
@@ -106,92 +73,54 @@ void CommandLine::apply(RieszTransform &rt) const
     if (threshold  >= 0) rt.threshold(threshold);
 }
 
-
-// Check repeat only if there is already an output file specified.
-//
-void CommandLine::apply(MainDialog &md) const
-{
-    static const double tick = md.itsLowCutoff.slider.tickInterval();
-    assert(ok);
-    assert(md.itsTransform);
-    apply(*md.itsTransform);
-    md.changeAmplification(amplify);
-    md.changeHighCutoff(highCutoff * tick);
-    md.changeLowCutoff(lowCutoff * tick);
-    md.changeThreshold(threshold);
-    if (!outFile.empty()) {
-        if (md.itsRepeat) md.itsRepeat->setChecked(repeat);
-        const int codec = md.itsSource->fourCcCodec();
-        const cv::Size size = md.itsSource->frameSize();
-        MeasureFps mFps(md.itsSource->fps());
-        md.itsOutput.saveTo(codec, mFps.fps(), size, outFile);
-        md.itsOutput.itsSave.setAutoDefault(false);
-    }
-}
-
-
 // Defaults for transform settings should be OK for the minimum frame rate.
 //
 CommandLine::CommandLine(int ac, char *av[])
     : av0(av[0])
     , program()
     , inFile()
-    , outFile()
     , cameraId(-1)
     , sourceCount(0)
-    , sinkCount(0)
+    , erodeDimension(2)
+    , dilateDimension(60)
+    , diffThreshold(5)
+    , motionDuration(1)
+    , pixelThreshold(10)
     , amplify(30.0)
-    , lowCutoff( MeasureFps::minimumFps() / 4.0)
-    , highCutoff(MeasureFps::minimumFps() / 2.0)
+    , lowCutoff(0.5)
+    , highCutoff(1.0)
     , threshold(25.0)
-    , repeat(false)
-    , gui(false)
+    , showDiff(false)
+    , showMagnification(false)
+    , showTimes(false)
     , about(false)
     , help(false)
-    , ok(true)                          // Check this before use.
+    , ok(true)           // Check this before use.
+    , crop(false)
+    , frameWidth(640)
+    , frameHeight(480)
 {
     const std::string::size_type n = av0.rfind("/");
     program
         = (n == std::string::npos || n == av0.size() - 1)
         ? av0
         : av0.substr(n + 1);
+
+    bool use_config_file = false;
+    std::string config_path = "";
+
     for (int i = 1; ok && i < ac; ++i) {
         std::stringstream raw(av[i]); std::string arg; raw >> arg;
         if ("--about" == arg) {
             about = true;
-        } else if ("--camera" == arg && (ok = ++i < ac)) {
-            std::stringstream ss(av[i]);
-            ok = (ss >> cameraId) && cameraId >= 0 && sourceCount == 0;
-            ++sourceCount;
-        } else if ("--input" == arg && (ok = ++i < ac)) {
-            inFile = av[i];
-            ok = sourceCount == 0;
-            ++sourceCount;
-        } else if ("--output" == arg && (ok = ++i < ac)) {
-            outFile = av[i];
-            ok = sinkCount == 0;
-            ++sinkCount;
-        } else if ("--amplify" == arg && (ok = ++i < ac)) {
-            std::stringstream ss(av[i]);
-            ok = (ss >> amplify) && amplify >= 0 && amplify <= 100;
-            if (!ok) std::cerr << amplifyOption(program);
-        } else if ("--low-cutoff" == arg && (ok = ++i < ac)) {
-            std::stringstream ss(av[i]);
-            ok = (ss >> lowCutoff) && lowCutoff >= 0;
-        } else if ("--high-cutoff" == arg && (ok = ++i < ac)) {
-            std::stringstream ss(av[i]);
-            ok = (ss >> highCutoff) && highCutoff >= 0;
-        } else if ("--threshold" == arg && (ok = ++i < ac)) {
-            std::stringstream ss(av[i]);
-            ok = (ss >> threshold) && threshold >= 0 && threshold <= 100;
-            if (!ok) std::cerr << thresholdOption(program);
-        } else if ("--repeat" == arg) {
-            repeat = true;
-        } else if ("--gui" == arg) {
-            gui = true;
         } else if ("--help" == arg) {
             help = true;
             showUsage(program, std::cerr);
+            break;
+        } else if ("--config" == arg && (ok = ++i < ac)) {
+            config_path = av[i];
+            use_config_file = true;
+            ok = true;
             break;
         } else {
             std::cerr << std::endl << program << ": Bad option '" << arg << "'"
@@ -199,49 +128,120 @@ CommandLine::CommandLine(int ac, char *av[])
             ok = false;
         }
     }
-    if (sourceCount > 1) {
-        std::cerr << program << ": Specify only one of --camera or --input."
-                  << std::endl << std::endl;
-    }
-    if (sinkCount > 1) {
-        std::cerr << program << ": Specify only one --output file."
-                  << std::endl << std::endl;
-    }
-    if (!(sourceCount && sinkCount)) if (!(about || help)) gui = true;
-    if (about && !gui) std::cout << program << acknowlegements() << std::endl;
-    if (!ok) showUsage(program, std::cerr);
-}
 
+    // Of user specifies to use INI file on commandline, load these arguments
+    // from the file rather than the commandline.
+    if (use_config_file) {
+        sourceCount = 0;
+        static INIReader reader(config_path);
 
-CommandLine::CommandLine(const MainDialog *md)
-    : av0(md->itsCl.av0)
-    , program(md->itsCl.program)
-    , inFile()
-    , outFile()
-    , cameraId(-1)
-    , sourceCount(0)
-    , sinkCount(0)
-    , amplify(-1.0)
-    , lowCutoff(-1.0)
-    , highCutoff(-1.0)
-    , threshold(-1.0)
-    , repeat(false)
-    , gui(true)
-    , about(false)
-    , help(false)
-    , ok(false)                         // Never check this.
-{
-    repeat = md->itsRepeat && md->itsRepeat->isChecked();
-    if (md->itsSource) {
-        if (md->itsSource->isFile()) {
-            inFile = md->itsSource->fileName();
-        } else {
-            cameraId = md->itsSource->cameraId();
+        if (reader.ParseError() < 0) {
+            printf("[error] Cannot load %s\n", config_path.c_str());
+            ok = false;
+            return;
         }
+
+        // check sources
+        std::string input_path = reader.Get("io", "input", "");
+        if (input_path != "") {
+            inFile = input_path;
+            ok = ok && sourceCount == 0;
+            ++sourceCount;
+        }
+
+        int input_cameraID = reader.GetInteger("io", "camera", -1);
+        if (input_cameraID != -1) {
+            cameraId = input_cameraID;
+            ok = ok && cameraId >= 0 && sourceCount == 0;
+            ++sourceCount;
+        }
+
+        // Validate that input is EITHER camera or file.
+        if (sourceCount > 1) {
+            std::cerr << program << ": Specify only one of --camera or --input."
+                      << std::endl << std::endl;
+            ok = false;
+            return;
+        }
+        if (!(sourceCount)) if (!(about || help)) {
+            std::cerr << program << ": Specify at least 1 input."
+                      << std::endl << std::endl;
+        }
+
+        amplify = reader.GetReal("magnification", "amplify", 20);
+        ok = ok && amplify && amplify >= 0 && amplify <= 100;
+
+        input_fps = reader.GetReal("io", "input_fps", 15);
+        if (input_cameraID != -1) {
+            // NoIR Camera can only handle 40fps max while retaining good
+            // performance in low-light.
+            ok = ok && input_fps && input_fps >= 0 && input_fps <= 40;
+        }
+        else {
+            ok = ok && input_fps && input_fps >= 0;
+        }
+
+        full_fps = reader.GetReal("io", "full_fps", 4.5);
+        ok = ok && full_fps && full_fps >= 0;
+
+        crop_fps = reader.GetReal("io", "crop_fps", 15);
+        ok = ok && crop_fps && crop_fps >= 0;
+
+        lowCutoff = reader.GetReal("magnification", "low-cutoff", 0.7);
+        ok = ok && lowCutoff && lowCutoff >= 0;
+
+        highCutoff = reader.GetReal("magnification", "high-cutoff", 1);
+        ok = ok && highCutoff && highCutoff >= 0;
+
+        threshold = reader.GetReal("magnification", "threshold", 50);
+        ok = ok && threshold && threshold >= 0 && threshold <= 100;
+
+        frameWidth = reader.GetInteger("io", "width", 640);
+        ok = ok && frameWidth >= 320 && frameWidth <= 1920;
+        frameHeight = reader.GetInteger("io", "height", 480);
+        ok = ok && frameHeight >= 240 && frameHeight <= 1080;
+
+
+        erodeDimension = reader.GetInteger("motion", "erode_dim", 3);
+        ok = ok && erodeDimension && erodeDimension > 0;
+
+        dilateDimension = reader.GetInteger("motion", "dilate_dim", 60);
+        ok = ok && dilateDimension && dilateDimension > 0;
+
+        diffThreshold = reader.GetInteger("motion", "diff_threshold", 10);
+        ok = ok && diffThreshold && diffThreshold >= 0;
+
+        motionDuration = reader.GetInteger("motion", "duration", 1);
+        ok = ok && motionDuration && motionDuration >= 1;
+
+        pixelThreshold = reader.GetInteger("motion", "pixel_threshold", 5);
+        ok = ok && pixelThreshold && pixelThreshold >= 1;
+
+        showDiff = reader.GetBoolean("motion", "show_diff", false);
+
+        showMagnification = reader.GetBoolean("magnification", "show_magnification", false);
+
+        showTimes = reader.GetBoolean("debug", "print_times", false);
+
+        crop = reader.GetBoolean("cropping", "crop", false);
+
+        framesToSettle = reader.GetInteger("cropping", "frames_to_settle", 10);
+        ok = ok && framesToSettle && framesToSettle >= 1;
+
+        timeToAlarm = reader.GetInteger("io", "time_to_alarm", 10);
+        ok = ok && timeToAlarm && timeToAlarm > 1;
+
+        roiWindow = reader.GetInteger("cropping", "roi_window", 10);
+        ok = ok && roiWindow && roiWindow >= 1;
+
+        roiUpdateInterval = reader.GetInteger("cropping", "roi_update_interval", 100);
+        ok = ok && roiUpdateInterval && roiUpdateInterval >= roiWindow;
+
+
+        about = reader.GetBoolean("io", "about", false);
+        help = reader.GetBoolean("io", "help", false);
     }
-    if (!md->itsOutput.itsFile.empty()) outFile = md->itsOutput.itsFile;
-    amplify    = md->itsAmplify.number.value();
-    lowCutoff  = md->itsLowCutoff.number.value();
-    highCutoff = md->itsHighCutoff.number.value();
-    threshold  = md->itsThreshold.number.value();
+
+    if (about) std::cout << program << acknowlegements() << std::endl;
+    if (!ok) showUsage(program, std::cerr);
 }
