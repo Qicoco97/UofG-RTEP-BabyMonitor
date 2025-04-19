@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="description" content="None" /><link rel="canonical" href="https://Qicoco97.github.io/UofG-RTEP/" />
       <link rel="shortcut icon" href="img/favicon.ico" />
-    <title>Baby Monitor Documentation</title>
+    <title>A contactless, video-based baby monitor</title>
     <link rel="stylesheet" href="css/theme.css" />
     <link rel="stylesheet" href="css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -30,7 +30,7 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-          <a href="." class="icon icon-home"> Baby Monitor Documentation
+          <a href="." class="icon icon-home"> A contactless, video-based baby monitor
         </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
       <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
@@ -43,12 +43,32 @@
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Home</a>
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#software">Software</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#hardware">Hardware</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#video-walkthroughs">Video Walkthroughs</a>
     </li>
     </ul>
                 </li>
               </ul>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="setup/setup/">Step-by-step Setup Instructions</a>
+                <li class="toctree-l1"><a class="reference internal" href="setup/sw-setup/">Software Setup Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="setup/hw-setup/">Hardware Setup Instructions</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="setup/config/">Software Configuration Parameters</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="setup/troubleshooting/">Troubleshooting</a>
                 </li>
               </ul>
       </div>
@@ -58,7 +78,7 @@
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
       <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href=".">Baby Monitor Documentation</a>
+          <a href=".">A contactless, video-based baby monitor</a>
         
       </nav>
       <div class="wy-nav-content">
@@ -75,15 +95,32 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="baby-monitor">Baby Monitor</h1>
-<p>This is a C++ implementation of <a href="http://people.csail.mit.edu/mrub/vidmag/">Video Magnification</a> tuned to run on a Raspberry Pi 3 Model B. [TODO: add more here later]</p>
+                <h1 id="video-based-baby-monitor-overview">Video-based Baby Monitor Overview</h1>
+<p>The baby monitor is a contactless, video-based baby monitor.</p>
+<p><a href="img/render-2.jpg">
+  <img src="img/render-2.jpg" alt="render" width=303>
+</a>
+<a href="img/complete-standing.jpg">
+  <img src="img/complete-standing.jpg" alt="render" width=248>
+</a></p>
+<p>This is a C++ implementation of the MIT <a href="http://people.csail.mit.edu/mrub/vidmag/">Video Magnification</a> algorithm that is tuned to run on a Raspberry Pi 3 Model B and easily extensible.</p>
+<p>You can setup your own baby monitor that raises an alarm if your infant stops moving.</p>
+<p>However, the monitor will not work as expected if the system is not calibrated properly.</p>
+<p>If the system is not calibrated well or the environment in the video is not conducive to video magnification, you may not be able to use it.</p>
 <h2 id="getting-started">Getting Started</h2>
-<p>To install the prerequisites and build the software, see the <a href="setup/setup/">step-by-step instructions</a></p>
+<p>The baby monitor is made up of two parts: the baby monitoring software and some simple hardware.
+Find out all you need to know about how to use and recreate your own monitor in the sections below.</p>
+<h3 id="software">Software</h3>
+<p>To install the prerequisites, build the software, or learn more about the software architecture, see the <a href="setup/sw-setup/">Software Setup Guide</a>.</p>
+<h3 id="hardware">Hardware</h3>
+<p>To learn more about the hardware materials we used, and how we build our setup, check out the <a href="setup/hw-setup/">Hardware Setup Guide</a>.</p>
+<h2 id="video-walkthroughs">Video Walkthroughs</h2>
+<p>TODO</p>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="setup/setup/" class="btn btn-neutral float-right" title="Step-by-step Setup Instructions">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="setup/sw-setup/" class="btn btn-neutral float-right" title="Software Setup Instructions">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -111,7 +148,7 @@
     
     
     
-      <span><a href="setup/setup/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="setup/sw-setup/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
@@ -131,5 +168,5 @@
 
 <!--
 MkDocs version : 1.6.1
-Build Date UTC : 2025-03-13 19:15:01.678379+00:00
+Build Date UTC : 2025-04-19 17:58:47.003592+00:00
 -->
