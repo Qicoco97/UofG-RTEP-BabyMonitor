@@ -1,12 +1,12 @@
 # Configuration
 
-Configuration of CribSense uses a file which is usually located in `/etc/cribsense/config.ini`.
+Configuration of baby monitor uses a file which is usually located in `/etc/babymonitor/config.ini`.
 
 The format is that of INI files: each line is a configuration value, and directives are grouped in section introduced by square brackets. Comments are delimited with `;` to the end of the line.
 
 ## Input/Output
 
-The `[io]` section of the file configures the input to CribSense.
+The `[io]` section of the file configures the input to baby monitor.
 You should not need to modify this section, as it is already calibrated to work on the Raspberry Pi.
 
 The `input` directive specifies that the magnifier should look for a video file instead of real-time camera input, while `camera` directive chooses the camera device to use (eg. `camera = 0` means to use `/dev/video0` as input).
@@ -14,10 +14,10 @@ File input exists as a demo or debugging feature only.
 
 If you change the input, you must also specify the fps parameters to match the input.
 For file input, there is only one fps setting, because frames are never dropped, while for camera input, to reduce latency you must specify the frame per second at full frame size and at cropped frame size (roughly 3x the full frame size fps).
-The latter values depend on the speed of the CPU on which cribsense run.
+The latter values depend on the speed of the CPU on which baby monitor run.
 Note that when using an input file that is less than 15 fps, `crop_fps` should be set to the input file's fps value in order to ensure the bandpass frequencies are calculated correctly.
 
-`time_to_alarm` determines the number of system-time seconds to wait after cribsense stops seeing motion before playing an alarm sound through the audio port.
+`time_to_alarm` determines the number of system-time seconds to wait after baby monitor stops seeing motion before playing an alarm sound through the audio port.
 
 ## Cropping
 
@@ -33,7 +33,7 @@ The default configuration will update the crop approximately every minute.
 
 The `[motion]` and `[magnification]` sections control the motion detection and video magnification algorithm respectively.
 
-These parameters depend on the setting in which the cribsense is deployed, such as lighting condition and contrast on the baby.
+These parameters depend on the setting in which the baby monitor is deployed, such as lighting condition and contrast on the baby.
 In general, you should not need to change the magnification setting, as it is tuned to detect normal breathing rates.
 
 Calibration may be needed for `erode_dim` and `dilate_dim`, which are used to determine where to crop the video, as well as `diff_threshold` and `pixel_threshold` which determine the thresholds used judge the magnitude of change in pixels and the number of pixels of motion are needed before being classified as motion rather than noise.
@@ -67,7 +67,7 @@ You can use these two flags to show the result of your changes to the motion and
 
 Finally, the `print_times` in the `[debug]` section controls printing of frame times in the standard output, which you can use to calibrate the FPS and latency settings when running on a device different than the Raspberry Pi.
 
-These features must be left to off when cribsense is started through systemd (automatically on boot or with `systemctl start`). They are only useful if you run cribsense manually.
+These features must be left to off when baby monitor is started through systemd (automatically on boot or with `systemctl start`). They are only useful if you run baby monitor manually.
 
 ## Calibrating the Motion & Magnification algorithm
 

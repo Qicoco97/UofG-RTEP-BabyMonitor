@@ -1,6 +1,6 @@
 # Software Setup Guide
 
-This is the step-by-step guide on building the CribSense software on Raspbian/Ubuntu.
+This is the step-by-step guide on building the video-based baby monitor software on Raspbian/Ubuntu.
 
 ## Prerequisites
 
@@ -23,7 +23,7 @@ i2c-dev
 bcm2835-v4l2
 ```
 Once you've added the line and saved the file, **reboot your Raspberry Pi**.
-This is the driver used by CribSense to directly pull frames from the NoIR Camera.
+This is the driver used by the monitor to directly pull frames from the NoIR Camera.
 
 
 ## Build
@@ -41,32 +41,32 @@ sudo systemctl daemon-reload
 To start the program in the background:
 
 ```sh
-sudo systemctl start cribsense
+sudo systemctl start babymonitor
 ```
 
 To run it in the foreground:
 
 ```sh
-cribsense --config /etc/cribsense/config.ini
+babymonitor --config /etc/babymonitor/config.ini
 ```
 
 To start the program automatically at every boot:
 
 ```sh
-sudo systemctl enable cribsense
+sudo systemctl enable babymonitor
 ```
 
-To stop cribsense from automatically running at boot:
+To stop baby monitor from automatically running at boot:
 
 ```sh
-sudo systemctl disable cribsense
+sudo systemctl disable babymonitor
 ```
 
-Note that when `cribsense` is started using `systemctl`, the config parameters are already sent and are stored in `/etc/systemd/system/cribsense.service`
+Note that when `babymonitor` is started using `systemctl`, the config parameters are already sent and are stored in `/etc/systemd/system/babymonitor.service`
 
-Once you have installed the software and have it configured well for your setting, you will no longer need the keyboard/mouse/monitor. Now, you can set your CribSense to autorun at every boot as shown above.
+Once you have installed the software and have it configured well for your setting, you will no longer need the keyboard/mouse/monitor. Now, you can set your baby monitor to autorun at every boot as shown above.
 
-Now, all you'll need to do is plug in speakers, attach the CribSense to your previously tested spot on the side of your crib, and plug it in. The software will automatically run after a few moments, and will begin tracking motion. When you're done, well, we don't have an elegant way for you to turn off the Pi yet. But, you can just unplug the speakers and leave it running (and be sure to set the infant in the crib for a couple minutes before plugging them back in). Directly unplugging the Pi may corrupt your SD card.
+Now, all you'll need to do is plug in speakers, attach the baby monitor to your previously tested spot on the side of your crib, and plug it in. The software will automatically run after a few moments, and will begin tracking motion. When you're done, well, we don't have an elegant way for you to turn off the Pi yet. But, you can just unplug the speakers and leave it running (and be sure to set the infant in the crib for a couple minutes before plugging them back in). Directly unplugging the Pi may corrupt your SD card.
 
 Remember that if the environment changes, you'll probably need to reconfigure. You'll want to disable the autorun using the command above, and go through the calibration steps on the [Configuration Page](./config.md).
 
@@ -76,11 +76,11 @@ Tip: If everything is set up, you can [make a backup of your Raspberry Pi SD Car
 
 ## Software Configuration
 
-CribSense customizable through a simple INI configuration file.
+Baby monitor customizable through a simple INI configuration file.
 After running `make install`, the configuration file is located at:
 
 ```sh
-sudo nano /etc/cribsense/config.ini
+sudo nano /etc/babymonitor/config.ini
 ```
 
 and it will look like this
@@ -124,7 +124,7 @@ print_times = false ; Print analysis times
 View the full configuration details on the [Configuration Page](./config.md)
 
 ## Software Architecture Details
-The CribSense software is the heart and soul of this project.
+The baby monitor software is the heart and soul of this project.
 The rest is mainly a fun opportunity to use a 3D printer and do some soldering.
 We saw some of the great demos of [video magnification](http://people.csail.mit.edu/mrub/vidmag/) from MIT, and wanted to try and run a similar algorithm on a Raspberry Pi.
  This required about 10x speedup from the great work of [tbl3rd on his C++ implementation](https://github.com/tbl3rd/Pyramids) of video magnification in order to run in real-time on the Pi.

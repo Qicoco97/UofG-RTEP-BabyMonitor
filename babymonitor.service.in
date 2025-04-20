@@ -1,9 +1,9 @@
 [Unit]
-Description=Cribsense Baby Monitoring Service
+Description=Baby Monitoring Service
 
 [Service]
 Type=simple
-ExecStart=@bindir@/cribsense --config @sysconfdir@/cribsense/config.ini
+ExecStart=@bindir@/babymonitor --config @sysconfdir@/babymonitor/config.ini
 CapabilityBoundingSet=
 ProtectSystem=true
 ProtectHome=false

@@ -4,9 +4,9 @@
 
 **Figure: Hardware Block Diagram**
 
-CribSense is relatively easy to construct, and is largely made up of commercially available parts.
+Baby monitor is relatively easy to construct, and is largely made up of commercially available parts.
 As seen in the figure above, there are 5 main hardware components, only 2 of which are custom made.
-This page contains the build instructions for CribSense.
+This page contains the build instructions for baby monitor.
 
 ## What you'll need
 
@@ -69,12 +69,12 @@ Several mounting options could include:
 -   [Velcro](https://www.amazon.com/VELCRO-Brand-Industrial-Strength-Black/dp/B00006RSP1/)
 -   Tape
 
-If you have access to a MakerBot Replicator (5th Generation), you can simply download the `.makerbot` files for the [case](https://github.com/lukehsiao/CribSense/raw/master/chassis/case.makerbot) and [cover](https://github.com/lukehsiao/CribSense/raw/master/chassis/cover.makerbot) onto your MakerBot Replicator and print.
+If you have access to a MakerBot Replicator (5th Generation), you can simply download the `.makerbot` files for the [case](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/case.makerbot) and [cover](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/cover.makerbot) onto your MakerBot Replicator and print.
 It takes about 6 hours to print the case and 3 hours to print the cover.
 If you are using a different type of 3D printer, please keep reading.
 
-As mentioned above, a minimum build volume of 9.9" (L) x 7.8" (W) x 5.9" (H) is required to print CribSense.
-If you do not have access to a 3D printer with this build volume, you can use an online 3D printing service (such as [Shapeways](http://www.shapeways.com/) or [Sculpteo](https://www.sculpteo.com/)) to print CribSense.
+As mentioned above, a minimum build volume of 9.9" (L) x 7.8" (W) x 5.9" (H) is required to print baby monitor.
+If you do not have access to a 3D printer with this build volume, you can use an online 3D printing service (such as [Shapeways](http://www.shapeways.com/) or [Sculpteo](https://www.sculpteo.com/)) to print baby monitor.
 The minimum print resolution is 0.015".
 If you are using a [fused filament fabrication](https://en.wikipedia.org/wiki/Fused_filament_fabrication) type 3D printer, this means that your nozzle diameter needs to be 0.015" or smaller.
 Printers with lower print resolutions (larger nozzle diameters) may work, but the Raspberry Pi might not fit into the chassis.
@@ -84,8 +84,8 @@ If your 3D printer has a heated build plate, turn off the heater before proceedi
 
 Orienting the model on your printer's build plate is critical for a successful print.
 These models were carefully designed so they do not need to be printed with support material, thus saving plastic and improving print quality.
-Before proceeding, download the 3D files for the [case](https://github.com/lukehsiao/CribSense/blob/master/chassis/case.stl) and [cover](https://github.com/lukehsiao/CribSense/blob/master/chassis/cover.stl).
-When printing these models, the neck of CribSense must lay flat on the build plate.
+Before proceeding, download the 3D files for the [case](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/case.stl) and [cover](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/cover.stl).
+When printing these models, the neck of baby monitor must lay flat on the build plate.
 This ensures that all overhang angles on the models do not exceed 45 degrees, thus eliminating the requirement for support material.
 For instructions on orientating 3D models in the build volume of your printer, please refer to the instruction manual that comes with your 3D printer.
 Examples for the build orientation of the case and cover are shown below.
@@ -108,9 +108,9 @@ Cover:
   <img src="../../img/print-cover-top.png" alt="Cover (Top View)" width=310>
 </a>
 
-In addition to putting the neck of CribSense flat against the build plate, you may notice that the models are rotated around the vertical axis.
+In addition to putting the neck of baby monitor flat against the build plate, you may notice that the models are rotated around the vertical axis.
 This may be necessary to fit the model inside the build volume of your 3D printer.
-This rotation is optional if the length of your build volume is long enough to accommodate CribSense.
+This rotation is optional if the length of your build volume is long enough to accommodate baby monitor.
 
 ### IR LED Circuit
 
@@ -172,7 +172,7 @@ Be sure to let everything dry before reapplying hot glue and booting the Raspber
 The assembly instructions below assume that you are using hot glue.
 If you are using a different type of glue, the assembly instructions still apply, though the drying times may differ.
 Throughout this process, make sure that the glue is dry before moving on to the next step.
-Throughout the build, check to make sure that all the ports can still be accessed through the holes in the CribSense chassis.
+Throughout the build, check to make sure that all the ports can still be accessed through the holes in the baby monitor chassis.
 Click any of the pictures below for higher resolution images.
 
 -   Insert the Raspberry Pi into the chassis. Once it is in place, be sure that all of the ports can still be accessed (e.g. you can plug in power power).
