@@ -24,6 +24,8 @@
  │
  ├── 📂 docs              # Documentation and design files 
  │
+ ├── 📂 img               # project image
+ │                  
  ├── 📂 src                    # Implementation files
  │   ├── 📂 IntelliFireUI      # Graphical UI visualization for sensor data
  │   ├── ads1115manager.cpp    # ADS1115 manager implementation
@@ -41,7 +43,7 @@
  │   ├── sensorContainer.cpp   # Sensor container implementation
  │   ├── UltraSonicSensor.cpp  # Ultrasonic sensor implementation
  │
- ├── 📂 img                   # project image
+ ├── 📂 tests                  # project tests
  ├── CMakeLists.txt            # CMake build configuration
  ├── LICENSE                   # Apache v2.0 License
  ├── README.md                 # Project documentation
