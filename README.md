@@ -17,20 +17,36 @@
 </p>
 
 ## 📦 Project Structure
-UofG-RTEP/ 
 
+```bash
+📂 UofG-RTEP
+ ├── 📂 chassis           # 3D printing file
+ │
+ ├── 📂 docs              # Documentation and design files 
+ │
+ ├── 📂 src                    # Implementation files
+ │   ├── 📂 IntelliFireUI      # Graphical UI visualization for sensor data
+ │   ├── ads1115manager.cpp    # ADS1115 manager implementation
+ │   ├── ads1115rpi.cpp        # ADS1115 implementation
+ │   ├── basicMotion.cpp       # Basic motion control implementation
+ │   ├── eventLoop.cpp         # Event loop implementation
+ │   ├── fireDetector.cpp      # Fire detector implementation
+ │   ├── IRSensor.cpp          # IR sensor implementation
+ │   ├── keyLogger.cpp         # Key logger implementation
+ │   ├── libcam2opencv.cpp     # Camera to OpenCV implementation
+ │   ├── LN298MotorControl.cpp # Motor control implementation
+ │   ├── main.cpp              # Main entry point, event-driven execution
+ │   ├── mainwindow.cpp        # Main window implementation
+ │   ├── pumpControl.cpp       # Pump activation logic
+ │   ├── sensorContainer.cpp   # Sensor container implementation
+ │   ├── UltraSonicSensor.cpp  # Ultrasonic sensor implementation
+ │
+ ├── 📂 img                   # project image
+ ├── CMakeLists.txt            # CMake build configuration
+ ├── LICENSE                   # Apache v2.0 License
+ ├── README.md                 # Project documentation
+```
 
-           ├── chassis/ # 3D printing file
-           
-           ├── docs/ # Documentation and design files 
-           
-           ├── src/ # source code
-           
-           ├── Makefile # Build configuration 
-           
-           ├── LICENSE # Project license (Apache-2.0) 
-           
-           └── README.md # This documentation file
 
 # Documentation
 
