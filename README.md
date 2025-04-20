@@ -19,8 +19,6 @@ UofG-RTEP/
            
            ├── src/ # source code
            
-           ├── build-aux/ # Build automation tools 
-           
            ├── Makefile # Build configuration 
            
            ├── LICENSE # Project license (Apache-2.0) 
