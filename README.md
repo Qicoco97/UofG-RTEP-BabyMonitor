@@ -55,7 +55,9 @@
 Please view our [Documentation Pages](https://qicoco97.github.io/UofG-RTEP/) for details and instructions on how to build the project.
 
 ## 📸 Demo & Promotion
-Figure:![demo](./img/demo.jpg)  real-time monitoring interface
+<p align="center">
+  <img src="img/demo.jpg" width="400" alt="BabyMonitor Logo">
+</p> real-time monitoring interface
 
 Project is published on GitHub and received positive feedback.
 
