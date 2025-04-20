@@ -2,14 +2,15 @@
 
 The baby monitor is a contactless, video-based baby monitor.
 
-<a href="img/render-2.jpg">
-  <img src="img/render-2.jpg" alt="render" width=303>
+<a href="img/model.jpg">
+  <img src="img/model.jpg" alt="render" width=303>
 </a>
-==TODO: 插入我们的实物图==
 
-This is a C++ implementation of the MIT [Video Magnification](http://people.csail.mit.edu/mrub/vidmag/) algorithm that is tuned to run on a Raspberry Pi 3 Model B and easily extensible.
+This project primarily uses a C++ implementation of the MIT [video enlargement](http://people.csail.mit.edu/mrub/vidmag/) algorithm that runs on a Raspberry Pi 3 Model B and is easily extensible.
 
 You can setup your own baby monitor that raises an alarm if your infant stops moving.
+
+==下面两段看看需不需要删除==
 
 However, the monitor will not work as expected if the system is not calibrated properly.
 
@@ -17,12 +18,12 @@ If the system is not calibrated well or the environment in the video is not cond
 
 ## Getting Started
 
-The baby monitor is made up of two parts: the baby monitoring software and some simple hardware.
-Find out all you need to know about how to use and recreate your own monitor in the sections below.
+The baby monitor consists of two parts: baby monitor software and some simple hardware.
+Learn how to use and recreate your own monitor in the following section.
 
 ### Software
 
-To install the prerequisites, build the software, or learn more about the software architecture, see the [Software Setup Guide](setup/sw-setup.md).
+To install prerequisites, build the software, or learn more about the software architecture, see [Software Installation Guide](setup/sw-setup.md).
 
 ### Hardware
 
