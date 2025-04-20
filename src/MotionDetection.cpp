@@ -178,6 +178,11 @@ unsigned MotionDetection::countNumChanges() {
                 }
                 lastEWMA = ewma;
                 noMovementDetected = false;
+                
+                // 触发运动回调
+                if (motionCallback) {
+                    motionCallback(ewma, getBreathingRate());
+                }
                 return ewma;
             }
         }
@@ -187,6 +192,7 @@ unsigned MotionDetection::countNumChanges() {
             }
         }
     }
+
     if (noMovementDetected) {
         unsigned timestamp = get_time_sec();
         unsigned elapsedTime = timestamp - lastZeroStartTime;
@@ -194,7 +200,12 @@ unsigned MotionDetection::countNumChanges() {
         // printf("[info]    timestamp:         %u\n", timestamp);
         // printf("[info]    elapsedTime:       %u\n", elapsedTime);
         if (elapsedTime >= timeToAlarm) {
-            soundAlarm();
+            // 触发报警回调
+            if (alarmCallback) {
+                alarmCallback();
+            } else {
+                soundAlarm();
+            }
         }
     }
     else {
@@ -425,6 +436,7 @@ void MotionDetection::update(cv::Mat newFrame) {
     //////////////////////////////////////
     // Perform state actions first      //
     //////////////////////////////////////
+    motionDetection_st previousState = currentState;
     switch(currentState) {
         case init_st:
             initTimer++;
@@ -512,6 +524,11 @@ void MotionDetection::update(cv::Mat newFrame) {
         default:
             printf("[error] Invalid state reached.\n");
             break;
+    }
+
+    // 触发状态变化回调
+    if (currentState != previousState && stateChangeCallback) {
+        stateChangeCallback(currentState);
     }
 }
 

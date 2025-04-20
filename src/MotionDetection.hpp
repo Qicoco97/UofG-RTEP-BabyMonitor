@@ -4,6 +4,7 @@
 #include <future>
 #include <opencv2/opencv.hpp>
 #include <canberra.h>
+#include <functional>
 
 #include "CommandLine.hpp"
 #include "RieszTransform.hpp"
@@ -19,6 +20,11 @@ enum frame_size {
     FULL_FRAME,
     CROPPED_FRAME
 };
+
+// 回调函数类型定义
+using MotionCallback = std::function<void(int changes, double rate)>;
+using AlarmCallback = std::function<void()>;
+using StateChangeCallback = std::function<void(motionDetection_st newState)>;
 
 class MotionDetection {
 
@@ -50,6 +56,9 @@ private:
     RieszTransform rt[SPLIT];
     WorkerThread<cv::Mat, RieszTransform*, cv::Mat> thread[SPLIT];
     ca_context *snd_context;
+    MotionCallback motionCallback;
+    AlarmCallback alarmCallback;
+    StateChangeCallback stateChangeCallback;
 
     /**
      * Use simple image diffs over 3 frames to create a black/white evaulation
@@ -128,6 +137,19 @@ public:
      * the user.
      */
     MotionDetection(const CommandLine &cl);
+
+    // 设置回调函数
+    void setMotionCallback(MotionCallback cb) {
+        motionCallback = cb;
+    }
+    
+    void setAlarmCallback(AlarmCallback cb) {
+        alarmCallback = cb;
+    }
+    
+    void setStateChangeCallback(StateChangeCallback cb) {
+        stateChangeCallback = cb;
+    }
 };
 
 #endif // #ifndef MOTIONDETECTION_H_INCLUDED
