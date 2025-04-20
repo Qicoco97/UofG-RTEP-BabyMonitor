@@ -1,4 +1,4 @@
-AC_INIT([Cribsense], [1.0])
+AC_INIT([UofG-RTEP], [1.0])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])

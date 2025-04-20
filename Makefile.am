@@ -8,9 +8,9 @@ AM_CXXFLAGS = $(ARCH_CXXFLAGS) $(WARN_CXXFLAGS) -Wno-error=inline -Wno-inline -O
 
 AM_LDFLAGS = -lrt
 
-bin_PROGRAMS = cribsense
+bin_PROGRAMS = babymonitor
 
-cribsense_SOURCES = \
+babymonitor_SOURCES = \
     src/VideoSource.hpp \
     src/CommandLine.hpp \
     src/RieszTransform.hpp \
@@ -30,25 +30,25 @@ cribsense_SOURCES = \
     src/VideoSource.cpp \
     $(NULL)
 
-cribsense_CXXFLAGS = $(AM_CXXFLAGS) $(DEPS_CFLAGS)
-cribsense_LDFLAGS = $(AM_LDFLAGS) $(DEPS_LIBS)
+babymonitor_CXXFLAGS = $(AM_CXXFLAGS) $(DEPS_CFLAGS)
+babymonitor_LDFLAGS = $(AM_LDFLAGS) $(DEPS_LIBS)
 
 dist_doc_DATA = \
     docs/index.md \
     docs/setup/hw-setup.md \
     docs/setup/sw-setup.md
 
-configdir = $(sysconfdir)/cribsense
+configdir = $(sysconfdir)/babymonitor
 
 dist_config_DATA = config.ini
 
 systemdsystemunitdir = $(sysconfdir)/systemd/system
-systemdsystemunit_DATA = cribsense.service
+systemdsystemunit_DATA = babymonitor.service
 
-cribsense.service: cribsense.service.in
+babymonitor.service: babymonitor.service.in
 	sed -e 's|[@]bindir@|$(bindir)|g' -e 's|[@]sysconfdir@|$(sysconfdir)|g' $< > $@
 
-CLEANFILES = cribsense.service
+CLEANFILES = babymonitor.service
 
 GITIGNOREFILES = \
 	aclocal.m4 \
