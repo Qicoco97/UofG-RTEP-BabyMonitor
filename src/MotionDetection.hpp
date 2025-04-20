@@ -15,6 +15,16 @@
 #define SPLIT 3
 #define NSEC_PER_SEC 1000000
 
+// 运动检测状态枚举
+enum motionDetection_st {
+    init_st,            // 初始化状态
+    reset_st,           // 重置状态
+    idle_st,            // 空闲状态
+    monitor_motion_st,  // 监控运动状态
+    compute_roi_st,     // 计算感兴趣区域状态
+    valid_roi_st        // 有效感兴趣区域状态
+};
+
 // Types of frame sizes for reinitializing the Riesz FPS.
 enum frame_size {
     FULL_FRAME,
@@ -153,3 +163,4 @@ public:
 };
 
 #endif // #ifndef MOTIONDETECTION_H_INCLUDED
+

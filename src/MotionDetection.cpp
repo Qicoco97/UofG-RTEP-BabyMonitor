@@ -2,14 +2,8 @@
 #include "MotionDetection.hpp"
 #include <time.h>
 
-enum motionDetection_st {
-    init_st,            // enter this state while waiting for frames to settle
-    reset_st,           // re-enlarge the video and recalculate ROI
-    idle_st,            // evaluation is valid to compute from
-    monitor_motion_st,  // observe motions in several frams
-    compute_roi_st,     // occasionally recompute roi
-    valid_roi_st        // Flag a valid ROI
-} currentState = init_st;
+// 全局状态变量
+motionDetection_st currentState = init_st;
 
 /**
  * Launch rt.transform for the given RieszTransform and the given frame.
@@ -569,3 +563,4 @@ MotionDetection::MotionDetection(const CommandLine &cl) {
 
     }
 }
+
