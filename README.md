@@ -1,7 +1,6 @@
 # 🛏️ Video-based baby monitor
 
 **Video-based baby monitor** is a real-time embedded system based on Raspberry Pi, designed to monitor the sleep status of infants to ensure their safety. The system uses sensors to detect the infant’s movement, displays real-time data through a graphical interface, and provides alerts to notify caregivers of abnormal conditions.
-logo:![demo](./img/logo.png)
 
 
 
@@ -10,6 +9,9 @@ logo:![demo](./img/logo.png)
 [![GitHub stars](https://img.shields.io/github/stars/qicoco97/UofG-RTEP.svg)](https://github.com/qicoco97/UofG-RTEP/stargazers)
 [![Bilibili](https://img.shields.io/badge/Bilibili-Video-ff69b4)](https://b23.tv/2XWn9GX)
 [![YouTube](https://img.shields.io/badge/YouTube-Video%20Demo-ff0000)](https://youtu.be/0SxoRG_W2z0?feature=shared)
+<p align="center">
+  <img src="img/logo.png" width="200" alt="BabyMonitor Logo">
+</p>
 
 ## 📦 Project Structure
 UofG-RTEP/ 
