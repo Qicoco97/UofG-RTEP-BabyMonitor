@@ -12,13 +12,12 @@
 ## 📦 Project Structure
 UofG-RTEP/ 
 
-           ├── src/ # Core source code (C++)
 
-           ├── chassis/ # Hardware interface and drivers 
+           ├── chassis/ # 3D printing file
            
            ├── docs/ # Documentation and design files 
            
-           ├── cribsense/ # System services and configurations 
+           ├── src/ # source code
            
            ├── build-aux/ # Build automation tools 
            
