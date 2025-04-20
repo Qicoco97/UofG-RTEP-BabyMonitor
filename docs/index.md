@@ -5,9 +5,7 @@ The baby monitor is a contactless, video-based baby monitor.
 <a href="img/render-2.jpg">
   <img src="img/render-2.jpg" alt="render" width=303>
 </a>
-<a href="img/complete-standing.jpg">
-  <img src="img/complete-standing.jpg" alt="render" width=248>
-</a>
+==TODO: 插入我们的实物图==
 
 This is a C++ implementation of the MIT [Video Magnification](http://people.csail.mit.edu/mrub/vidmag/) algorithm that is tuned to run on a Raspberry Pi 3 Model B and easily extensible.
 
@@ -32,5 +30,5 @@ To learn more about the hardware materials we used, and how we build our setup, 
 
 ## Video Walkthroughs
 
-TODO
+==TODO: 插入我们的宣传视频==
 
