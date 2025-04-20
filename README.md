@@ -4,12 +4,14 @@
 
 
 
-
 [![Documentation](https://img.shields.io/badge/docs-mkdocs-lightgrey.svg?style=flat)](https://qicoco97.github.io/UofG-RTEP/)
 [![GitHub issues](https://img.shields.io/github/issues/qicoco97/UofG-RTEP.svg)](https://github.com/Qicoco97/UofG-RTEP/issues)
 [![GitHub stars](https://img.shields.io/github/stars/qicoco97/UofG-RTEP.svg)](https://github.com/qicoco97/UofG-RTEP/stargazers)
 [![Bilibili](https://img.shields.io/badge/Bilibili-Video-ff69b4)](https://b23.tv/2XWn9GX)
 [![YouTube](https://img.shields.io/badge/YouTube-Video%20Demo-ff0000)](https://youtu.be/0SxoRG_W2z0?feature=shared)
+<p align="center">
+  <img src="img/logo.png" width="200" alt="BabyMonitor Logo">
+</p>
 
 ## 📦 Project Structure
 UofG-RTEP/ 
@@ -32,7 +34,7 @@ UofG-RTEP/
 Please view our [Documentation Pages](https://qicoco97.github.io/UofG-RTEP/) for details and instructions on how to build the project.
 
 ## 📸 Demo & Promotion
-Figure:![demo](./img/demo.jpg) CribSense real-time monitoring interface
+Figure:![demo](./img/demo.jpg)  real-time monitoring interface
 
 Project is published on GitHub and received positive feedback.
 
