@@ -4,9 +4,11 @@
 
 **Figure: Hardware Block Diagram**
 
-Baby monitor is relatively easy to construct, and is largely made up of commercially available parts.
-As seen in the figure above, there are 5 main hardware components, only 2 of which are custom made.
-This page contains the build instructions for baby monitor.
+Baby monitors are relatively simple to construct and consist mainly of commercially available components.
+
+As shown above, there are 5 main hardware components, of which only 2 are customised.
+
+This page contains installation instructions for the baby monitor.
 
 ## What you'll need
 
@@ -38,194 +40,189 @@ Chassis:
 
 ## Prerequisites
 
-Before you start our step-by-step guide, you should have already installed the latest version of [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) on your SD card and ensured that your Pi is functional and booting.
-You'll also need to [enable the camera module](https://www.raspberrypi.org/documentation/configuration/camera.md) before you'll be able to interface with the camera.
+Before starting our step-by-step guide, you should have installed the latest version of [Raspbian](https://www.raspberrypi.org/downloads/raspbian/) on your SD card and made sure that your Pi boots properly.
+
+You also need to [Enable Camera Module](https://www.raspberrypi.org/documentation/configuration/camera.md) before you can connect the camera.
 
 ## Build Instructions
 
 ### Swap NoIR Camera Cable
 
-The 6" cable that comes with the camera is too short.
-Swap the short one (6") with the longer one (12").
-To do this, you can follow [this guide from ModMyPi](https://www.modmypi.com/blog/how-to-replace-the-raspberry-pi-camera-cable).
-To summarize, there is a push/pull tab on the back of the NoIR camera, just like the one found on the Pi itself:
+The 6-inch cable that came with the camera is too short.
+Please replace the short (6-inch) cable with a long (12-inch) cable.
 
-![noir-rear](../img/noir-rear.jpg)
+You can follow [this guide provided by ModMyPi](https://www.modmypi.com/blog/how-to-replace-the-raspberry-pi-camera-cable).
 
-Simply pull the black plastic tab out, remove the short cable, replace it with the long cable (making sure that the blue plastic strip is facing up still as shown in the picture), and push the tab back in to secure it.
+In short, the NoIR camera has a push/pull tab on the back of the camera, just like the one on the Pi itself:
+
+<a href="../img/camera.jpg">
+  <img src="../img/camera.jpg" alt="front" width=300>
+</a>
+
+Simply pull the black plastic tab out, remove the short cable and replace it with the long cable (make sure the blue plastic strip is facing up as shown), then push the plastic tab back in to secure the cable.
 
 ### 3D Printed Chassis
 
-<a href="../../img/render-2.jpg">
-  <img src="../../img/render-2.jpg" alt="Render 2" width=400>
-</a>
+Use of our chassis is optional but recommended to prevent young children from touching exposed electronic circuitry.
 
-Using our chassis is optional, though recommended to prevent young children from touching exposed electronic circuitry.
-Every crib is different, so our chassis does not include include a mounting bracket.
-Several mounting options could include:
-
--   [Cable Ties](https://www.amazon.com/Miady-Pieces-Self-Locking-Nylon-Inches/dp/B01M0IL0GO/)
--   [3M Dual Lock](https://www.amazon.com/3M-Reclosable-Fastener-SJ3560-Clear/dp/B00PX22H42/)
--   [Velcro](https://www.amazon.com/VELCRO-Brand-Industrial-Strength-Black/dp/B00006RSP1/)
--   Tape
+Every cot is different, so our chassis does not include mounting brackets.
 
 If you have access to a MakerBot Replicator (5th Generation), you can simply download the `.makerbot` files for the [case](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/case.makerbot) and [cover](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/cover.makerbot) onto your MakerBot Replicator and print.
-It takes about 6 hours to print the case and 3 hours to print the cover.
+
 If you are using a different type of 3D printer, please keep reading.
 
-As mentioned above, a minimum build volume of 9.9" (L) x 7.8" (W) x 5.9" (H) is required to print baby monitor.
-If you do not have access to a 3D printer with this build volume, you can use an online 3D printing service (such as [Shapeways](http://www.shapeways.com/) or [Sculpteo](https://www.sculpteo.com/)) to print baby monitor.
-The minimum print resolution is 0.015".
-If you are using a [fused filament fabrication](https://en.wikipedia.org/wiki/Fused_filament_fabrication) type 3D printer, this means that your nozzle diameter needs to be 0.015" or smaller.
-Printers with lower print resolutions (larger nozzle diameters) may work, but the Raspberry Pi might not fit into the chassis.
-We recommend PLA (polylactic acid) as the preferred printing material.
-Other plastics may work, but the Raspberry Pi may not fit in the case if the thermal expansion coefficient of the chosen plastic is larger than that of PLA.
-If your 3D printer has a heated build plate, turn off the heater before proceeding.
+As mentioned above, printing a baby monitor requires a minimum volume of 9.9 inches (L) x 7.8 inches (W) x 5.9 inches (H).
 
-Orienting the model on your printer's build plate is critical for a successful print.
-These models were carefully designed so they do not need to be printed with support material, thus saving plastic and improving print quality.
-Before proceeding, download the 3D files for the [case](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/case.stl) and [cover](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/cover.stl).
-When printing these models, the neck of baby monitor must lay flat on the build plate.
-This ensures that all overhang angles on the models do not exceed 45 degrees, thus eliminating the requirement for support material.
-For instructions on orientating 3D models in the build volume of your printer, please refer to the instruction manual that comes with your 3D printer.
-Examples for the build orientation of the case and cover are shown below.
+If you don't have a 3D printer with this build volume, you can use an online 3D printing service such as [Shapeways](http://www.shapeways.com/) or [Sculpteo](https://www.sculpteo.com/) to print the baby monitor.
+
+The minimum print resolution is 0.015 inches.
+
+If you are using a [Fused Filament Manufacturing](https://en.wikipedia.org/wiki/Fused_filament_fabrication) type 3D printer, this means that your nozzle diameter needs to be 0.015 inches or less.
+
+Printers with lower print resolution (larger nozzle diameter) may work, but the Raspberry Pi may not fit in the chassis.
+
+We recommend Polylactic Acid (PLA) as the preferred printing material.
+
+Other plastics can be used, but if the coefficient of thermal expansion of the chosen plastic is greater than that of PLA, the Raspberry Pi may not fit into the chassis.
+
+Before proceeding, download the [enclosure](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/case.stl) and [cover](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/cover.stl) 3D files.
+
+For instructions on orienting the 3D model in the printer build space, refer to the instruction manual that came with the 3D printer.
+
+Examples of chassis and cover mounting orientations are shown below.
 
 Case:
 
-<a href="../../img/print-case-iso.png">
-  <img src="../../img/print-case-iso.png" alt="Case (Isometric View)" width=300>
+<a href="../img/print-case-iso.png">
+  <img src="../img/print-case-iso.png" alt="Case (Isometric View)" width=300>
 </a>
-<a href="../../img/print-case-top.png">
-  <img src="../../img/print-case-top.png" alt="Case (Top View)" width=310>
+<a href="../img/print-case-top.png">
+  <img src="../img/print-case-top.png" alt="Case (Top View)" width=310>
 </a>
 
 Cover:
 
-<a href="../../img/print-cover-iso.png">
-  <img src="../../img/print-cover-iso.png" alt="Cover (Isometric View)" width=300>
+<a href="../img/print-cover-iso.png">
+  <img src="../img/print-cover-iso.png" alt="Cover (Isometric View)" width=300>
 </a>
-<a href="../../img/print-cover-top.png">
-  <img src="../../img/print-cover-top.png" alt="Cover (Top View)" width=310>
+<a href="../img/print-cover-top.png">
+  <img src="../img/print-cover-top.png" alt="Cover (Top View)" width=310>
 </a>
 
-In addition to putting the neck of baby monitor flat against the build plate, you may notice that the models are rotated around the vertical axis.
-This may be necessary to fit the model inside the build volume of your 3D printer.
-This rotation is optional if the length of your build volume is long enough to accommodate baby monitor.
+In addition to placing the neck of the baby monitor flat on the build plate, you may also notice that the model is rotated around a vertical axis.
+
+This may be necessary to load the model into the 3D printer build space.
+
+If the build space is long enough to accommodate the baby monitor, rotation is optional.
 
 ### IR LED Circuit
 
-In order to provide adequate lighting at night, we use an IR LED, which is not visible to the human eye but visible to the NoIR camera.
-The IR LED does not consume a lot of power compared to the Raspberry Pi, so we leave the IR LED on for the sake of simplicity.
+To provide sufficient illumination at night, we use infrared LEDs, which are invisible to the human eye but visible to the NoIR camera.
 
-To power the LED from the GPIO header pins on the Pi, we construct the circuit in the figure below.
+The IR LEDs don't consume much power compared to the Raspberry Pi, so for simplicity we'll leave the IR LEDs on.
+
+To power the LEDs through the GPIO pins on the Pi, we built the circuit shown below.
 
 ![led](../img/led-schematic.png)
 **Figure: LED Schematic**
 
-In earlier versions of the Pi, the maximum output current of these pins was [50mA](http://pinout.xyz/pinout/pin1_3v3_power).
-The Raspberry Pi B+ increased this to 500mA.
-However, for simplicity and backwards compatibility, we use the 5V power pins, which can supply up to [1.5A](http://pinout.xyz/pinout/pin2_5v_power).
-The forward voltage of the IR LED is about 1.7~1.9V according to our measurements.
-Even though the IR LED has a maximum current of 500mA, we decided to reduce the current to around 200mA to reduce heat and overall power consumption.
-Experimental results also show that the IR LED is bright enough with 200 mA of input current.
-To bridge the gap between 5V and 1.9V, we decided to use three 1N4001 diodes and a 1 Ohm resistor in series with the IR LED.
-The voltage drop over the wire, diodes and resistor is about 0.2V, 0.9V (for each one) and 0.2V, respectively.
-Thus, the voltage over the IR LED is `5V - 0.2V - (3 * 0.9V) - 0.2V = 1.9V`.
-The heat dissipation over each LED is 0.18W, and is 0.2W over the resistor, all well within the maximum ratings.
+For simplicity and backward compatibility, we use the 5V power pin, which can provide up to [1.5A](http://pinout.xyz/pinout/pin2_5v_power).
+
+According to our measurements, the forward voltage of the infrared LED is about 1.7~1.9V.
+
+Although their LED and ASA have a maximum current of 500MA, we decided to reduce the current to around 200MA to reduce heat and overall power consumption.
+
+To bridge the gap between 5V and 1.9V, we decided to use three 1N4001 diodes and a 1 ohm resistor in series with the IR LED.
+
+Therefore, the voltage across the IR LED is `5V - 0.2V - (3 * 0.9V) - 0.2V = 1.9V`.
+
+The heat dissipation of each LED is 0.18W, and the heat dissipation of the resistor is 0.2W, both within the maximum ratings.
 
 The circuit should looking something like this:
 
-<a href="../../img/ir-led-zoom.jpg">
-  <img src="../../img/ir-led-zoom.jpg" alt="zoom" width=300>
+<a href="../img/ir-led.jpg">
+  <img src="../img/ir-led.jpg" alt="zoom" width=300>
 </a>
-<a href="../../img/ir-led-full.jpg">
-  <img src="../../img/ir-led-full.jpg" alt="full" width=300>
-</a>
-
-But, we're not done yet!
-In order to get a better fit in the 3D printed chassis, we want to have the IR LED lens protrude from our chassis and have the PCB board flush with the hole.
-The small photodiode in the bottom right will get in the way.
-To remedy this, we desolder it and flip it to the opposite side of the board like this:
-
-<a href="../../img/photodiode-side.jpg">
-  <img src="../../img/photodiode-side.jpg" alt="side" width=300>
-</a>
-<a href="../../img/photodiode-front.jpg">
-  <img src="../../img/photodiode-front.jpg" alt="front" width=300>
-</a>
-
-The photodiode is not needed since we want the LED to always be on.
-Simply switching it to the opposite side leaves the original LED circuit unchanged.
 
 ### Assembly: Bring it all together
 
-Once you have all the hardware ready, you can begin assembly.
-Any glue can be used in this process, but we recommend hot glue for two main reasons.
-Hot glue drys quickly, so you do not need to wait a long time for the glue to dry.
-In addition, hot glue is removable if you make a mistake.
-To remove dried hot glue, soak the hot glue in in rubbing (isopropyl) alcohol.
-We recommend 90% concentration or higher, but 70% concentration will still work.
-Soaking the dried hot glue in isopropyl alcohol will weaken the bond between the glue and underlying surface, allowing you to peel the glue off cleanly.
-When soaking the glue in isopropyl alcohol, the Raspberry Pi should be powered off and unplugged.
-Be sure to let everything dry before reapplying hot glue and booting the Raspberry Pi.
+Once you have all the hardware ready, you can start assembling.
 
-The assembly instructions below assume that you are using hot glue.
-If you are using a different type of glue, the assembly instructions still apply, though the drying times may differ.
-Throughout this process, make sure that the glue is dry before moving on to the next step.
-Throughout the build, check to make sure that all the ports can still be accessed through the holes in the baby monitor chassis.
-Click any of the pictures below for higher resolution images.
+You can use any glue for this process, but we recommend hot glue for two main reasons.
 
--   Insert the Raspberry Pi into the chassis. Once it is in place, be sure that all of the ports can still be accessed (e.g. you can plug in power power).
+Hot glue dries quickly, so you don't need to wait long for the glue to dry.
 
-<a href="../../img/pi-chassis.jpg">
-  <img src="../../img/pi-chassis.jpg" alt="front" width=300>
+In addition, if you make a mistake, hot glue is removable. To remove dried hot glue, soak the hot glue in in rubbing (isopropyl) alcohol.
+
+Make sure everything is dry before reapplying the hot glue and powering up your Raspberry Pi.
+
+Throughout the T and build process, check to make sure all T and ports are still accessible through the holes in the int and baby monitor chassis.
+
+-   Insert the Raspberry Pi into the case. Once it is in place, make sure all ports are accessible (e.g., you can plug in the power supply).
+
+<a href="../img/step1.jpg">
+  <img src="../img/step1.jpg" alt="front" width=300>
 </a>
 
--   Next, use hot glue to tack the Pi into place and attach the camera to the Pi. There are screw holes as well if you prefer to use those.
+-   Next, use some hot glue to secure the Raspberry Pi in place and mount the camera to the Raspberry Pi. There are also screw holes on the Raspberry Pi that you can use if you prefer.
 
-<a href="../../img/pi-glued.jpg">
-  <img src="../../img/pi-glued.jpg" alt="front" width=200>
+<a href="../img/pi-glued.jpg">
+  <img src="../img/pi-glued.jpg" alt="front" width=200>
 </a>
+
+==替换实物图==
 
 -   Glue the LED and camera to the front cover.
 
-<a href="../../img/chassis-front.jpg">
-  <img src="../../img/chassis-front.jpg" alt="front" width=300>
+<a href="../img/chassis-front.jpg">
+  <img src="../img/chassis-front.jpg" alt="front" width=300>
 </a>
 
--   First, glue the NoIR camera to the camera hole. Be sure that the camera is snug and lined up with the chassis. Do not use too much glue; otherwise, you will not be able to fit the camera into the main case. Be sure to power on the Pi and take a look at the camera (`raspistill -v`, for example) to make sure that it is angled well and has a good field of view. If it is not, remove the hot glue and reposition it.
+==替换实物图==
 
-<a href="../../img/noir-glued.jpg">
-  <img src="../../img/noir-glued.jpg" alt="front" width=200>
+-   First, glue the NoIR camera into the camera hole. Make sure the camera is firmly seated and aligned with the chassis. Do not use too much glue or the camera will not fit into the main case. Always power on the Raspberry Pi and check the camera (e.g., using `raspistill -v`) to make sure it is at the right angle and has a good field of view. If the angle is wrong, remove the hot glue and reposition it.
+
+<a href="../img/noir-glued.jpg">
+  <img src="../img/noir-glued.jpg" alt="front" width=200>
 </a>
 
--   Next, glue the IR LED to the hole on the neck of the cover. It's at a 45 degree angle to side light the crib, which results in more shadows in low-light situations. This adds more contrast to the image, making it easier to detect motion.
+==替换实物图==
 
-<a href="../../img/ir-led-glued-zoom.jpg">
-  <img src="../../img/ir-led-glued-zoom.jpg" alt="front" width=300>
+-   Next, glue an infrared LED light to the hole in the neck of the bedspread. It is at a 45-degree angle to the bedspread to illuminate the crib from the side and create more shadows in low-light environments. This will increase the contrast of the image and make it easier to detect motion.
+
+<a href="../img/ir-led-glued-zoom.jpg">
+  <img src="../img/ir-led-glued-zoom.jpg" alt="front" width=300>
 </a>
 
--   With both of them glued to the neck, it should look like this:
+==替换实物图==
 
-<a href="../../img/ir-led-glued-front.jpg">
-  <img src="../../img/ir-led-glued-front.jpg" alt="front" width=300>
+-   After gluing them to the neck, it should look like this:
+
+<a href="../img/ir-led-glued-front.jpg">
+  <img src="../img/ir-led-glued-front.jpg" alt="front" width=300>
 </a>
-<a href="../../img/ir-led-glued-rear.jpg">
-  <img src="../../img/ir-led-glued-rear.jpg" alt="front" width=300>
-</a>
-
--   Attach the IR LED wires to the Raspberry Pi's GPIO pins as shown in the LED Schematic figure.
--   Pack the cables into the chassis in a way that does not crease or strain them. We ended up folding the cable accordion style because our camera flex cable was too long.
-
-<a href="../../img/cable-packing.jpg">
-  <img src="../../img/cable-packing.jpg" alt="front" width=300>
+<a href="../img/ir-led-glued-rear.jpg">
+  <img src="../img/ir-led-glued-rear.jpg" alt="front" width=300>
 </a>
 
--   With everything tucked in, hot glue around the edges where the two pieces meet, sealing them in place.
+==替换实物图==
 
-<a href="../../img/complete-standing.jpg">
-  <img src="../../img/complete-standing.jpg" alt="front" width=300>
+-   Connect the infrared LED wires to the GPIO pins of the Raspberry Pi as shown in the LED schematic.
+-   Place the cable into the chassis, being careful not to wrinkle or strain it.
+
+<a href="../img/cable-packing.jpg">
+  <img src="../img/cable-packing.jpg" alt="front" width=300>
 </a>
-<a href="../../img/complete-ports.jpg">
-  <img src="../../img/complete-ports.jpg" alt="front" width=300>
+
+==替换实物图==
+
+-   Once everything is tucked in place, hot glue the edges where the two pieces meet to seal them in place.
+
+<a href="../img/complete-standing.jpg">
+  <img src="../img/complete-standing.jpg" alt="front" width=300>
 </a>
+<a href="../img/complete-ports.jpg">
+  <img src="../img/complete-ports.jpg" alt="front" width=300>
+</a>
+
+==替换实物图==
