@@ -151,10 +151,6 @@
 <p>If your crib is in a very high contrast environment, you may also need to adjust these parameters.</p>
 <p>Generally speaking, for high contrast settings you want a higher erode_dim, and for low contrast settings you want a lower erode_dim.</p>
 <p>If you run with <code>show_diff=true</code> and you notice that too many parts of your input video are white, or that some completely irrelevant parts of the video are detected as motion (such as a flashing light), then you will want to increase <code>erode_dim</code> until the only parts of the video corresponding to your breathing baby are the largest white parts.</p>
-<p>The top image shows an example where the erosion dimension is too low for the amount of motion in the frame, while the bottom image shows a correctly calibrated frame.</p>
-<p><img alt="too-much" src="../../img/too-much-motion.png" /></p>
-<p><img alt="motion" src="../../img/motion.png" /></p>
-<p>==需要换成实际测试图==</p>
 <p>Once the calibration is complete you will want to make sure the <code>pixel_threshold</code> is set so that motion is only reported when you expect it, rather than constantly (which means you will need to remove noise).</p>
 <p>Ideally, you would see output like this in your terminal:</p>
 <pre><code class="language-sh">[info] Pixel Movement: 0     [info] Motion Estimate: 1.219812 Hz
@@ -200,7 +196,6 @@
 [info] Pixel Movement: 0     [info] Motion Estimate: 0.839298 Hz
 [info] Pixel Movement: 0     [info] Motion Estimate: 0.839298 Hz
 </code></pre>
-<p>==换成实际的好的测试结果==</p>
 <p>There are clear periodic patterns that correspond to the movements.</p>
 <p>If your output looks more like this:</p>
 <pre><code>[info] Pixel Movement: 921   [info] Motion Estimate: 1.352046 Hz
@@ -242,7 +237,6 @@
 [info] Pixel Movement: 601   [info] Motion Estimate: 1.312346 Hz
 [info] Pixel Movement: 456   [info] Motion Estimate: 1.312346 Hz
 </code></pre>
-<p>==换成实际的不好的测试结果==</p>
 <p>You then need to adjust the <code>pixel_threshold</code> and <code>diff_threshold</code> until you see a peak, otherwise the pixel shift is 0.</p>
               
             </div>
