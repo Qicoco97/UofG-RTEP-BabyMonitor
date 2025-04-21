@@ -58,6 +58,8 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="#">Troubleshooting</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-install-opencv-24">How to install Opencv 2.4</a>
+    </li>
     <li class="toctree-l2"><a class="reference internal" href="#no-alarm-is-playing">No alarm is playing</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#ir-led-is-not-working">IR LED is not working</a>
@@ -99,6 +101,43 @@
               
                 <h1 id="troubleshooting">Troubleshooting</h1>
 <p>Here are some troubleshooting tips we've gathered while making baby monitor.</p>
+<h3 id="how-to-install-opencv-24">How to install Opencv 2.4</h3>
+<ul>
+<li>Install dependencies</li>
+</ul>
+<pre><code class="language-sh">sudo apt-get update
+sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install -y python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+</code></pre>
+<ul>
+<li>Download source code</li>
+</ul>
+<pre><code class="language-sh">wget -O opencv-2.4.13.5.zip https://github.com/opencv/opencv/archive/2.4.13.5.zip
+unzip opencv-2.4.13.5.zip
+cd opencv-2.4.13.5
+</code></pre>
+<ul>
+<li>Create a build directory and configure</li>
+</ul>
+<pre><code class="language-sh">mkdir build &amp;&amp; cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D WITH_FFMPEG=OFF \
+      ..
+</code></pre>
+<ul>
+<li>Compile and install</li>
+</ul>
+<pre><code class="language-sh">make -j$(nproc)
+sudo make install
+sudo ldconfig
+</code></pre>
+<ul>
+<li>Check if installation is complete</li>
+</ul>
+<pre><code class="language-sh">pkg-config --modversion opencv
+# Should output 2.4.13.5
+</code></pre>
 <h3 id="no-alarm-is-playing">No alarm is playing</h3>
 <ul>
 <li>Are your speakers working?</li>
