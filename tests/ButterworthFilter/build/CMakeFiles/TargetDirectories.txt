@@ -1,3 +1,0 @@
-C:/Users/LS/Desktop/c++/ButterworthFilter/build/CMakeFiles/butterworth_test.dir
-C:/Users/LS/Desktop/c++/ButterworthFilter/build/CMakeFiles/ALL_BUILD.dir
-C:/Users/LS/Desktop/c++/ButterworthFilter/build/CMakeFiles/ZERO_CHECK.dir
