@@ -27,21 +27,16 @@
  ├── 📂 img               # project image
  │                  
  ├── 📂 src                    # Implementation files
- │   ├── 📂 IntelliFireUI      # Graphical UI visualization for sensor data
- │   ├── ads1115manager.cpp    # ADS1115 manager implementation
- │   ├── ads1115rpi.cpp        # ADS1115 implementation
- │   ├── basicMotion.cpp       # Basic motion control implementation
- │   ├── eventLoop.cpp         # Event loop implementation
- │   ├── fireDetector.cpp      # Fire detector implementation
- │   ├── IRSensor.cpp          # IR sensor implementation
- │   ├── keyLogger.cpp         # Key logger implementation
- │   ├── libcam2opencv.cpp     # Camera to OpenCV implementation
- │   ├── LN298MotorControl.cpp # Motor control implementation
- │   ├── main.cpp              # Main entry point, event-driven execution
- │   ├── mainwindow.cpp        # Main window implementation
- │   ├── pumpControl.cpp       # Pump activation logic
- │   ├── sensorContainer.cpp   # Sensor container implementation
- │   ├── UltraSonicSensor.cpp  # Ultrasonic sensor implementation
+ │   ├── Butterworth.cpp / .hpp       # Implements a Butterworth filter for signal/image smoothing
+ │   ├── CommandLine.cpp / .hpp       # Parses and handles command-line arguments for the application
+ │   ├── ComplexMat.hpp               # Defines complex matrix operations, likely used in Riesz Transform
+ │   ├── INIReader.cpp / .h           # Handles reading configuration settings from .ini files
+ │   ├── MotionDetection.cpp / .hpp   # Implements motion detection logic, likely frame differencing or filtering
+ │   ├── RieszTransform.cpp / .hpp    # Applies Riesz Transform, often used for phase-based motion amplification
+ │   ├── VideoSource.cpp / .hpp       # Abstraction for video input, handles camera or video file streams
+ │   ├── WorkerThread.hpp             # Declares a multithreaded worker for background processing (e.g., motion detection)
+ │   ├── ini.c / .h                   # Lightweight INI parser, probably a third-party or standalone config reader
+ │   ├── main.cpp                     # Entry point for the application, likely initializes components and starts processing
  │
  ├── 📂 tests                  # project tests
  ├── CMakeLists.txt            # CMake build configuration
