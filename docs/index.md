@@ -26,6 +26,6 @@ To learn more about the hardware materials we used, and how we build our setup, 
 ## Video Walkthroughs
 
 <video width="640" height="360" controls>
-  <source src="/img/demo.mp4" type="video/mp4">
+  <source src="img/demo.mp4" type="video/mp4">
 </video>
 
