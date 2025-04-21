@@ -25,6 +25,8 @@
  ├── 📂 docs              # Documentation and design files 
  │
  ├── 📂 img               # project image
+ │
+ ├── 📂 m4                # To generate configuration scripts for Autoconf
  │                  
  ├── 📂 src                    # Implementation files
  │   ├── Butterworth.cpp / .hpp       # Implements a Butterworth filter for signal/image smoothing

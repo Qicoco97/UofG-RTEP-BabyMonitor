@@ -55,9 +55,7 @@ You can follow [this guide provided by ModMyPi](https://www.modmypi.com/blog/how
 
 In short, the NoIR camera has a push/pull tab on the back of the camera, just like the one on the Pi itself:
 
-<a href="../../img/camera.jpg">
-  <img src="../../img/camera.jpg" alt="front" width=300>
-</a>
+![camera](../img/camera.jpg)
 
 Simply pull the black plastic tab out, remove the short cable and replace it with the long cable (make sure the blue plastic strip is facing up as shown), then push the plastic tab back in to secure the cable.
 
@@ -93,21 +91,13 @@ Examples of chassis and cover mounting orientations are shown below.
 
 Case:
 
-<a href="../../img/print-case-iso.png">
-  <img src="../../img/print-case-iso.png" alt="Case (Isometric View)" width=300>
-</a>
-<a href="../../img/print-case-top.png">
-  <img src="../../img/print-case-top.png" alt="Case (Top View)" width=310>
-</a>
+![Case (Isometric View)](../img/print-case-iso.png)
+![Case (Top View)](../img/print-case-top.png)
 
 Cover:
 
-<a href="../../img/print-cover-iso.png">
-  <img src="../../img/print-cover-iso.png" alt="Cover (Isometric View)" width=300>
-</a>
-<a href="../../img/print-cover-top.png">
-  <img src="../../img/print-cover-top.png" alt="Cover (Top View)" width=310>
-</a>
+![Cover (Isometric View)](../img/print-cover-iso.png)
+![Cover (Top View)](../img/print-cover-top.png)
 
 In addition to placing the neck of the baby monitor flat on the build plate, you may also notice that the model is rotated around a vertical axis.
 
@@ -140,9 +130,7 @@ The heat dissipation of each LED is 0.18W, and the heat dissipation of the resis
 
 The circuit should looking something like this:
 
-<a href="../../img/ir-led.jpg">
-  <img src="../../img/ir-led.jpg" alt="zoom" width=300>
-</a>
+![ir-led](../img/ir-led.jpg)
 
 ### Assembly: Bring it all together
 
@@ -160,69 +148,24 @@ Throughout the T and build process, check to make sure all T and ports are still
 
 -   Insert the Raspberry Pi into the case. Once it is in place, make sure all ports are accessible (e.g., you can plug in the power supply).
 
-<a href="../../img/step1.jpg">
-  <img src="../../img/step1.jpg" alt="front" width=300>
-</a>
+![step1](../img/step1.jpg)
 
 -   Next, use some hot glue to secure the Raspberry Pi in place and mount the camera to the Raspberry Pi. There are also screw holes on the Raspberry Pi that you can use if you prefer.
 
-<a href="../../img/pi-glued.jpg">
-  <img src="../../img/pi-glued.jpg" alt="front" width=200>
-</a>
-
-==替换实物图==
+![step2](../img/step2.jpg)
 
 -   Glue the LED and camera to the front cover.
 
-<a href="../../img/chassis-front.jpg">
-  <img src="../../img/chassis-front.jpg" alt="front" width=300>
-</a>
-
-==替换实物图==
-
 -   First, glue the NoIR camera into the camera hole. Make sure the camera is firmly seated and aligned with the chassis. Do not use too much glue or the camera will not fit into the main case. Always power on the Raspberry Pi and check the camera (e.g., using `raspistill -v`) to make sure it is at the right angle and has a good field of view. If the angle is wrong, remove the hot glue and reposition it.
-
-<a href="../../img/noir-glued.jpg">
-  <img src="../../img/noir-glued.jpg" alt="front" width=200>
-</a>
-
-==替换实物图==
 
 -   Next, glue an infrared LED light to the hole in the neck of the bedspread. It is at a 45-degree angle to the bedspread to illuminate the crib from the side and create more shadows in low-light environments. This will increase the contrast of the image and make it easier to detect motion.
 
-<a href="../../img/ir-led-glued-zoom.jpg">
-  <img src="../../img/ir-led-glued-zoom.jpg" alt="front" width=300>
-</a>
-
-==替换实物图==
-
--   After gluing them to the neck, it should look like this:
-
-<a href="../../img/ir-led-glued-front.jpg">
-  <img src="../../img/ir-led-glued-front.jpg" alt="front" width=300>
-</a>
-<a href="../../img/ir-led-glued-rear.jpg">
-  <img src="../../img/ir-led-glued-rear.jpg" alt="front" width=300>
-</a>
-
-==替换实物图==
+![step3](../img/step3.jpg)
 
 -   Connect the infrared LED wires to the GPIO pins of the Raspberry Pi as shown in the LED schematic.
 -   Place the cable into the chassis, being careful not to wrinkle or strain it.
 
-<a href="../../img/cable-packing.jpg">
-  <img src="../../img/cable-packing.jpg" alt="front" width=300>
-</a>
-
-==替换实物图==
-
 -   Once everything is tucked in place, hot glue the edges where the two pieces meet to seal them in place.
 
-<a href=".../../img/complete-standing.jpg">
-  <img src="../../img/complete-standing.jpg" alt="front" width=300>
-</a>
-<a href="../../img/complete-ports.jpg">
-  <img src="../../img/complete-ports.jpg" alt="front" width=300>
-</a>
-
-==替换实物图==
+![done1](../img/done1.jpg)
+![done2](../img/done2.jpg)

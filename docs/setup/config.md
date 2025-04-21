@@ -110,14 +110,6 @@ Generally speaking, for high contrast settings you want a higher erode_dim, and 
 
 If you run with `show_diff=true` and you notice that too many parts of your input video are white, or that some completely irrelevant parts of the video are detected as motion (such as a flashing light), then you will want to increase `erode_dim` until the only parts of the video corresponding to your breathing baby are the largest white parts.
 
-The top image shows an example where the erosion dimension is too low for the amount of motion in the frame, while the bottom image shows a correctly calibrated frame.
-
-![too-much](../img/too-much-motion.png)
-
-![motion](../img/motion.png)
-
-==需要换成实际测试图==
-
 Once the calibration is complete you will want to make sure the `pixel_threshold` is set so that motion is only reported when you expect it, rather than constantly (which means you will need to remove noise).
 
 Ideally, you would see output like this in your terminal:
@@ -167,8 +159,6 @@ Ideally, you would see output like this in your terminal:
 [info] Pixel Movement: 0	 [info] Motion Estimate: 0.839298 Hz
 ```
 
-==换成实际的好的测试结果==
-
 There are clear periodic patterns that correspond to the movements.
 
 If your output looks more like this:
@@ -213,7 +203,5 @@ If your output looks more like this:
 [info] Pixel Movement: 601	 [info] Motion Estimate: 1.312346 Hz
 [info] Pixel Movement: 456	 [info] Motion Estimate: 1.312346 Hz
 ```
-
-==换成实际的不好的测试结果==
 
 You then need to adjust the `pixel_threshold` and `diff_threshold` until you see a peak, otherwise the pixel shift is 0.
