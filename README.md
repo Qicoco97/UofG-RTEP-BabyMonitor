@@ -4,9 +4,9 @@
 
 
 
-[![Documentation](https://img.shields.io/badge/docs-mkdocs-lightgrey.svg?style=flat)](https://qicoco97.github.io/UofG-RTEP/)
-[![GitHub issues](https://img.shields.io/github/issues/qicoco97/UofG-RTEP.svg)](https://github.com/Qicoco97/UofG-RTEP/issues)
-[![GitHub stars](https://img.shields.io/github/stars/qicoco97/UofG-RTEP.svg)](https://github.com/qicoco97/UofG-RTEP/stargazers)
+[![Documentation](https://img.shields.io/badge/docs-mkdocs-lightgrey.svg?style=flat)](https://qicoco97.github.io/UofG-RTEP-BabyMonitor/)
+[![GitHub issues](https://img.shields.io/github/issues/qicoco97/UofG-RTEP-BabyMonitor.svg)](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/issues)
+[![GitHub stars](https://img.shields.io/github/stars/qicoco97/UofG-RTEP-BabyMonitor.svg)](https://github.com/qicoco97/UofG-RTEP-BabyMonitor/stargazers)
 [![Follow us on X](https://img.shields.io/badge/X-@babymonitor_gla-1DA1F2?logo=twitter&logoColor=white)](https://x.com/babymonitor_gla)
 [![TikTok](https://img.shields.io/badge/TikTok-@babymonitor-black?logo=tiktok&logoColor=white)](https://www.tiktok.com/@congli.zhang)
 [![YouTube](https://img.shields.io/badge/YouTube-Video%20Demo-ff0000)](https://youtu.be/0SxoRG_W2z0?feature=shared)
@@ -19,7 +19,7 @@
 ## 📦 Project Structure
 
 ```bash
-📂 UofG-RTEP
+📂 UofG-RTEP-BabyMonitor
  ├── 📂 chassis           # 3D printing file
  │
  ├── 📂 docs              # Documentation and design files 
@@ -47,7 +47,7 @@
 
 # Documentation
 
-Please view our [Documentation Pages](https://qicoco97.github.io/UofG-RTEP/) for details and instructions on how to build the project.
+Please view our [Documentation Pages](https://qicoco97.github.io/UofG-RTEP-BabyMonitor/) for details and instructions on how to build the project.
 
 ## 📸 Demo & Promotion
 <p align="center">

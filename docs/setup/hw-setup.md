@@ -67,7 +67,7 @@ Use of our chassis is optional but recommended to prevent young children from to
 
 Every cot is different, so our chassis does not include mounting brackets.
 
-If you have access to a MakerBot Replicator (5th Generation), you can simply download the `.makerbot` files for the [case](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/case.makerbot) and [cover](https://github.com/Qicoco97/UofG-RTEP/raw/master/chassis/cover.makerbot) onto your MakerBot Replicator and print.
+If you have access to a MakerBot Replicator (5th Generation), you can simply download the `.makerbot` files for the [case](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/raw/master/chassis/case.makerbot) and [cover](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/raw/master/chassis/cover.makerbot) onto your MakerBot Replicator and print.
 
 If you are using a different type of 3D printer, please keep reading.
 
@@ -85,7 +85,7 @@ We recommend Polylactic Acid (PLA) as the preferred printing material.
 
 Other plastics can be used, but if the coefficient of thermal expansion of the chosen plastic is greater than that of PLA, the Raspberry Pi may not fit into the chassis.
 
-Before proceeding, download the [enclosure](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/case.stl) and [cover](https://github.com/Qicoco97/UofG-RTEP/blob/master/chassis/cover.stl) 3D files.
+Before proceeding, download the [enclosure](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/chassis/case.stl) and [cover](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/chassis/cover.stl) 3D files.
 
 For instructions on orienting the 3D model in the printer build space, refer to the instruction manual that came with the 3D printer.
 
