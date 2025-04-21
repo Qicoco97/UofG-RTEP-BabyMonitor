@@ -25,5 +25,7 @@ To learn more about the hardware materials we used, and how we build our setup, 
 
 ## Video Walkthroughs
 
-==TODO: 插入我们的宣传视频==
+<video width="640" height="360" controls>
+  <source src="/img/demo.mp4" type="video/mp4">
+</video>
 
