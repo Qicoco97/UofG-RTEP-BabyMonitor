@@ -8,3 +8,5 @@ nav:
   - Software Configuration Parameters: 'setup/config.md'
   - Troubleshooting: 'setup/troubleshooting.md'
 theme: readthedocs
+plugin:
+  - mermaid2
