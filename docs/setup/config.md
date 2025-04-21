@@ -1,98 +1,126 @@
 # Configuration
 
-Configuration of baby monitor uses a file which is usually located in `/etc/babymonitor/config.ini`.
+The configuration of the baby monitor uses a file usually located at `/etc/babymonitor/config.ini`.
 
-The format is that of INI files: each line is a configuration value, and directives are grouped in section introduced by square brackets. Comments are delimited with `;` to the end of the line.
+Its format is the same as that of an INI file: each line represents a configuration value, and directives are grouped in square brackets. Comments are separated by `;` until the end of the line.
 
 ## Input/Output
 
-The `[io]` section of the file configures the input to baby monitor.
-You should not need to modify this section, as it is already calibrated to work on the Raspberry Pi.
+The `[io]` section of the file configures the input to the baby monitor.
 
-The `input` directive specifies that the magnifier should look for a video file instead of real-time camera input, while `camera` directive chooses the camera device to use (eg. `camera = 0` means to use `/dev/video0` as input).
-File input exists as a demo or debugging feature only.
+The `input` directive specifies that the magnifier should look for a video file instead of a live camera input, while the `camera` directive selects the camera device to use (e.g. `camera=0` means use `/dev/video0` as input).
 
-If you change the input, you must also specify the fps parameters to match the input.
-For file input, there is only one fps setting, because frames are never dropped, while for camera input, to reduce latency you must specify the frame per second at full frame size and at cropped frame size (roughly 3x the full frame size fps).
-The latter values depend on the speed of the CPU on which baby monitor run.
-Note that when using an input file that is less than 15 fps, `crop_fps` should be set to the input file's fps value in order to ensure the bandpass frequencies are calculated correctly.
+File input exists only as a demonstration or debugging feature.
 
-`time_to_alarm` determines the number of system-time seconds to wait after baby monitor stops seeing motion before playing an alarm sound through the audio port.
+If you change the input, you must also specify the fps parameter to match the input.
+
+For file input there is only one fps setting as frames are never dropped, whereas for camera input, to reduce latency you must specify the frames per second for both the full and cropped frame sizes (approximately 3 times the full frame size fps).
+
+The latter values ​​depend on the speedo ft and CPU on which baby monitor run.
+
+Note that when using input files with less than 15 fps, `crop_fps` should be set to the fps value of the input file to ensure correct calculation of the bandpass frequencies.
+
+`time_to_alarm` determines the number of system time seconds the baby monitor waits before playing the alarm sound through the audio port after it stops detecting motion.
 
 ## Cropping
 
-The `[cropping]` section controls the adaptive motion-based cropping, which focuses the magnification process on a smaller Region of Interest (ROI) where the most motion is occurring, reducing the CPU load.
+The `[cropping]` section controls motion-based adaptive cropping, focusing the upscaling process on a smaller region of interest (ROI) where the most motion occurs, thus reducing CPU load.
 
-The different parameters affect the latency of detection, as they control the number of "slow" frames (fully uncropped).
-Optimal values for the parameters depend on the target CPU.
-If you're running on a different device than the Pi, and it's sufficiently powerful, you can also disable cropping altogether.
+The different parameters affect the latency of the detection, as they control the number of "slow" frames (completely uncropped).
+
+The best values ​​for the parameters depend on the target CPU.
+
+If you are running on something other than a Pi, and the device is powerful enough, you can also disable cropping altogether.
 
 The default configuration will update the crop approximately every minute.
 
 ## Motion & Magnification
 
-The `[motion]` and `[magnification]` sections control the motion detection and video magnification algorithm respectively.
+The `[motion]` and `[magnification]` sections control the motion detection and video magnification algorithms respectively.
 
-These parameters depend on the setting in which the baby monitor is deployed, such as lighting condition and contrast on the baby.
-In general, you should not need to change the magnification setting, as it is tuned to detect normal breathing rates.
+These parameters depend on the environment in which the baby monitor is deployed, such as lighting conditions and contrast of the baby.
 
-Calibration may be needed for `erode_dim` and `dilate_dim`, which are used to determine where to crop the video, as well as `diff_threshold` and `pixel_threshold` which determine the thresholds used judge the magnitude of change in pixels and the number of pixels of motion are needed before being classified as motion rather than noise.
+You may need to calibrate `erode_dim` and `dilate_dim`, which are used to determine where to crop the video, as well as `diff_threshold` and `pixel_threshold`, which determine the threshold used to judge how much a pixel changes, and the number of moving pixels required before classifying motion as motion rather than noise.
 
-Specifically, `diff_threshold` specifies the amount of change a grayscale pixel (value between 0 and 255) will need to change before being marked as changed.
-For example, if `diff_threshold` is 30, the difference between a pixels has to be equal to or more than 30 to be marked changed.
-The higher this threshold, the more the pixels needs to be different to be marked.
+Specifically, `diff_threshold` specifies how much a grayscale pixel (value between 0 and 255) needs to change before it is marked as changed.
 
-`pixel_threshold` defines a hard cut of in the number of pixels that need to be marked as changed before outputting motion values.
-This effectively sets the cutoff for noise when determining whether or not an infant is breathing.
-For example, if `pixel_threshold` is set to 100, the algorithm must see more than 100 pixels of change before registering any motion as seen. It will report no motion if that threshold is not crossed.
+For example, if `diff_threshold` is 30, the difference between pixels must be equal to or greater than 30 to be marked as changed.
 
-`erode_dim` specifies the dimension of the kernel to use in an [OpenCV erode operation](http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html).
+The higher this threshold, the more different the pixels need to be labeled.
+
+`pixel_threshold` defines a hard limit on the number of pixels that need to be marked as changed before a motion value is output.
+
+This effectively sets the noise cutoff for determining whether the baby is breathing.
+
+For example, if `pixel_threshold` is set to 100, the algorithm must detect a change of more than 100 pixels before registering any visible motion. If the threshold is not exceeded, no motion is reported.
+
+`erode_dim` specifies the dimension of the kernel used in the [OpenCV erosion operation](http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html).
+
 This is used to minimize the changed pixels.
-That is, pixels that are isolated will be removed, but when large groups of pixels are changed, they will remain.
-`dilate_dim` is the opposite, it takes a pixels and expands it.
-These two parameters are used when detecting the region of the frame that the infant is located in.
-First, the pixel differences are calculated, then, a small erosion is applied to eliminate noise and a large dilation is applied to broadly mark the areas of motion.
 
-`low-cuttoff` and `high-cutoff` define the range of the bandpass filter used during magnification.
-Specifically, video magnification will try to magnify motion that occurs within this frequency range, and ignore motion outside this range.
-We've tuned this to be able to capture breathing rats in general, but you may need to tweak this during calibration.
+That is, isolated pixels are removed, but when large groups of pixels are changed, those pixels are preserved.
+
+`dilate_dim` does the opposite, it takes pixels and dilates them.
+
+These two parameters are used to detect the area of ​​the frame where the baby is.
+
+First, the pixel differences are calculated, then a small erosion is applied to remove noise, and a large dilation is applied to roughly mark the area of ​​motion.
+
+`Low Cutoff` and `High Cutoff` define the range of the bandpass filter used during amplification.
+
+Specifically, video upscaling will attempt to amplify motion that occurs within this frequency range, while ignoring motion outside of this range.
+
+We have adjusted it so that it can capture the average breathing rat, but you may need to adjust it during calibration.
 
 See the section on calibration for more information.
 
 ## Debugging features
 
-The `show_diff` flag in `[motion]` will show a window where the areas where motion is detected in the frame are highlighted in white.
-The `show_magnification` flag in `[magnification]` controls a window that shows the output of just video magnification (which should look like the camera feed, in black and white, with enlarged motion).
-You can use these two flags to show the result of your changes to the motion and magnification parameters.
+The `show_diff` flag in `[motion]` will display a window where areas in the frame where motion was detected are highlighted in white.
 
-Finally, the `print_times` in the `[debug]` section controls printing of frame times in the standard output, which you can use to calibrate the FPS and latency settings when running on a device different than the Raspberry Pi.
+The `show_magnification` flag in `[magnification]` controls a window that shows just the output of the video magnification (it should look like a black and white image of the camera feed, with magnified motion).
 
-These features must be left to off when baby monitor is started through systemd (automatically on boot or with `systemctl start`). They are only useful if you run baby monitor manually.
+You can use these two flags to display the results of changes to the motion and magnification parameters.
+
+Finally, `print_times` in the `[debug]` section controls the printing of frame times to standard output, which you can use to calibrate FPS and latency settings when running on a device other than the Raspberry Pi.
+
+When starting Baby Monitor via systemd (automatically at boot or with `systemctl start`), these features must be turned off. They are only useful when running Baby Monitor manually.
 
 ## Calibrating the Motion & Magnification algorithm
 
-Calibration of the algorithm is an iterative effort, with no right or wrong answer.
-We encourage you to experiment with various values, combining them with the debugging features, to find the combination of parameters most suitable to your environment.
+Algorithm calibration is an iterative process with no right or wrong answer.
 
-As a guideline, increasing the `amplification` and the `phase_threshold` values increases the amount of magnification applied to the input video.
-You should change these values until you clearly see the movement from your baby breathing, and no significant artifact in other areas of the video.
-If you experience artifacts, reducing the `phase_threshold` while keeping the same `amplification` might help.
-You can view the effects of these parameters by setting `show_magnification` to `true`.
+We encourage you to experiment with various values ​​and combine them with the debugging feature to find the combination of parameters that works best for your environment.
 
-As for the motion detection parameters, the main driver is the amount of noise.
-When detecting regions of motion to crop to, `erode_dim` and `dilate_dim` are used to size the dimensions of the OpenCV kernels used to [erode and dilate](http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html) motion so that noise is first eroded away, then the remaining motion signal is significantly dilated to make the regions of motion obvious.
-These parameters may also need to be tuned if your crib is in a very high-contrast setting.
-In general, you will need a higher `erode_dim` for high contrast settings, and a lower `erode_dim` for low contrast.
+As a guideline, increasing the `amplification` and `phase_threshold` values ​​increases the amount of amplification applied to the input video.
 
-If you run with `show_diff = true` and you notice that too much of the input video is white, or some completely unrelated part of the video is detected as motion (e.g. a flickering lamp), you'll want to increase the `erode_dim` until only the part of the video corresponding to your breathing baby is the largest section of white.
-The top figure shows an example where the erode dimension is too low for the amount of motion in the frame, while the bottom one shows a correctly calibrated frame.
+You should change these values ​​until you can clearly see the motion of your baby's breathing and there are no noticeable artifacts in other areas of the video.
+
+If you experience artifacts, lowering the `phase_threshold` while keeping the same `amplification` may help.
+
+You can see the effect of these parameters by setting `show_magnification` to `true`.
+
+As for the motion detection parameters, the main driving factor is the amount of noise.
+
+When detecting motion regions to be cropped, `erode_dim` and `dilate_dim` are used to adjust the size of the OpenCV kernels used for the [erosion and dilation](http://docs.opencv.org/2.4/doc/tutorials/imgproc/erosion_dilatation/erosion_dilatation.html) motion in order to first remove the noise and then significantly dilate the remaining motion signal to make the motion regions apparent.
+
+If your crib is in a very high contrast environment, you may also need to adjust these parameters.
+
+Generally speaking, for high contrast settings you want a higher erode_dim, and for low contrast settings you want a lower erode_dim.
+
+If you run with `show_diff=true` and you notice that too many parts of your input video are white, or that some completely irrelevant parts of the video are detected as motion (such as a flashing light), then you will want to increase `erode_dim` until the only parts of the video corresponding to your breathing baby are the largest white parts.
+
+The top image shows an example where the erosion dimension is too low for the amount of motion in the frame, while the bottom image shows a correctly calibrated frame.
 
 ![too-much](../img/too-much-motion.png)
 
 ![motion](../img/motion.png)
 
-Once this has been calibrated, you'll want to make sure that the `pixel_threshold` is set so that motion is only reported when you expect, and not constantly (which means you need to cut out the noise).
-Ideally, you'll see output like this in your terminal:
+==需要换成实际测试图==
+
+Once the calibration is complete you will want to make sure the `pixel_threshold` is set so that motion is only reported when you expect it, rather than constantly (which means you will need to remove noise).
+
+Ideally, you would see output like this in your terminal:
 
 ```sh
 [info] Pixel Movement: 0	 [info] Motion Estimate: 1.219812 Hz
@@ -138,7 +166,10 @@ Ideally, you'll see output like this in your terminal:
 [info] Pixel Movement: 0	 [info] Motion Estimate: 0.839298 Hz
 [info] Pixel Movement: 0	 [info] Motion Estimate: 0.839298 Hz
 ```
-Where there is a clear periodic pattern corresponding to the motion.
+
+==换成实际的好的测试结果==
+
+There are clear periodic patterns that correspond to the movements.
 
 If your output looks more like this:
 
@@ -182,4 +213,7 @@ If your output looks more like this:
 [info] Pixel Movement: 601	 [info] Motion Estimate: 1.312346 Hz
 [info] Pixel Movement: 456	 [info] Motion Estimate: 1.312346 Hz
 ```
-Then you'll need to adjust `pixel_threshold` and `diff_threshold` until just peaks are seen, and pixel movement is 0 otherwise.
+
+==换成实际的不好的测试结果==
+
+You then need to adjust the `pixel_threshold` and `diff_threshold` until you see a peak, otherwise the pixel shift is 0.
