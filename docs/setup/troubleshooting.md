@@ -2,6 +2,39 @@
 
 Here are some troubleshooting tips we've gathered while making baby monitor.
 
+### How to install Opencv 2.4
+- Install dependencies
+```sh
+sudo apt-get update
+sudo apt-get install -y build-essential cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+sudo apt-get install -y python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+```
+- Download source code
+```sh
+wget -O opencv-2.4.13.5.zip https://github.com/opencv/opencv/archive/2.4.13.5.zip
+unzip opencv-2.4.13.5.zip
+cd opencv-2.4.13.5
+```
+- Create a build directory and configure
+```sh
+mkdir build && cd build
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      -D WITH_FFMPEG=OFF \
+      ..
+```
+- Compile and install
+```sh
+make -j$(nproc)
+sudo make install
+sudo ldconfig
+```
+- Check if installation is complete
+```sh
+pkg-config --modversion opencv
+# Should output 2.4.13.5
+```
+
 ### No alarm is playing
 
 -   Are your speakers working?
