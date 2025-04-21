@@ -9,7 +9,6 @@
 [![GitHub stars](https://img.shields.io/github/stars/qicoco97/UofG-RTEP-BabyMonitor.svg)](https://github.com/qicoco97/UofG-RTEP-BabyMonitor/stargazers)
 [![Follow us on X](https://img.shields.io/badge/X-@babymonitor_gla-1DA1F2?logo=twitter&logoColor=white)](https://x.com/babymonitor_gla)
 [![TikTok](https://img.shields.io/badge/TikTok-@babymonitor-black?logo=tiktok&logoColor=white)](https://www.tiktok.com/@congli.zhang)
-[![YouTube](https://img.shields.io/badge/YouTube-Video%20Demo-ff0000)](https://youtu.be/0SxoRG_W2z0?feature=shared)
 ![C++](https://img.shields.io/badge/Language-C%2B%2B-red.svg)  
 ![Raspberry Pi](https://img.shields.io/badge/Platform-Raspberry%20Pi-green.svg) 
 <p align="center">
