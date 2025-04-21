@@ -25,5 +25,9 @@ To learn more about the hardware materials we used, and how we build our setup, 
 
 ## Video Walkthroughs
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/zSiRmgIE3pY?rel=0" frameborder="0" allowfullscreen></iframe>
+
+<video width="600" controls>
+  <source src="img/demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
