@@ -10,12 +10,6 @@ This project primarily uses a C++ implementation of the MIT [video enlargement](
 
 You can setup your own baby monitor that raises an alarm if your infant stops moving.
 
-==下面两段看看需不需要删除==
-
-However, the monitor will not work as expected if the system is not calibrated properly.
-
-If the system is not calibrated well or the environment in the video is not conducive to video magnification, you may not be able to use it.
-
 ## Getting Started
 
 The baby monitor consists of two parts: baby monitor software and some simple hardware.
