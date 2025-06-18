@@ -67,7 +67,7 @@ void MotionTimer::onMotion(Callback cb) {
 }
 
 void MotionTimer::timerEvent() {
-    std::lock_guard<std::mutex> lk(_mtx);
+    std::lock_guard<std::mutex> lk(_mtx); /// Avoid data conflicts
 
     auto now     = std::chrono::steady_clock::now();
     auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(now - _lastMotionTime).count();
