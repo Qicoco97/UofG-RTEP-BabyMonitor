@@ -3,6 +3,7 @@ build/
 
 # OS generated files
 .DS_Store
+.idea
 Thumbs.db
 
 # VSCode settings (optional: keep if collaborative)
