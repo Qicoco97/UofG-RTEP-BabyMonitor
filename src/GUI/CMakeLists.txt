@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(helloworld LANGUAGES CXX)
+project(Alarm LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -27,14 +27,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
 
 if(ANDROID)
-  add_library(helloworld SHARED
+  add_library(Alarm SHARED
     main.cpp
     mainwindow.cpp
     mainwindow.h
     mainwindow.ui
   )
 else()
-  add_executable(helloworld
+  add_executable(Alarm
     main.cpp
     mainwindow.cpp
     mainwindow.h

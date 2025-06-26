@@ -85,6 +85,8 @@ class Libcam2OpenCV {
 public:
     struct Callback {
 	virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &metadata) = 0;
+    virtual void motion(const cv::Mat &frame, const libcamera::ControlList &metadata) = 0;
+
 	virtual ~Callback() {}
     };
 

@@ -19,7 +19,7 @@ set(LIBINCLUDE gpioevent.h)
 add_library(gpioevent
   SHARED
   ${LIBSRC}
-  )
+		../../MotionAlarmPublisher.cpp)
 
 set_target_properties(gpioevent PROPERTIES
   SOVERSION 1
