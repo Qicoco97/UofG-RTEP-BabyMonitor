@@ -1,0 +1,5 @@
+struct AlarmMsg
+{
+    unsigned long index;
+    string message;
+};
