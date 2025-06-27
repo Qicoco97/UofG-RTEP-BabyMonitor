@@ -37,6 +37,7 @@
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include "CppTimer.h"
+#include "LedController.h"
 
 using namespace eprosima::fastdds::dds;
 
@@ -211,12 +212,14 @@ void onSigint(int){ running = false; }
 // 定义并注册回调结构体：负责帧差运动检测 + 发布报警
 struct FrameBridge : Libcam2OpenCV::Callback {
     AlarmPublisher &pub;
+    LEDController   &led;
     cv::Mat        prevBlur;      // 上一帧模糊灰度图
     bool           firstFrame{true};
     int            thresh{25};    // 二值化阈值
     double         minArea{500};  // 最小运动面积
 
-    FrameBridge(AlarmPublisher &p) : pub(p) {}
+    FrameBridge(AlarmPublisher &p, LEDController &l)
+      : pub(p), led(l) {}
 
     void hasFrame(const cv::Mat &frame, const libcamera::ControlList&) override {
         // 1. 转灰度 + 高斯模糊
@@ -256,6 +259,7 @@ struct FrameBridge : Libcam2OpenCV::Callback {
             msg.message("Motion Detected");
             pub.publish(msg);
             std::cout << "[DDS] 运动报警 #" << idx << " 已发送\n";
+            led.blink(5, 150, 100);
         }
 
         // 6. 更新上一帧
@@ -276,7 +280,8 @@ int main()
    
 
     // 构造桥梁并启动摄像头
-    FrameBridge bridge(publisher);
+    LEDController led(0, 17);
+    FrameBridge bridge(publisher, led);
     Libcam2OpenCV camera;
     camera.registerCallback(&bridge);
 

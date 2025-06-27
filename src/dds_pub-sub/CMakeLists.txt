@@ -30,7 +30,7 @@ add_executable(DDSAlarmPublisher
                 libcam2opencv.cpp
                  AlarmPublisher.cpp
                 )
-target_link_libraries(DDSAlarmPublisher fastcdr fastrtps HellowWorldMsg cam2opencv PkgConfig::LIBCAMERA ${OpenCV_LIBS})
+target_link_libraries(DDSAlarmPublisher fastcdr fastrtps HellowWorldMsg cam2opencv PkgConfig::LIBCAMERA ${OpenCV_LIBS} gpiod)
 
 
 # Subscriber
