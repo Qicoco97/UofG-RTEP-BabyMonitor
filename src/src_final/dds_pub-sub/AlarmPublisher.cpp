@@ -29,7 +29,6 @@
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include "CppTimer.h"
-#include "LedController.h"
 #include "AlarmPublisher.h"
 
 using namespace eprosima::fastdds::dds;
@@ -241,7 +240,7 @@ public:
 
 
 
-int main(
+/*int main(
     int,
     char**)
 {
@@ -250,4 +249,4 @@ int main(
     std::this_thread::sleep_for(std::chrono::milliseconds(10000));
     ee.stop();
 }
-
+*/
