@@ -1,39 +1,43 @@
 #### Dependencies
 ``` bash
 sudo apt update
-sudo apt install libopencv-dev libgpiod-dev libwebsocketpp-dev libboost-all-dev libcamera-dev
-```
-
-``` bash
-# Clone and build libcamera2opencv (required for video streaming)
-
-git clone https://github.com/berndporr/libcamera2opencv.git
-cd libcamera2opencv
-mkdir build && cd build
-cmake ..
-make
-sudo make install
+sudo apt install libopencv-dev libgpiod-dev libwebsocketpp-dev libboost-all-dev libcamera-dev libfastcdr-dev libfastrtps-dev fastddsgen fastdds-tools
+libqwt-qt5-dev qtdeclarative5-dev qtcharts
 ```
 
 #### Build & Run
 ``` bash
-git clone https://github.com/RickyElE/Team18_Robot_Prj.git
-cd Team18_robot_prj
-mkdir build && cd build
-cmake ../
+git clone https://github.com/Qicoco97/UofG-RTEP-BabyMonitor.git
+cd src 
+cmake .
 make
-./main
+./baby
 ```
-Then you need to open the website folder and execute the command:
+Then you will see the QT window running and monitoring
+![](./img%26demo/Output.png)
+if you want to subscribe the information, you need to following bash
 ``` bash
-cd ../website
-python3 -m http.server 8085
+cd dds_pub-sub
+./DDSAlarmSubscriber
+```
+then you will see
+![](./img%26demo/Subscribe.png)
+
+and you can see our demo at https://www.bilibili.com/video/BV1gLGLzrE4g/ or our img&demo dir
+
+#### Wiring 
+For the wiring and GPIO use see the following pic
+![](./img%26demo/Wiring.png)
+#### Issues
+when make, you may find error: qtchartview.h: No such file or directory, go to baby_autogen/include/mainwindow_ui.h change it with 
+``` bash
+#include <QtCharts>
+#include "qchartview.h"
+QT_CHARTS_USE_NAMESPACE
 ```
 
-#### Access the Interface
-Open your browser and go to:
-- http://**your-raspberry-pi-ip**:8085
+### Credits 
+The libcamera2opencv and Fastdds code was based on my teacher's code https://github.com/berndporr/libcamera2opencv/ adn https://github.com/berndporr/fast-dds-demo/ Thanks to my teacher and i learned a lot from this lecture !!! And the Original idea was came up with cribsense project! Thanks all
 
----
-
-### License
+### Future work
+may use the PM2.5 module to monitor the air quality

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(helloworld LANGUAGES CXX)
+project(baby LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -29,7 +29,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/dds_pub-sub
                  ${CMAKE_BINARY_DIR}/dds_pub-sub)
 add_subdirectory(${CMAKE_SOURCE_DIR}/DHT11)
 
-add_executable(helloworld
+add_executable(baby
     main.cpp
     mainwindow.cpp
     libcam2opencv.cpp
@@ -39,17 +39,17 @@ add_executable(helloworld
 
   )
 
-target_include_directories(helloworld
+target_include_directories(baby
     PRIVATE
       ${CMAKE_SOURCE_DIR}/DHT11
 )
 
-target_link_libraries(helloworld PRIVATE Qt5::Widgets Qt5::Charts
+target_link_libraries(baby PRIVATE Qt5::Widgets Qt5::Charts
     ${OpenCV_LIBS}
     Threads::Threads
     PkgConfig::LIBCAMERA
     PkgConfig::GPIOD
-    fastrtps      # “¿¿µ fas trtps
+    fastrtps      # library fas trtps
     fastcdr 
     alarmpublisher
     dht11gpiod )
