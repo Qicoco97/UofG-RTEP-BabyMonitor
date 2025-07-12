@@ -15,6 +15,7 @@ make
 ```
 Then you will see the QT window running and monitoring
 ![](./img%26demo/Output.png)
+![](./img%26demo/window.png)
 if you want to subscribe the information, you need to following bash
 ``` bash
 cd dds_pub-sub
