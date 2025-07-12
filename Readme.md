@@ -8,7 +8,7 @@ libqwt-qt5-dev qtdeclarative5-dev qtcharts
 #### Build & Run
 ``` bash
 git clone https://github.com/Qicoco97/UofG-RTEP-BabyMonitor.git
-cd src 
+cd src_final 
 cmake .
 make
 ./baby
