@@ -4,6 +4,10 @@
 #include <QTimer>
 #include <QDateTime>
 #include <QPixmap>
+#include <QDebug>
+#include <QString>
+#include <QThread>
+#include <QImage>
 #include <motionworker.h>
 #include <opencv2/opencv.hpp>
 
