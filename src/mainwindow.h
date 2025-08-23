@@ -7,6 +7,7 @@
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
+#include <QtCharts/QChart>
 #include "DHT11Worker.h"
 #include "AlarmPublisher.h"
 #include "LedController.h"

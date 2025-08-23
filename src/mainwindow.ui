@@ -116,7 +116,7 @@
   <customwidget>
    <class>QChartView</class>
    <extends>QGraphicsView</extends>
-   <header>qchartview.h</header>
+   <header>QtCharts/QChartView</header>
   </customwidget>
  </customwidgets>
  <resources/>
