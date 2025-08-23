@@ -208,38 +208,38 @@ int main(
 {
     AlarmPublisher publisher;
     if (!publisher.init()) {
-        std::cerr << "DDS 初始化失败\n";
+        std::cerr << "DDS initialization failed\n";
         return -1;
     }
 
-    // ======= 2. 初始化运动检测 =======
-    // 参数：阈值 avg diff、超时 ms、检测间隔 ms、上采样层数
+    // ======= 2. Initialize motion detection =======
+    // Parameters: threshold avg diff, timeout ms, detection interval ms, upsampling layers
 
-    // MotionTimer 在后台线程里定期调用 timerEvent()
-    // onMotion 回调在检测到运动时触发
+    // MotionTimer periodically calls timerEvent() in background thread
+    // onMotion callback is triggered when motion is detected
     motionTimer.onMotion([&](){
         static uint32_t idx = 0;
         AlarmMsg msg;
         msg.index(++idx);
         msg.message("Motion Detected!");
         publisher.publish(msg);
-        std::cout << "[DDS] 运动报警消息 #" << msg.message() << " 已发送\n";
+        std::cout << "[DDS] Motion alarm message #" << msg.message() << " sent\n";
     });
 
-    // 只要 start()，MotionTimer 会启动自己的后台线程
+    // Once start() is called, MotionTimer will start its own background thread
     motionTimer.startms(1000,PERIODC);
 
-    // ======= 3. 启动摄像头，并把帧传给 MotionTimer =======
+    // ======= 3. Start camera and pass frames to MotionTimer =======
     Libcam2OpenCVSettings camset;
     camset.width     = 640;
     camset.height    = 480;
     camset.framerate = 30;
     Libcam2OpenCV camera;
-    // 注册一个轻量级的 Callback 来把每帧给 MotionTimer
+    // Register a lightweight Callback to pass each frame to MotionTimer
 
     camera.registerCallback(&bridge);
     camera.start(camset);
 
-    std::cout << "摄像头已启动，开始运动检测并通过 DDS 报警。\n"
-              << "按 Ctrl+C 退出。\n";
+    std::cout << "Camera started, motion detection and DDS alarm active.\n"
+              << "Press Ctrl+C to exit.\n";
 }

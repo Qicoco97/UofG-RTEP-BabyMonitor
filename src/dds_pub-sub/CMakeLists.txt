@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.6)
-
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 project(DDSAlarm)
 
 find_package(fastcdr REQUIRED)
@@ -24,13 +24,23 @@ add_custom_target(
 add_library(HellowWorldMsg STATIC AlarmMsg.cxx AlarmMsgPubSubTypes.cxx)
 add_dependencies(HellowWorldMsg messages)
 
+add_library(alarmpublisher SHARED
+      AlarmPublisher.h
+     AlarmPublisher.cpp
+     AlarmSubscriber.cpp
+)
+
+target_include_directories(alarmpublisher
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}        # so AlarmPublisher.h is visible to consumers
+    ${fastdds_INCLUDE_DIRS}
+    ${fastcdr_INCLUDE_DIRS}
+)
 
 # Publisher
-add_executable(DDSAlarmPublisher 
-                libcam2opencv.cpp
-                 AlarmPublisher.cpp
-                )
-target_link_libraries(DDSAlarmPublisher fastcdr fastrtps HellowWorldMsg cam2opencv PkgConfig::LIBCAMERA ${OpenCV_LIBS} gpiod)
+
+target_link_libraries(alarmpublisher PUBLIC fastrtps fastcdr HellowWorldMsg cam2opencv PkgConfig::LIBCAMERA ${OpenCV_LIBS} gpiod)
+
 
 
 # Subscriber

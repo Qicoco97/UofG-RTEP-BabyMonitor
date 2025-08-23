@@ -13,7 +13,7 @@
 */
 class LEDController {
 public:
-    // chipNo: /dev/gpiochipN， lineNo: BCM 引脚号对应的 line
+    // chipNo: /dev/gpiochipN, lineNo: BCM pin number corresponding line
     LEDController(int chipNo, int lineNo)
         : chip_(nullptr), line_(nullptr)
     {
@@ -32,7 +32,7 @@ public:
     }
 
     ~LEDController() {
-        // 熄灭并释放资源
+        // Turn off and release resources
         if (line_) {
             gpiod_line_set_value(line_, 0);
             gpiod_line_release(line_);
@@ -40,9 +40,9 @@ public:
         if (chip_) gpiod_chip_close(chip_);
     }
 
-    // 异步闪烁 n 次，每次 onMs 毫秒，offMs 毫秒
+    // Asynchronously blink n times, each onMs on, offMs off
     void blink(int n = 3, int onMs = 200, int offMs = 100) {
-        // 拷贝必要成员到 lambda
+        // Need to capture member variable in lambda
         auto *line = line_;
         std::thread([line, n, onMs, offMs]{
             for (int i = 0; i < n; ++i) {

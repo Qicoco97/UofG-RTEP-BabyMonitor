@@ -29,24 +29,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setupCharts();
 
-//    // 摄像头回调 (使用 libcam2opencv 回调注册)
+//    // Camera callback (using libcam2opencv callback registration)
 //    motionTimer = new MotionTimer(10, 5000, 1000, 1);
 //    connect(motionTimer, &MotionTimer::frameReady, this, &MainWindow::onNewFrame);
 //    connect(motionTimer, &MotionTimer::motion, this, &MainWindow::onMotionDetected);
 //    connect(motionTimer, &MotionTimer::noMotion, this, &MainWindow::onNoMotion);
 //    motionTimer->start();
 
-//    // 温度传感器
+//    // Temperature sensor
 //    tempSensor = new TemperatureSensor(5, 10000, 60.0f); // GPIO pin 5
 //    connect(tempSensor, &TemperatureSensor::temperatureUpdated, this, &MainWindow::onTemperatureUpdated);
 //    tempSensor->start();
 
-//    // 湿度传感器
+//    // Humidity sensor
 //    humSensor = new HumiditySensor(6, 10000, 40.0f); // GPIO pin 6
 //    connect(humSensor, &HumiditySensor::humidityUpdated, this, &MainWindow::onHumidityUpdated);
 //    humSensor->start();
 
-//    // PM2.5 检测
+//    // PM2.5 detection
 //    pmSensor = new SDS011Detector("/dev/ttyUSB0", 9600, 75.0f);
 //    connect(pmSensor, &SDS011Detector::highPM, this, &MainWindow::onPMExceeded);
 //    pmSensor->start();
@@ -90,34 +90,34 @@ void MainWindow::setupCharts()
 
 //void MainWindow::onMotionDetected()
 //{
-//    ui->motionStatusLabel->setText("运动中");
+//    ui->motionStatusLabel->setText("Motion Detected");
 //    motionSeries->append(timeIndex, 1);
 //    timeIndex++;
 //}
 
 //void MainWindow::onNoMotion()
 //{
-//    ui->motionStatusLabel->setText("无运动");
+//    ui->motionStatusLabel->setText("No Motion");
 //    motionSeries->append(timeIndex, 0);
 //    timeIndex++;
 //}
 
 //void MainWindow::onTemperatureUpdated(float temp)
 //{
-//    ui->tempLabel->setText(QString("温度: %1 °C").arg(temp));
+//    ui->tempLabel->setText(QString("Temperature: %1 °C").arg(temp));
 //    tempSeries->append(timeIndex, temp);
 //    timeIndex++;
 //}
 
 //void MainWindow::onHumidityUpdated(float hum)
 //{
-//    ui->humLabel->setText(QString("湿度: %1 %").arg(hum));
+//    ui->humLabel->setText(QString("Humidity: %1 %").arg(hum));
 //    humSeries->append(timeIndex, hum);
 //    timeIndex++;
 //}
 
 //void MainWindow::onPMExceeded(float pm25, float pm10)
 //{
-//    // 在界面上可弹框或状态提示
-//    QMessageBox::warning(this, "PM2.5 超标", QString("PM2.5: %1 μg/m³").arg(pm25));
+//    // Show popup or status notification on the interface
+//    QMessageBox::warning(this, "PM2.5 Exceeded", QString("PM2.5: %1 μg/m³").arg(pm25));
 //}

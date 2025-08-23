@@ -17,43 +17,43 @@ MainWindow::MainWindow(QWidget *parent)
     setupCharts();
  	  myCallback.window = this;
 	  camera.registerCallback(&myCallback);
-    ui->motionStatusLabel->setText("无运动");
-    
+    ui->motionStatusLabel->setText("No Motion");
+
     if (!alarmPub_.init()) {
-        qWarning() << "AlarmPublisher 初始化失败";
+        qWarning() << "AlarmPublisher initialization failed";
     }
 
-    // 启动 Qt 定时器：1000ms 调一次 timerEvent
+    // Start Qt timer: call timerEvent every 1000ms
     alarmTimerId_ = startTimer(1000);
-    
-    
+
+
     QThread *motionThread = new QThread(this);
     MotionWorker *worker = new MotionWorker(500, 25);
     worker->moveToThread(motionThread);
-    
+
     connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
     connect(this, &MainWindow::frameReady, worker, &MotionWorker::processFrame);
     connect(worker, &MotionWorker::motionDetected,
             this, &MainWindow::onMotionStatusChanged);
-    
-    // 启动线程
-    motionThread->start();
-    
-    dhtWorker_ = new DHT11Worker("/dev/gpiochip0" /*gpiochip*/, 
-                                 17             /*BCM4引脚*/, 
-                                 this);         // 让它的生命周期依赖于 MainWindow
 
-    // 2) 连接信号到 UI 槽
+    // Start thread
+    motionThread->start();
+
+    dhtWorker_ = new DHT11Worker("/dev/gpiochip0" /*gpiochip*/,
+                                 17             /*BCM pin 17*/,
+                                 this);         // Make its lifecycle depend on MainWindow
+
+    // 2) Connect signals to UI slots
     connect(dhtWorker_, &DHT11Worker::newReading,
             this,       &MainWindow::onNewDHTReading);
     connect(dhtWorker_, &DHT11Worker::errorReading,
             this,       &MainWindow::onDHTError);
 
-    // 3) 启动后台线程循环读取
+    // 3) Start background thread loop reading
     dhtWorker_->start();
 
 
-//    // PM2.5 检测
+//    // PM2.5 detection
 //    pmSensor = new SDS011Detector("/dev/ttyUSB0", 9600, 75.0f);
 //    connect(pmSensor, &SDS011Detector::highPM, this, &MainWindow::onPMExceeded);
 //    pmSensor->start();
@@ -66,7 +66,7 @@ MainWindow::~MainWindow()
     if (alarmTimerId_ != -1) killTimer(alarmTimerId_);
     if (dhtWorker_) {
         dhtWorker_->stop();
-        // dhtWorker_ 是 this 的 child，不必 delete
+        // dhtWorker_ is a child of this, no need to delete
     }
     camera.stop();
     delete ui;
@@ -79,14 +79,14 @@ void MainWindow::setupCharts()
     humSeries  = new QtCharts::QLineSeries();
     humSeries ->setName("humidity (%)");
 
-    // 2) 新建一个 Chart，把两个系列都加进去
+    // 2) Create a new Chart and add both series to it
     chart = new QtCharts::QChart();
     chart->addSeries(tempSeries);
     chart->addSeries(humSeries);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    // 3) 建立统一的 X/Y 轴
+    // 3) Create unified X/Y axes
     axisX = new QtCharts::QValueAxis();
     axisX->setLabelFormat("%g");
     axisX->setTitleText("Index");
@@ -95,7 +95,7 @@ void MainWindow::setupCharts()
     humSeries ->attachAxis(axisX);
 
     axisY = new QtCharts::QValueAxis();
-    axisY->setRange(0, 100);  // 温湿度都在 0–100
+    axisY->setRange(0, 100);  // Temperature and humidity both in 0-100 range
     axisY->setTitleText("Value");
     axisY->setLabelsVisible(true);
 
@@ -103,11 +103,11 @@ void MainWindow::setupCharts()
     tempSeries->attachAxis(axisY);
     humSeries ->attachAxis(axisY);
 
-    // 4) 只把这个 chart 绑定到 UI 的 ChartView
+    // 4) Bind this chart to the UI's ChartView
     ui->thChartView->setChart(chart);
     ui->thChartView->setRenderHint(QPainter::Antialiasing);
 
-    // 初始化 timeIndex
+    // Initialize timeIndex
     timeIndex = 0;
 }
 
@@ -115,8 +115,8 @@ void MainWindow::setupCharts()
 
 //void MainWindow::onPMExceeded(float pm25, float pm10)
 //{
-//    // 在界面上可弹框或状态提示
-//    QMessageBox::warning(this, "PM2.5 超标", QString("PM2.5: %1 μg/m³").arg(pm25));
+//    // Show popup or status notification on the interface
+//    QMessageBox::warning(this, "PM2.5 Exceeded", QString("PM2.5: %1 μg/m³").arg(pm25));
 //}
 void MainWindow::updateImage(const cv::Mat &mat) {
 	const QImage frame(mat.data, mat.cols, mat.rows, mat.step,
@@ -158,7 +158,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 void MainWindow::onMotionStatusChanged(bool detected)
 {
-    // 这里更新 UI
+    // Update UI here
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
@@ -174,8 +174,8 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     float temperature = t_int + t_dec / 100.0f;
     float humidity    = h_int + h_dec    / 100.0f;
 
-    // 显示到标签，保留两位小数
-     // 这里的槽一定在 GUI 线程被调用
+    // Display on labels, keep two decimal places
+     // This slot is definitely called in the GUI thread
     ui->tempLabel->setText(
         QString::number(temperature, 'f', 2) + " ℃"
     );
@@ -185,12 +185,12 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     );
     //humSeries->append(timeIndex, humidity);
     //timeIndex++;
-    
+
     tempSeries->append(timeIndex, temperature);
     humSeries ->append(timeIndex, humidity);
     timeIndex++;
 
-    // 让 X 轴始终展示最近 100 个样本
+    // Make X-axis always show the latest 100 samples
     int minX = std::max(0, timeIndex - 100);
     axisX->setRange(minX, timeIndex);
 

@@ -1,36 +1,15 @@
-//#ifndef MAINWINDOW_H
-//#define MAINWINDOW_H
-
-//#include <QMainWindow>
-
-//QT_BEGIN_NAMESPACE
-//namespace Ui { class MainWindow; }
-//QT_END_NAMESPACE
-
-//class MainWindow : public QMainWindow
-//{
-//    Q_OBJECT
-
-//public:
-//    MainWindow(QWidget *parent = nullptr);
-//    ~MainWindow();
-
-//private:
-//    Ui::MainWindow *ui;
-//};
-//#endif // MAINWINDOW_H
-// MainWindow.h
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "libcam2opencv.h"
 #include <QMainWindow>
 #include <QLabel>
+#include <QTimer>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-//#include "MotionTimer.h"
-//#include "TemperatureSensor.h"
-//#include "HumiditySensor.h"
-//#include "SDS011Detector.h"
+#include <QtCharts/QValueAxis>
+#include "DHT11Worker.h"
+#include "AlarmPublisher.h"
+#include "LedController.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -57,35 +36,46 @@ public:
     Libcam2OpenCV camera;
     MyCallback myCallback;
     
+protected:
+    void timerEvent(QTimerEvent *event) override;
+    
 signals:
-    // 每当有新帧时就 emit 这个信号
+    // Emit this signal every time there is a new frame.
     void frameReady(const cv::Mat &mat);
 
 private slots:
     void onMotionStatusChanged(bool detected);
+    void onNewDHTReading(int t_int, int t_dec,
+                         int h_int, int h_dec);
+    void onDHTError();
 
-//private slots:
-//    void onNewFrame(const QImage &img);
-//    void onMotionDetected();
-//    void onNoMotion();
-//    void onTemperatureUpdated(float temp);
-//    void onHumidityUpdated(float hum);
 //    void onPMExceeded(float pm25, float pm10);
 
 private:
     Ui::MainWindow *ui;
-//    MotionTimer *motionTimer;
-//    TemperatureSensor *tempSensor;
-//    HumiditySensor *humSensor;
-//    SDS011Detector *pmSensor;
+
     cv::Mat previousFrame;
+    
+
+    QtCharts::QLineSeries *motionSeries;
+    QtCharts::QChart *motionChart;
+    
+    QtCharts::QChart      *chart;
     QtCharts::QLineSeries *tempSeries;
     QtCharts::QLineSeries *humSeries;
-    QtCharts::QLineSeries *motionSeries;
-    QtCharts::QChart *tempChart;
-    QtCharts::QChart *humChart;
-    QtCharts::QChart *motionChart;
+    QtCharts::QValueAxis  *axisX;
+    QtCharts::QValueAxis  *axisY;       ///< Value axis Y
+     ///< Current data index
+    
     int timeIndex;
+    
+    AlarmPublisher alarmPub_; 
+    int            alarmTimerId_{-1};
+    uint32_t       samplesSent_{1};
+    bool           motionDetected_{false};
+    LEDController     led_;  
+    
+    DHT11Worker   *dhtWorker_; 
 
     void setupCharts();
 };

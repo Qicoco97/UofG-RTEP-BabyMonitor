@@ -7,32 +7,32 @@
 #include <chrono>
 
 /**
- * 头文件版 LEDController，
- * 构造时打开 GPIO，析构时关闭并释放，
- * blink() 会在后台线程闪烁指定次数。
- */
+* Header version of LEDController,
+* Open GPIO when constructed, close and release when destroyed,
+* blink() will blink the specified number of times in the background thread.
+*/
 class LEDController {
 public:
-    // chipNo: /dev/gpiochipN， lineNo: BCM 引脚号对应的 line
+    // chipNo: /dev/gpiochipN, lineNo: BCM pin number corresponding line
     LEDController(int chipNo, int lineNo)
         : chip_(nullptr), line_(nullptr)
     {
         chip_ = gpiod_chip_open_by_number(chipNo);
-        if (!chip_) throw std::runtime_error("打开 LED gpiochip 失败");
+        if (!chip_) throw std::runtime_error("open LED gpiochip failed");
         line_ = gpiod_chip_get_line(chip_, lineNo);
         if (!line_) {
             gpiod_chip_close(chip_);
-            throw std::runtime_error("获取 LED line 失败");
+            throw std::runtime_error("acquire LED line failed");
         }
         if (gpiod_line_request_output(line_, "LEDCtrl", 0) < 0) {
             gpiod_line_release(line_);
             gpiod_chip_close(chip_);
-            throw std::runtime_error("请求 LED 输出失败");
+            throw std::runtime_error("request LED output failed");
         }
     }
 
     ~LEDController() {
-        // 熄灭并释放资源
+        // Turn off and release resources
         if (line_) {
             gpiod_line_set_value(line_, 0);
             gpiod_line_release(line_);
@@ -40,9 +40,9 @@ public:
         if (chip_) gpiod_chip_close(chip_);
     }
 
-    // 异步闪烁 n 次，每次 onMs 毫秒，offMs 毫秒
+    // Asynchronously blink n times, each onMs on, offMs off
     void blink(int n = 3, int onMs = 200, int offMs = 100) {
-        // 拷贝必要成员到 lambda
+        // Need to capture member variable in lambda
         auto *line = line_;
         std::thread([line, n, onMs, offMs]{
             for (int i = 0; i < n; ++i) {

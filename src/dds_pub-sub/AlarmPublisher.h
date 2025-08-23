@@ -16,10 +16,10 @@ public:
     AlarmPublisher();
     ~AlarmPublisher();
 
-    //! 初始化 DDS（participant/publisher/topic/writer）
+//! Initialize DDS (participant/publisher/topic/writer)
     bool init();
 
-    //! 发布一条 AlarmMsg；如果有订阅者则返回 true
+//! Publish an AlarmMsg; return true if there is a subscriber
     bool publish(AlarmMsg& msg);
 
 private:
@@ -29,7 +29,7 @@ private:
     eprosima::fastdds::dds::DataWriter* writer_{nullptr};
     eprosima::fastdds::dds::TypeSupport type_;
 
-    // 内部 listener，用来跟踪匹配数量
+// Internal listener to track the number of matches
     class PubListener : public eprosima::fastdds::dds::DataWriterListener {
     public:
         std::atomic_int matched_{0};

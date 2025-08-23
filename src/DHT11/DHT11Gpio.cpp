@@ -21,7 +21,7 @@ DHT11Gpio::DHT11Gpio(const std::string &chipname,
 {}
 
 bool DHT11Gpio::begin() {
-    // 检查能否打开 chip，并等待上电稳定时间 ≥1s
+// Check whether the chip can be turned on and wait for the power-on stabilization time to be about 1s
     try {
         gpiod::chip test(chipname_);
         (void)test.get_line(line_offset_);
@@ -52,21 +52,21 @@ bool DHT11Gpio::readBitsBusy(gpiod::line &line,
 {
     out = 0;
     for (int i = 0; i < bits; ++i) {
-        // 等待上一次高电平结束（50μs 起始低脉冲后的返回高）
+// Wait for the last high level to end (return high after 50us initial low pulse)
         if (!waitLevelBusy(line, 1, timeout_us)) {
             std::cerr << "[readBits] bit " << i << " wait HIGH timeout\n";
             return false;
         }
-        // 等待高电平开始
+//Wait for high level to start
         if (!waitLevelBusy(line, 1, timeout_us)) {
-            // （其实上一行已是 high，保留此处如需改进）
+
         }
-        // 忙等 sample_delay_us 后读取电平
+// Wait for sample_delay_us to read the level
         uint64_t tRise = now_us();
         while (now_us() - tRise < sample_delay_us);
         int val = line.get_value();
         out = (out << 1) | (val ? 1u : 0u);
-        // 等待高脉冲结束
+
         if (!waitLevelBusy(line, 0, timeout_us)) {
             std::cerr << "[readBits] bit " << i << " wait FALL timeout\n";
             return false;
@@ -76,10 +76,10 @@ bool DHT11Gpio::readBitsBusy(gpiod::line &line,
 }
 
 bool DHT11Gpio::read() {
-    // 1. 获取一根干净的 line
+    // 1. Get a clean line
     gpiod::line line = chip_.get_line(line_offset_);
 
-    // —— Start 信号：拉低 ≥18ms，再拉高 30μs —— 
+    // Send Start signal: pull low for about 18ms, then pull high for 30us
     line.request({"DHT11", gpiod::line_request::DIRECTION_OUTPUT, 0}, 0);
     line.set_value(0);
     uint64_t t0 = now_us();
@@ -89,7 +89,7 @@ bool DHT11Gpio::read() {
     while (now_us() - t0 < 30);
     line.release();
 
-    // —— 握手：切输入 + 内部上拉，等待 80μs↓ + 80μs↑ + 50μs↓ —— 
+// Wait for Handshake: switch to input + internal pull-up, wait 80us low + 80us high + 50us low
     line.request({"DHT11",
                   gpiod::line_request::DIRECTION_INPUT,
                   gpiod::line_request::FLAG_BIAS_PULL_UP},
@@ -98,19 +98,19 @@ bool DHT11Gpio::read() {
     if (!waitLevelBusy(line, 1, 1000000)) { line.release(); return false; }
     if (!waitLevelBusy(line, 0, 1000000)) { line.release(); return false; }
 
-    // —— 读取 32 位数据 —— 
+    // Read 32 bit data
     uint32_t data = 0;
     if (!readBitsBusy(line, 32, /*sample=*/50, /*timeout=*/2000, data)) {
         line.release(); return false;
     }
 
-    // —— 读取 8 位 CRC —— 
+    // Read 8 bit CRC
     uint32_t crc = 0;
     if (!readBitsBusy(line, 8, 50, 2000, crc)) {
         line.release(); return false;
     }
 
-    // 校验
+    // Checksum verification
     uint8_t b0 = (data >> 24) & 0xFF;
     uint8_t b1 = (data >> 16) & 0xFF;
     uint8_t b2 = (data >>  8) & 0xFF;

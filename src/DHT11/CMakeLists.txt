@@ -14,10 +14,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GPIOD REQUIRED IMPORTED_TARGET libgpiodcxx)
-
+find_package(Qt5 COMPONENTS Core REQUIRED)
 add_library(dht11gpiod STATIC
     DHT11Gpio.cpp
     DHT11Gpio.h
+    DHT11Worker.h
 )
 target_link_libraries(dht11gpiod
     PUBLIC PkgConfig::GPIOD
@@ -26,9 +27,13 @@ target_include_directories(dht11gpiod
     PUBLIC ${CMAKE_SOURCE_DIR}
 )
 
-add_executable(dht11_test
-    main.cpp
-)
-target_link_libraries(dht11_test
-    PRIVATE dht11gpiod
+#add_executable(dht11_test
+#    main.cpp
+#)
+
+# Á´½Ó libgpiodcxx£¨C++ binding£©
+target_link_libraries(dht11gpiod
+  PUBLIC
+    PkgConfig::GPIOD
+    Qt5::Core 
 )

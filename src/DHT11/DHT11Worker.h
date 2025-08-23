@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <QObject>
 #include <thread>
 #include <atomic>
@@ -17,12 +17,12 @@ public:
         stop();
     }
 
-    /// Æô¶¯ÄÚ²¿Ïß³ÌÖÜÆÚĞÔ¶ÁÈ¡
+    /// Start internal thread for automatic reading
     void start() {
         if (running_) return;
         running_ = true;
         workerThread_ = std::thread([this]{
-            // ÉÏµçÑÓÊ± + ¼ì²é
+            // Initialize sensor + error handling
             if (!sensor_.begin()) {
                 emit errorReading();
                 return;
@@ -43,7 +43,7 @@ public:
         });
     }
 
-    /// Í£Ö¹Ïß³Ì²¢µÈ´ıÍË³ö
+    /// Stop thread and wait for exit
     void stop() {
         running_ = false;
         if (workerThread_.joinable())
@@ -59,3 +59,4 @@ private:
     std::thread          workerThread_;
     std::atomic<bool>    running_{false};
 };
+
