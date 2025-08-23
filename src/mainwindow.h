@@ -11,6 +11,8 @@
 #include "AlarmPublisher.h"
 #include "LedController.h"
 
+QT_CHARTS_USE_NAMESPACE
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

@@ -27,6 +27,9 @@
 #include <QLabel>
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
+
+QT_CHARTS_USE_NAMESPACE
+
 //#include "MotionTimer.h"
 //#include "TemperatureSensor.h"
 //#include "HumiditySensor.h"
