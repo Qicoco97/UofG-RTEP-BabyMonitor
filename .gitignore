@@ -23,6 +23,13 @@ CMakeCache.txt
 cmake_install.cmake
 Makefile
 
+# Qt auto-generated files
+*_autogen/
+**/*_autogen/
+src/dds_pub-sub/*_autogen/
+src/DHT11/*_autogen/
+
+
 # Logs and temporary files
 *.log
 *.tmp
