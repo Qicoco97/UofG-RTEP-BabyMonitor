@@ -29,13 +29,7 @@ and you can see our demo at https://www.bilibili.com/video/BV1gLGLzrE4g/ or our 
 #### Wiring 
 For the wiring and GPIO use see the following pic
 ![](./img%26demo/Wiring.png)
-#### Issues
-when make, you may find error: qtchartview.h: No such file or directory, go to baby_autogen/include/mainwindow_ui.h change it with 
-``` bash
-#include <QtCharts>
-#include "qchartview.h"
-QT_CHARTS_USE_NAMESPACE
-```
+
 
 ### Credits 
 The libcamera2opencv and Fastdds code was based on my teacher's code https://github.com/berndporr/libcamera2opencv/ adn https://github.com/berndporr/fast-dds-demo/ Thanks to my teacher and i learned a lot from this lecture !!! And the Original idea was came up with cribsense project! Thanks all
