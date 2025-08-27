@@ -173,15 +173,24 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     // Update structured sensor data
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
 
+    // Check if this is a recovery from error state
+    bool wasInErrorState = (dht11ConsecutiveErrors_ > 0);
+
     // Reset consecutive error count on successful reading
     dht11ConsecutiveErrors_ = 0;
     systemStatus_.dht11Active = true;
 
-    // Report successful reading (only occasionally to avoid spam)
+    // Report successful reading
     static int readingCount = 0;
-    if (++readingCount % 10 == 0) {  // Report every 10th reading
-        errorHandler_.reportInfo("DHT11", QString("Reading successful (T:%1°C, H:%2%)")
+    readingCount++;
+
+    if (wasInErrorState) {
+        // Always report when recovering from error state
+        errorHandler_.reportInfo("DHT11", QString("Sensor recovered - Reading successful (T:%1°C, H:%2%)")
                                 .arg(temperature, 0, 'f', 1).arg(humidity, 0, 'f', 1));
+    } else if (readingCount % 20 == 0) {  // Report every 20th reading when stable
+        errorHandler_.reportInfo("DHT11", QString("Sensor stable - Reading #%1 (T:%2°C, H:%3%)")
+                                .arg(readingCount).arg(temperature, 0, 'f', 1).arg(humidity, 0, 'f', 1));
     }
 
     // Display on labels, keep two decimal places
