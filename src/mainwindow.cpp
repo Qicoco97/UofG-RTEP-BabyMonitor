@@ -46,7 +46,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     dhtWorker_ = new DHT11Worker(BabyMonitorConfig::GPIO_CHIP_DEVICE /*gpiochip*/,
                                  BabyMonitorConfig::DHT11_PIN_NUMBER /*BCM pin*/,
-                                 this);         // Make its lifecycle depend on MainWindow
+                                 this,         // Make its lifecycle depend on MainWindow
+                                 BabyMonitorConfig::DHT11_READ_INTERVAL_S); // Use configured interval
 
     // 2) Connect signals to UI slots
     connect(dhtWorker_, &DHT11Worker::newReading,

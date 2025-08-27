@@ -13,7 +13,7 @@ namespace BabyMonitorConfig {
     
     // Timer Configuration
     constexpr int ALARM_TIMER_INTERVAL_MS = 1000;
-    constexpr int DHT11_READ_INTERVAL_S = 2;
+    constexpr int DHT11_READ_INTERVAL_S = 3;  // Increased from 2s to 3s for better reliability
     
     // Chart Configuration
     constexpr int CHART_MAX_POINTS = 100;
