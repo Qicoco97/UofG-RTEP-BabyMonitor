@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent)
     , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
+    , dht11ConsecutiveErrors_(0)
 {
     ui->setupUi(this);
     setupCharts();
@@ -172,7 +173,8 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     // Update structured sensor data
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
 
-    // Mark DHT11 as active on successful reading
+    // Reset consecutive error count on successful reading
+    dht11ConsecutiveErrors_ = 0;
     systemStatus_.dht11Active = true;
 
     // Report successful reading (only occasionally to avoid spam)
@@ -203,8 +205,20 @@ void MainWindow::onDHTError()
     // Update structured sensor data with invalid reading
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(0.0f, 0.0f, false);
 
-    // Report error through centralized handler
-    handleSystemError("DHT11", "Sensor reading failed");
+    // Increment consecutive error count
+    dht11ConsecutiveErrors_++;
+
+    // Only mark system as offline after multiple consecutive failures
+    if (dht11ConsecutiveErrors_ >= DHT11_MAX_CONSECUTIVE_ERRORS) {
+        if (systemStatus_.dht11Active) {  // Only report once when transitioning to offline
+            handleSystemError("DHT11", QString("Sensor offline after %1 consecutive failures")
+                            .arg(dht11ConsecutiveErrors_));
+        }
+    } else {
+        // Report individual errors but don't mark system as offline yet
+        errorHandler_.reportWarning("DHT11", QString("Reading failed (%1/%2)")
+                                  .arg(dht11ConsecutiveErrors_).arg(DHT11_MAX_CONSECUTIVE_ERRORS));
+    }
 
     ui->tempLabel->setText("Read Err");
     ui->humLabel->setText("Read Err");

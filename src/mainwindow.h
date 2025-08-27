@@ -94,6 +94,10 @@ private:
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
+    // DHT11 error tracking
+    int dht11ConsecutiveErrors_;
+    static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
+
     void setupCharts();
 
     // Chart management methods
