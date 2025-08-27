@@ -27,15 +27,18 @@ MainWindow::MainWindow(QWidget *parent)
     camera.registerCallback(&cameraCallback);
     ui->motionStatusLabel->setText("No Motion");
     errorHandler_.reportInfo("Camera", "Callback registered successfully");
+    systemStatus_.cameraActive = true;  // Mark camera as active
 
     // Initialize motion detection
     initializeMotionDetection();
     errorHandler_.reportInfo("MotionDetection", "Initialization completed");
+    systemStatus_.motionDetectionActive = true;  // Mark motion detection as active
 
     if (!alarmPub_.init()) {
         handleSystemError("AlarmPublisher", "Initialization failed");
     } else {
         errorHandler_.reportInfo("AlarmPublisher", "Initialized successfully");
+        systemStatus_.alarmSystemActive = true;  // Mark alarm system as active
     }
 
     // Start Qt timer: call timerEvent every 1000ms
@@ -167,6 +170,9 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
 
     // Update structured sensor data
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
+
+    // Mark DHT11 as active on successful reading
+    systemStatus_.dht11Active = true;
 
     // Report successful reading (only occasionally to avoid spam)
     static int readingCount = 0;
