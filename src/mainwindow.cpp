@@ -19,6 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setupCharts();
+    initializeLED();
  	  myCallback.window = this;
 	  camera.registerCallback(&myCallback);
     ui->motionStatusLabel->setText("No Motion");
@@ -167,9 +168,7 @@ void MainWindow::onMotionStatusChanged(bool detected)
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
-        led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
-                   BabyMonitorConfig::LED_ON_DURATION_MS,
-                   BabyMonitorConfig::LED_OFF_DURATION_MS);
+        triggerMotionAlert();
         }
     else
         ui->motionStatusLabel->setText(tr("no motion"));
@@ -209,4 +208,18 @@ void MainWindow::onDHTError()
 {
     ui->tempLabel->setText("Read Err");
     ui->humLabel->setText("Read Err");
+}
+
+// LED control methods implementation
+void MainWindow::initializeLED()
+{
+    // LED is initialized in constructor member initializer list
+    // This method can be extended for additional LED setup if needed
+}
+
+void MainWindow::triggerMotionAlert()
+{
+    led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
+               BabyMonitorConfig::LED_ON_DURATION_MS,
+               BabyMonitorConfig::LED_OFF_DURATION_MS);
 }

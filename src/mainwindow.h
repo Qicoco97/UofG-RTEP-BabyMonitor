@@ -80,9 +80,13 @@ private:
     bool           motionDetected_{false};
     LEDController     led_;  
     
-    DHT11Worker   *dhtWorker_; 
+    DHT11Worker   *dhtWorker_;
 
     void setupCharts();
+
+    // LED control methods
+    void initializeLED();
+    void triggerMotionAlert();
 };
 
 #endif // MAINWINDOW_H
