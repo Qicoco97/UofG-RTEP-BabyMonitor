@@ -33,7 +33,8 @@ add_executable(baby
     main.cpp
     mainwindow.cpp
     libcam2opencv.cpp
-    motionworker.cpp 
+    motionworker.cpp
+    ErrorHandler.cpp
     mainwindow.h
     mainwindow.ui
 
