@@ -90,6 +90,11 @@ private:
 
     void setupCharts();
 
+    // Chart management methods
+    void updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data);
+    void updateMotionChart(const BabyMonitor::MotionData& data);
+    void configureChartAxes();
+
     // LED control methods
     void initializeLED();
     void triggerMotionAlert();

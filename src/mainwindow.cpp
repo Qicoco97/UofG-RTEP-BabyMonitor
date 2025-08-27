@@ -85,31 +85,17 @@ void MainWindow::setupCharts()
     humSeries  = new QtCharts::QLineSeries();
     humSeries ->setName("humidity (%)");
 
-    // 2) Create a new Chart and add both series to it
+    // Create a new Chart and add both series to it
     chart = new QtCharts::QChart();
     chart->addSeries(tempSeries);
     chart->addSeries(humSeries);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    // 3) Create unified X/Y axes
-    axisX = new QtCharts::QValueAxis();
-    axisX->setLabelFormat("%g");
-    axisX->setTitleText("Index");
-    chart->addAxis(axisX, Qt::AlignBottom);
-    tempSeries->attachAxis(axisX);
-    humSeries ->attachAxis(axisX);
+    // Configure chart axes
+    configureChartAxes();
 
-    axisY = new QtCharts::QValueAxis();
-    axisY->setRange(0, 100);  // Temperature and humidity both in 0-100 range
-    axisY->setTitleText("Value");
-    axisY->setLabelsVisible(true);
-
-    chart->addAxis(axisY, Qt::AlignLeft);
-    tempSeries->attachAxis(axisY);
-    humSeries ->attachAxis(axisY);
-
-    // 4) Bind this chart to the UI's ChartView
+    // Bind this chart to the UI's ChartView
     ui->thChartView->setChart(chart);
     ui->thChartView->setRenderHint(QPainter::Antialiasing);
 
@@ -191,20 +177,12 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     ui->tempLabel->setText(
         QString::number(temperature, 'f', 2) + " ℃"
     );
-    //tempSeries->append(timeIndex, temperature);
     ui->humLabel->setText(
         QString::number(humidity,    'f', 2) + " %"
     );
-    //humSeries->append(timeIndex, humidity);
-    //timeIndex++;
 
-    tempSeries->append(timeIndex, temperature);
-    humSeries ->append(timeIndex, humidity);
-    timeIndex++;
-
-    // Make X-axis always show the latest 100 samples
-    int minX = std::max(0, timeIndex - 100);
-    axisX->setRange(minX, timeIndex);
+    // Update chart with structured data
+    updateTemperatureHumidityChart(lastTempHumData_);
 
 
 
@@ -231,4 +209,47 @@ void MainWindow::triggerMotionAlert()
     led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
                BabyMonitorConfig::LED_ON_DURATION_MS,
                BabyMonitorConfig::LED_OFF_DURATION_MS);
+}
+
+// Chart management methods implementation
+void MainWindow::configureChartAxes()
+{
+    // Create unified X/Y axes
+    axisX = new QtCharts::QValueAxis();
+    axisX->setLabelFormat("%g");
+    axisX->setTitleText("Index");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    tempSeries->attachAxis(axisX);
+    humSeries ->attachAxis(axisX);
+
+    axisY = new QtCharts::QValueAxis();
+    axisY->setRange(0, 100);  // Temperature and humidity both in 0-100 range
+    axisY->setTitleText("Value");
+    axisY->setLabelsVisible(true);
+
+    chart->addAxis(axisY, Qt::AlignLeft);
+    tempSeries->attachAxis(axisY);
+    humSeries ->attachAxis(axisY);
+}
+
+void MainWindow::updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data)
+{
+    if (!data.isValid) {
+        return; // Don't add invalid data to chart
+    }
+
+    tempSeries->append(timeIndex, data.temperature);
+    humSeries->append(timeIndex, data.humidity);
+    timeIndex++;
+
+    // Make X-axis always show the latest configured max points
+    int minX = std::max(0, timeIndex - BabyMonitorConfig::CHART_MAX_POINTS);
+    axisX->setRange(minX, timeIndex);
+}
+
+void MainWindow::updateMotionChart(const BabyMonitor::MotionData& data)
+{
+    // Motion chart implementation can be added here in future
+    // For now, we just store the data in lastMotionData_
+    Q_UNUSED(data);
 }
