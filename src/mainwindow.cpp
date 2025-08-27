@@ -44,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Start thread
     motionThread->start();
 
-    dhtWorker_ = new DHT11Worker("/dev/gpiochip0" /*gpiochip*/,
+    dhtWorker_ = new DHT11Worker(BabyMonitorConfig::GPIO_CHIP_DEVICE /*gpiochip*/,
                                  BabyMonitorConfig::DHT11_PIN_NUMBER /*BCM pin*/,
                                  this);         // Make its lifecycle depend on MainWindow
 
