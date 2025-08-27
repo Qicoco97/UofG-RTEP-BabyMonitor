@@ -14,6 +14,7 @@
 #include "LedController.h"
 #include "Config.h"
 #include "SensorData.h"
+#include "ErrorHandler.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -89,6 +90,9 @@ private:
     BabyMonitor::MotionData lastMotionData_;
     BabyMonitor::SystemStatus systemStatus_;
 
+    // Error handling
+    BabyMonitor::ErrorHandler& errorHandler_;
+
     void setupCharts();
 
     // Chart management methods
@@ -104,6 +108,11 @@ private:
     // LED control methods
     void initializeLED();
     void triggerMotionAlert();
+
+    // Error handling methods
+    void handleSystemError(const QString& component, const QString& message);
+    void handleCriticalError(const QString& component, const QString& message);
+    void updateSystemStatus();
 };
 
 #endif // MAINWINDOW_H

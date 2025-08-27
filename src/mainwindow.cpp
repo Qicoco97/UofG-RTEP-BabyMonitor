@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
+    , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
 {
     ui->setupUi(this);
     setupCharts();
@@ -25,12 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
     cameraCallback.window = this;
     camera.registerCallback(&cameraCallback);
     ui->motionStatusLabel->setText("No Motion");
+    errorHandler_.reportInfo("Camera", "Callback registered successfully");
 
     // Initialize motion detection
     initializeMotionDetection();
+    errorHandler_.reportInfo("MotionDetection", "Initialization completed");
 
     if (!alarmPub_.init()) {
-        qWarning() << "AlarmPublisher initialization failed";
+        handleSystemError("AlarmPublisher", "Initialization failed");
+    } else {
+        errorHandler_.reportInfo("AlarmPublisher", "Initialized successfully");
     }
 
     // Start Qt timer: call timerEvent every 1000ms
@@ -163,6 +168,13 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     // Update structured sensor data
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
 
+    // Report successful reading (only occasionally to avoid spam)
+    static int readingCount = 0;
+    if (++readingCount % 10 == 0) {  // Report every 10th reading
+        errorHandler_.reportInfo("DHT11", QString("Reading successful (T:%1°C, H:%2%)")
+                                .arg(temperature, 0, 'f', 1).arg(humidity, 0, 'f', 1));
+    }
+
     // Display on labels, keep two decimal places
      // This slot is definitely called in the GUI thread
     ui->tempLabel->setText(
@@ -183,6 +195,9 @@ void MainWindow::onDHTError()
 {
     // Update structured sensor data with invalid reading
     lastTempHumData_ = BabyMonitor::TemperatureHumidityData(0.0f, 0.0f, false);
+
+    // Report error through centralized handler
+    handleSystemError("DHT11", "Sensor reading failed");
 
     ui->tempLabel->setText("Read Err");
     ui->humLabel->setText("Read Err");
@@ -285,5 +300,56 @@ void MainWindow::cleanupMotionDetection()
     if (motionThread) {
         motionThread->quit();
         motionThread->wait();
+        errorHandler_.reportInfo("MotionDetection", "Thread cleanup completed");
+    }
+}
+
+// Error handling methods implementation
+void MainWindow::handleSystemError(const QString& component, const QString& message)
+{
+    errorHandler_.reportError(component, message);
+
+    // Update system status
+    if (component == "DHT11") {
+        systemStatus_.dht11Active = false;
+    } else if (component == "Camera") {
+        systemStatus_.cameraActive = false;
+    } else if (component == "MotionDetection") {
+        systemStatus_.motionDetectionActive = false;
+    } else if (component == "AlarmPublisher") {
+        systemStatus_.alarmSystemActive = false;
+    }
+
+    updateSystemStatus();
+}
+
+void MainWindow::handleCriticalError(const QString& component, const QString& message)
+{
+    errorHandler_.reportCritical(component, message);
+
+    // For critical errors, we might want to disable the entire system
+    systemStatus_.cameraActive = false;
+    systemStatus_.dht11Active = false;
+    systemStatus_.motionDetectionActive = false;
+    systemStatus_.alarmSystemActive = false;
+
+    updateSystemStatus();
+
+    // Could show a critical error dialog to user
+    ui->motionStatusLabel->setText("SYSTEM ERROR");
+}
+
+void MainWindow::updateSystemStatus()
+{
+    systemStatus_.lastUpdate = QDateTime::currentDateTime();
+
+    // Update UI based on system status
+    QString statusText = systemStatus_.toString();
+
+    // Log system status
+    if (systemStatus_.isAllSystemsActive()) {
+        errorHandler_.reportInfo("System", "All systems operational");
+    } else {
+        errorHandler_.reportWarning("System", "Some systems offline: " + statusText);
     }
 }
