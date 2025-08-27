@@ -107,8 +107,7 @@ void MainWindow::updateImage(const cv::Mat &mat) {
 			   QImage::Format_RGB888);
 	ui->cameraLabel->setPixmap(QPixmap::fromImage(frame));
   //bool motion = detectMotion(mat);
-  emit frameReady(mat.clone()); 
-	update();
+  // Note: frameReady emission moved to processNewFrame()
 }
 
 void MainWindow::timerEvent(QTimerEvent *event) {
@@ -252,8 +251,11 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
     // Update camera display
     updateImage(frame);
 
-    // Emit frame for motion detection processing
+    // Emit frame for motion detection processing (using original logic)
     emit frameReady(frame.clone());
+
+    // Trigger UI update (this was missing!)
+    update();
 }
 
 void MainWindow::initializeMotionDetection()
