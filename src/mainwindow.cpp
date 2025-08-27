@@ -14,7 +14,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
-    , led_(0, 27)
+    , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
 {
     ui->setupUi(this);
@@ -28,11 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     // Start Qt timer: call timerEvent every 1000ms
-    alarmTimerId_ = startTimer(1000);
+    alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
 
 
     QThread *motionThread = new QThread(this);
-    MotionWorker *worker = new MotionWorker(500, 25);
+    MotionWorker *worker = new MotionWorker(BabyMonitorConfig::MOTION_MIN_AREA,
+                                           BabyMonitorConfig::MOTION_THRESHOLD);
     worker->moveToThread(motionThread);
 
     connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
@@ -44,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     motionThread->start();
 
     dhtWorker_ = new DHT11Worker("/dev/gpiochip0" /*gpiochip*/,
-                                 17             /*BCM pin 17*/,
+                                 BabyMonitorConfig::DHT11_PIN_NUMBER /*BCM pin*/,
                                  this);         // Make its lifecycle depend on MainWindow
 
     // 2) Connect signals to UI slots
@@ -166,7 +167,9 @@ void MainWindow::onMotionStatusChanged(bool detected)
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
-        led_.blink(5, 200, 100);
+        led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
+                   BabyMonitorConfig::LED_ON_DURATION_MS,
+                   BabyMonitorConfig::LED_OFF_DURATION_MS);
         }
     else
         ui->motionStatusLabel->setText(tr("no motion"));

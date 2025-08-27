@@ -15,6 +15,30 @@
 
 QT_CHARTS_USE_NAMESPACE
 
+// Configuration constants
+namespace BabyMonitorConfig {
+    // GPIO Configuration
+    constexpr int LED_CHIP_NUMBER = 0;
+    constexpr int LED_PIN_NUMBER = 27;
+    constexpr int DHT11_PIN_NUMBER = 17;
+
+    // Motion Detection Configuration
+    constexpr double MOTION_MIN_AREA = 500.0;
+    constexpr int MOTION_THRESHOLD = 25;
+
+    // Timer Configuration
+    constexpr int ALARM_TIMER_INTERVAL_MS = 1000;
+    constexpr int DHT11_READ_INTERVAL_S = 2;
+
+    // Chart Configuration
+    constexpr int CHART_MAX_POINTS = 100;
+
+    // LED Configuration
+    constexpr int LED_BLINK_COUNT = 5;
+    constexpr int LED_ON_DURATION_MS = 200;
+    constexpr int LED_OFF_DURATION_MS = 100;
+}
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
