@@ -31,16 +31,17 @@ public:
     void updateImage(const cv::Mat &mat);
     bool detectMotion(const cv::Mat &currentFrame);
     
-    struct MyCallback : Libcam2OpenCV::Callback {
-	    MainWindow* window = nullptr;
-	      virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-	    if (nullptr != window) {
-		window->updateImage(frame);
-	    }
-	}
+    struct CameraCallback : Libcam2OpenCV::Callback {
+        MainWindow* window = nullptr;
+
+        virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) override {
+            if (window != nullptr) {
+                window->processNewFrame(frame);
+            }
+        }
     };
     Libcam2OpenCV camera;
-    MyCallback myCallback;
+    CameraCallback cameraCallback;
     
 protected:
     void timerEvent(QTimerEvent *event) override;
@@ -94,6 +95,11 @@ private:
     void updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data);
     void updateMotionChart(const BabyMonitor::MotionData& data);
     void configureChartAxes();
+
+    // Frame processing methods
+    void processNewFrame(const cv::Mat& frame);
+    void initializeMotionDetection();
+    void cleanupMotionDetection();
 
     // LED control methods
     void initializeLED();

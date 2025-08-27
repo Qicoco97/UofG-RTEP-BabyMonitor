@@ -20,9 +20,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setupCharts();
     initializeLED();
- 	  myCallback.window = this;
-	  camera.registerCallback(&myCallback);
+
+    // Initialize camera callback
+    cameraCallback.window = this;
+    camera.registerCallback(&cameraCallback);
     ui->motionStatusLabel->setText("No Motion");
+
+    // Initialize motion detection
+    initializeMotionDetection();
 
     if (!alarmPub_.init()) {
         qWarning() << "AlarmPublisher initialization failed";
@@ -30,20 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Start Qt timer: call timerEvent every 1000ms
     alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
-
-
-    QThread *motionThread = new QThread(this);
-    MotionWorker *worker = new MotionWorker(BabyMonitorConfig::MOTION_MIN_AREA,
-                                           BabyMonitorConfig::MOTION_THRESHOLD);
-    worker->moveToThread(motionThread);
-
-    connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &MainWindow::frameReady, worker, &MotionWorker::processFrame);
-    connect(worker, &MotionWorker::motionDetected,
-            this, &MainWindow::onMotionStatusChanged);
-
-    // Start thread
-    motionThread->start();
 
     dhtWorker_ = new DHT11Worker(BabyMonitorConfig::GPIO_CHIP_DEVICE /*gpiochip*/,
                                  BabyMonitorConfig::DHT11_PIN_NUMBER /*BCM pin*/,
@@ -74,6 +65,7 @@ MainWindow::~MainWindow()
         dhtWorker_->stop();
         // dhtWorker_ is a child of this, no need to delete
     }
+    cleanupMotionDetection();
     camera.stop();
     delete ui;
 }
@@ -252,4 +244,44 @@ void MainWindow::updateMotionChart(const BabyMonitor::MotionData& data)
     // Motion chart implementation can be added here in future
     // For now, we just store the data in lastMotionData_
     Q_UNUSED(data);
+}
+
+// Frame processing methods implementation
+void MainWindow::processNewFrame(const cv::Mat& frame)
+{
+    // Update camera display
+    updateImage(frame);
+
+    // Emit frame for motion detection processing
+    emit frameReady(frame.clone());
+}
+
+void MainWindow::initializeMotionDetection()
+{
+    QThread *motionThread = new QThread(this);
+    MotionWorker *worker = new MotionWorker(BabyMonitorConfig::MOTION_MIN_AREA,
+                                           BabyMonitorConfig::MOTION_THRESHOLD);
+    worker->moveToThread(motionThread);
+
+    connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
+    connect(this, &MainWindow::frameReady, worker, &MotionWorker::processFrame);
+    connect(worker, &MotionWorker::motionDetected,
+            this, &MainWindow::onMotionStatusChanged);
+
+    // Start thread
+    motionThread->start();
+
+    // Store references for cleanup (could be improved with member variables)
+    setProperty("motionThread", QVariant::fromValue(motionThread));
+    setProperty("motionWorker", QVariant::fromValue(worker));
+}
+
+void MainWindow::cleanupMotionDetection()
+{
+    // Get stored references
+    QThread* motionThread = property("motionThread").value<QThread*>();
+    if (motionThread) {
+        motionThread->quit();
+        motionThread->wait();
+    }
 }
