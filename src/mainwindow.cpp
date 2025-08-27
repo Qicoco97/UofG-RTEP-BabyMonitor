@@ -164,6 +164,9 @@ void MainWindow::timerEvent(QTimerEvent *event) {
 
 void MainWindow::onMotionStatusChanged(bool detected)
 {
+    // Update structured motion data
+    lastMotionData_ = BabyMonitor::MotionData(detected, 0.8);
+
     // Update UI here
     motionDetected_ = detected;
     if (detected){
@@ -179,6 +182,9 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
 {
     float temperature = t_int + t_dec / 100.0f;
     float humidity    = h_int + h_dec    / 100.0f;
+
+    // Update structured sensor data
+    lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
 
     // Display on labels, keep two decimal places
      // This slot is definitely called in the GUI thread
@@ -206,6 +212,9 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
 }
 void MainWindow::onDHTError()
 {
+    // Update structured sensor data with invalid reading
+    lastTempHumData_ = BabyMonitor::TemperatureHumidityData(0.0f, 0.0f, false);
+
     ui->tempLabel->setText("Read Err");
     ui->humLabel->setText("Read Err");
 }

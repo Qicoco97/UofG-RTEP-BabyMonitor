@@ -13,6 +13,7 @@
 #include "AlarmPublisher.h"
 #include "LedController.h"
 #include "Config.h"
+#include "SensorData.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -78,9 +79,14 @@ private:
     int            alarmTimerId_{-1};
     uint32_t       samplesSent_{1};
     bool           motionDetected_{false};
-    LEDController     led_;  
-    
+    LEDController     led_;
+
     DHT11Worker   *dhtWorker_;
+
+    // Structured sensor data
+    BabyMonitor::TemperatureHumidityData lastTempHumData_;
+    BabyMonitor::MotionData lastMotionData_;
+    BabyMonitor::SystemStatus systemStatus_;
 
     void setupCharts();
 
