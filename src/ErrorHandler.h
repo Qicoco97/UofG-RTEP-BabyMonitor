@@ -52,40 +52,34 @@ struct ErrorInfo {
 /**
  * Centralized error handler - Single responsibility for error management
  */
-class ErrorHandler : public QObject {
-    Q_OBJECT
-
+class ErrorHandler {
 public:
     static ErrorHandler& getInstance();
-    
+
     // Error reporting methods
-    void reportError(ErrorLevel level, const QString& component, 
+    void reportError(ErrorLevel level, const QString& component,
                     const QString& message, const QString& details = "");
     void reportInfo(const QString& component, const QString& message, const QString& details = "");
     void reportWarning(const QString& component, const QString& message, const QString& details = "");
     void reportError(const QString& component, const QString& message, const QString& details = "");
     void reportCritical(const QString& component, const QString& message, const QString& details = "");
-    
+
     // Error retrieval
     QList<ErrorInfo> getRecentErrors(int maxCount = 50) const;
     QList<ErrorInfo> getErrorsByLevel(ErrorLevel level) const;
     bool hasErrors() const;
     bool hasCriticalErrors() const;
-    
+
     // Error management
     void clearErrors();
     void setMaxErrorHistory(int maxCount);
 
-signals:
-    void errorReported(const ErrorInfo& error);
-    void criticalErrorReported(const ErrorInfo& error);
-
 private:
     ErrorHandler() = default;
-    
+
     QList<ErrorInfo> errorHistory_;
     int maxErrorHistory_ = 100;
-    
+
     void addToHistory(const ErrorInfo& error);
     void logToConsole(const ErrorInfo& error);
 };

@@ -8,17 +8,14 @@ ErrorHandler& ErrorHandler::getInstance() {
     return instance;
 }
 
-void ErrorHandler::reportError(ErrorLevel level, const QString& component, 
+void ErrorHandler::reportError(ErrorLevel level, const QString& component,
                               const QString& message, const QString& details) {
     ErrorInfo error(level, component, message, details);
     addToHistory(error);
     logToConsole(error);
-    
-    emit errorReported(error);
-    
-    if (level == ErrorLevel::CRITICAL) {
-        emit criticalErrorReported(error);
-    }
+
+    // Note: Removed signal emissions since ErrorHandler no longer inherits from QObject
+    // This simplifies the design and avoids MOC complications
 }
 
 void ErrorHandler::reportInfo(const QString& component, const QString& message, const QString& details) {

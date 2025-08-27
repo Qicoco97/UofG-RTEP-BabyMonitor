@@ -14,9 +14,10 @@
 #include "LedController.h"
 #include "Config.h"
 #include "SensorData.h"
-#include "ErrorHandler.h"
 
 QT_CHARTS_USE_NAMESPACE
+
+#include "ErrorHandler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
