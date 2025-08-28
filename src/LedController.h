@@ -36,6 +36,11 @@ public:
         // Signal any running threads to stop
         blinking_.store(false);
 
+        // Wait for any running blink thread to complete
+        if (blinkThread_.joinable()) {
+            blinkThread_.join();
+        }
+
         // Turn off and release resources
         if (line_) {
             gpiod_line_set_value(line_, 0);
@@ -55,22 +60,33 @@ public:
             return; // Already blinking, ignore new request
         }
 
+        // Wait for any previous thread to complete
+        if (blinkThread_.joinable()) {
+            blinkThread_.join();
+        }
+
         blinking_.store(true);
-        auto *line = line_;
-        std::thread([this, line, n, onMs, offMs]{
-            for (int i = 0; i < n && line_; ++i) { // Check line_ is still valid
-                gpiod_line_set_value(line, 1);
+        blinkThread_ = std::thread([this, n, onMs, offMs]{
+            for (int i = 0; i < n && blinking_.load(); ++i) {
+                // Check if object is still valid and resources available
+                if (!line_ || !chip_) break;
+
+                gpiod_line_set_value(line_, 1);
                 std::this_thread::sleep_for(std::chrono::milliseconds(onMs));
-                if (!line_) break; // Exit if object is being destroyed
-                gpiod_line_set_value(line, 0);
+
+                // Check again before turning off
+                if (!blinking_.load() || !line_ || !chip_) break;
+
+                gpiod_line_set_value(line_, 0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(offMs));
             }
             blinking_.store(false);
-        }).detach();
+        });
     }
 
 private:
     gpiod_chip *chip_;
     gpiod_line *line_;
     std::atomic<bool> blinking_{false};
+    std::thread blinkThread_;  // Store thread to allow proper cleanup
 };
