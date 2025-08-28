@@ -19,6 +19,7 @@ add_library(dht11gpiod STATIC
     DHT11Gpio.cpp
     DHT11Gpio.h
     DHT11Worker.h
+    DHT11Worker.cpp
 )
 target_link_libraries(dht11gpiod
     PUBLIC PkgConfig::GPIOD
@@ -31,7 +32,7 @@ target_include_directories(dht11gpiod
 #    main.cpp
 #)
 
-# Á´½Ó libgpiodcxx£¨C++ binding£©
+# ï¿½ï¿½ï¿½ï¿½ libgpiodcxxï¿½ï¿½C++ bindingï¿½ï¿½
 target_link_libraries(dht11gpiod
   PUBLIC
     PkgConfig::GPIOD

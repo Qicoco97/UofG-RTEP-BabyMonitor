@@ -7,7 +7,7 @@
 int main() {
     DHT11Gpio sensor("/dev/gpiochip0", /*BCM4=*/17);
     if (!sensor.begin()) {
-        std::cerr << "³õÊ¼»¯Ê§°Ü\n";
+        std::cerr << "Initialisation failed\n";
         return 1;
     }
     while (true) {
@@ -15,7 +15,7 @@ int main() {
             std::cout << "humidity: " << sensor.humidityInt() << "%  "
                       << "temperature: " << sensor.temperatureInt() << "degree\n";
         } else {
-            std::cerr << "¶ÁÈ¡Ê§°Ü\n";
+            std::cerr << "ï¿½ï¿½È¡Ê§ï¿½ï¿½\n";
         }
         std::this_thread::sleep_for(std::chrono::seconds(2));
     }

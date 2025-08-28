@@ -2,6 +2,7 @@
 #include <QObject>
 #include <thread>
 #include <atomic>
+#include <chrono>
 #include "DHT11Gpio.h"
 
 class DHT11Worker : public QObject {
