@@ -83,11 +83,9 @@ To address these issues, we designed and implemented an **intelligent baby monit
 - **LED Feedback**: GPIO-controlled LED blinking on motion detection  
 - **Qt GUI**: Live video stream, motion status, and environmental charts  
 
----
-
-##  Architecture Diagram  
-
 [Architecture Diagram](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Architecture%20Diagram.png)  
+[Class](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Class.png)
+[Data Flow](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Data%20Flow.png)
 
 ---
 
