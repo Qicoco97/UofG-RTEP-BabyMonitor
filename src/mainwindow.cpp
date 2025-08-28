@@ -424,5 +424,16 @@ void MainWindow::cleanupDHT11Sensor()
 void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem)
 {
     injectedAlarmSystem_ = alarmSystem;
+
+    // Initialize and start the injected alarm system
+    if (injectedAlarmSystem_) {
+        if (injectedAlarmSystem_->initialize()) {
+            injectedAlarmSystem_->start();
+            errorHandler_.reportInfo("DependencyInjection", "Injected AlarmSystem initialized and started");
+        } else {
+            errorHandler_.reportError("DependencyInjection", "Failed to initialize injected AlarmSystem");
+        }
+    }
+
     errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
 }
