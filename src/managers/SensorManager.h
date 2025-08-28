@@ -1,4 +1,4 @@
-// SensorManager.h - Simple implementation of sensor management
+// SensorManager.h - Implementation of sensor management
 #pragma once
 
 #include <QObject>
@@ -10,7 +10,7 @@
 namespace BabyMonitor {
 
 /**
- * Simple sensor manager implementation
+ * Sensor manager implementation
  * Follows Single Responsibility Principle - only manages sensors
  */
 class SensorManager : public QObject, public ISensorManager {

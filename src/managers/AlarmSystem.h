@@ -1,4 +1,4 @@
-// AlarmSystem.h - Simple alarm system implementation
+// AlarmSystem.h - Alarm system implementation
 #pragma once
 
 #include <QObject>
@@ -10,7 +10,7 @@
 namespace BabyMonitor {
 
 /**
- * Simple alarm system implementation
+ * Alarm system implementation
  * Wraps the existing AlarmPublisher with interface compliance
  */
 class AlarmSystem : public QObject, public IAlarmSystem {

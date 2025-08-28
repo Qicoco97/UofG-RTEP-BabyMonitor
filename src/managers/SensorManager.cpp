@@ -1,4 +1,4 @@
-// SensorManager.cpp - Simple sensor manager implementation
+// SensorManager.cpp - Sensor manager implementation
 #include "SensorManager.h"
 
 namespace BabyMonitor {

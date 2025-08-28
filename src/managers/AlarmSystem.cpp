@@ -1,4 +1,4 @@
-// AlarmSystem.cpp - Simple alarm system implementation
+// AlarmSystem.cpp - Alarm system implementation
 #include "AlarmSystem.h"
 #include <QDateTime>
 
