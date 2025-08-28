@@ -88,8 +88,9 @@ private:
     bool           motionDetected_{false};
     LEDController     led_;
 
-    // Interface-based components
-    std::unique_ptr<BabyMonitor::AlarmSystem> alarmSystem_;
+    // Interface-based components (dependency injection)
+    std::shared_ptr<BabyMonitor::IAlarmSystem> injectedAlarmSystem_;
+    std::unique_ptr<BabyMonitor::AlarmSystem> alarmSystem_; // Fallback for backward compatibility
 
     DHT11Worker   *dhtWorker_;
 
@@ -136,6 +137,9 @@ private:
     void handleSystemError(const QString& component, const QString& message);
     void handleCriticalError(const QString& component, const QString& message);
     void updateSystemStatus();
+
+    // Dependency injection methods
+    void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
 };
 
 #endif // MAINWINDOW_H

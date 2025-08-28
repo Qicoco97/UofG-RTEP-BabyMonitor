@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     , dht11ConsecutiveErrors_(0)
     , motionThread_(nullptr)
     , motionWorker_(nullptr)
+    , injectedAlarmSystem_(nullptr)
     , alarmSystem_(std::make_unique<BabyMonitor::AlarmSystem>(this))
 {
     ui->setupUi(this);
@@ -100,13 +101,15 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         return;
     }
 
-    // Use interface-based alarm system
+    // Use injected alarm system if available, fallback to local instance
+    auto alarmSystem = injectedAlarmSystem_ ? injectedAlarmSystem_ : alarmSystem_;
+
     if (!motionDetected_) {
         QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
-        alarmSystem_->publishAlarm(message, 3); // High severity
+        alarmSystem->publishAlarm(message, 3); // High severity
     } else {
         QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
-        alarmSystem_->publishAlarm(message, 1); // Low severity
+        alarmSystem->publishAlarm(message, 1); // Low severity
         motionDetected_ = false;
     }
 }
@@ -409,4 +412,11 @@ void MainWindow::cleanupDHT11Sensor()
         errorHandler_.reportInfo("DHT11", "Sensor stopped");
         // dhtWorker_ is a child of this, no need to delete
     }
+}
+
+// Dependency injection methods implementation
+void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem)
+{
+    injectedAlarmSystem_ = alarmSystem;
+    errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
 }

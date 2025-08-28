@@ -36,6 +36,8 @@ add_executable(baby
     motionworker.cpp
     ErrorHandler.cpp
     managers/AlarmSystem.cpp
+    core/ServiceContainer.cpp
+    core/ApplicationBootstrap.cpp
     mainwindow.h
     SensorFactory.h
     mainwindow.ui
