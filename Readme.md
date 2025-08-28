@@ -117,8 +117,8 @@ make
 
 | File | Description |
 |------|-------------|
-| [`System Architecture.md`](docs/System%20Architecture.md) | System architecture: hardware/software modules and interaction relationships |
-| [`Analysis & Future Prospects.md`](docs/Analysis%20%26%20Future%20Prospects.md) | Limitations analysis and future improvement directions |
+| [`System Architecture.md`](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/docs/System%20Architecture%20.md) | System architecture: hardware/software modules and interaction relationships |
+| [`Analysis & Future Prospects.md`](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/docs/Analysis%20%26%20Future%20Prospects.md) | Limitations analysis and future improvement directions |
 
 
 
