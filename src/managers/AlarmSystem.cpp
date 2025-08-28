@@ -1,5 +1,6 @@
 // AlarmSystem.cpp - Alarm system implementation
 #include "AlarmSystem.h"
+#include "../dds_pub-sub/AlarmMsg.h"
 #include <QDateTime>
 
 namespace BabyMonitor {
@@ -73,8 +74,13 @@ bool AlarmSystem::publishAlarm(const QString& message, int severity)
     }
     
     QString formattedMessage = formatAlarmMessage(message, severity);
-    
-    if (alarmPublisher_.sendAlarm(formattedMessage.toStdString())) {
+
+    // Create AlarmMsg and publish using the correct method
+    AlarmMsg msg;
+    msg.index(severity);
+    msg.message(formattedMessage.toStdString());
+
+    if (alarmPublisher_.publish(msg)) {
         errorHandler_.reportInfo("AlarmSystem", QString("Alarm published: %1").arg(message));
         emit alarmPublished(message);
         return true;
@@ -108,5 +114,3 @@ QString AlarmSystem::formatAlarmMessage(const QString& message, int severity) co
 }
 
 } // namespace BabyMonitor
-
-#include "AlarmSystem.moc"
