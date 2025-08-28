@@ -72,8 +72,18 @@ void ErrorHandler::clearErrors() {
 }
 
 void ErrorHandler::setMaxErrorHistory(int maxCount) {
+    // Data validation
+    if (maxCount < 1) {
+        qWarning() << "ErrorHandler: Invalid maxCount" << maxCount << ", using minimum value 1";
+        maxCount = 1;
+    }
+    if (maxCount > 10000) {
+        qWarning() << "ErrorHandler: maxCount" << maxCount << "too large, using maximum value 10000";
+        maxCount = 10000;
+    }
+
     maxErrorHistory_ = maxCount;
-    
+
     // Trim existing history if needed
     while (errorHistory_.size() > maxErrorHistory_) {
         errorHistory_.removeFirst();

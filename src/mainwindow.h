@@ -46,8 +46,15 @@ public:
             }
         }
     };
-    Libcam2OpenCV camera;
-    CameraCallback cameraCallback;
+
+    // Dependency injection methods (public for bootstrap access)
+    void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
+
+    // Public accessors for system status (read-only)
+    bool isMotionDetected() const { return motionDetected_; }
+    const BabyMonitor::SystemStatus& getSystemStatus() const { return systemStatus_; }
+    const BabyMonitor::TemperatureHumidityData& getLastTempHumData() const { return lastTempHumData_; }
+    const BabyMonitor::MotionData& getLastMotionData() const { return lastMotionData_; }
     
 protected:
     void timerEvent(QTimerEvent *event) override;
@@ -137,9 +144,9 @@ private:
     void handleCriticalError(const QString& component, const QString& message);
     void updateSystemStatus();
 
-public:
-    // Dependency injection methods (public for bootstrap access)
-    void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
+    // Camera and callback (moved to private for better encapsulation)
+    Libcam2OpenCV camera;
+    CameraCallback cameraCallback;
 
 private:
 };

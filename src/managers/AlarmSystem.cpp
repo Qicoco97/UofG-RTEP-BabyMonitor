@@ -105,8 +105,20 @@ bool AlarmSystem::hasSubscribers() const
 
 void AlarmSystem::setPublishInterval(int intervalMs)
 {
+    // Data validation
+    if (intervalMs < 100) {
+        errorHandler_.reportWarning("AlarmSystem",
+            QString("Interval %1ms too small, using minimum 100ms").arg(intervalMs));
+        intervalMs = 100;
+    }
+    if (intervalMs > 60000) {
+        errorHandler_.reportWarning("AlarmSystem",
+            QString("Interval %1ms too large, using maximum 60000ms").arg(intervalMs));
+        intervalMs = 60000;
+    }
+
     publishInterval_ = intervalMs;
-    errorHandler_.reportInfo("AlarmSystem", 
+    errorHandler_.reportInfo("AlarmSystem",
         QString("Publish interval set to %1ms").arg(intervalMs));
 }
 
