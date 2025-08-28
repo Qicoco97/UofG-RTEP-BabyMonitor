@@ -3,5 +3,3 @@
 
 // This file is needed for Qt MOC to process the DHT11Worker class
 // The actual implementation is in the header file as inline methods
-
-#include "DHT11Worker.moc"

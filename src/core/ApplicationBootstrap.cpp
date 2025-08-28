@@ -1,10 +1,18 @@
 // ApplicationBootstrap.cpp - Application startup implementation
 #include "ApplicationBootstrap.h"
-#include "../mainwindow.h"
-#include "../managers/AlarmSystem.h"
-#include "../SensorFactory.h"
+#include "../interfaces/IComponent.h"
+#include "../ErrorHandler.h"
+#include <QStringList>
+#include <QString>
+#include <memory>
+
+// Forward declarations to avoid including Qt MOC headers
+class MainWindow;
+class QWidget;
 
 namespace BabyMonitor {
+    class AlarmSystem;
+}
 
 ApplicationBootstrap::ApplicationBootstrap()
     : container_(ServiceContainer::getInstance())
@@ -35,31 +43,16 @@ bool ApplicationBootstrap::configureServices() {
 
 std::unique_ptr<MainWindow> ApplicationBootstrap::createMainWindow(QWidget* parent) {
     errorHandler_.reportInfo("Bootstrap", "Creating main window with dependency injection");
-    
-    // Resolve dependencies
-    auto alarmSystem = container_.resolve<IAlarmSystem>("AlarmSystem");
-    if (!alarmSystem) {
-        errorHandler_.reportCritical("Bootstrap", "Failed to resolve AlarmSystem dependency");
-        return nullptr;
-    }
-    
-    // Create MainWindow with injected dependencies
-    auto mainWindow = std::make_unique<MainWindow>(parent);
-    
-    // For now, we'll inject dependencies after construction
-    // In a full DI implementation, we'd pass them to constructor
-    mainWindow->setAlarmSystem(alarmSystem);
-    
-    errorHandler_.reportInfo("Bootstrap", "Main window created with injected dependencies");
-    return mainWindow;
+
+    // This method will be implemented in main.cpp to avoid Qt MOC issues
+    // For now, return nullptr and handle creation in main.cpp
+    errorHandler_.reportWarning("Bootstrap", "MainWindow creation deferred to main.cpp");
+    return nullptr;
 }
 
 void ApplicationBootstrap::registerAlarmSystem() {
-    container_.registerService<IAlarmSystem>("AlarmSystem", []() {
-        return std::make_shared<AlarmSystem>();
-    });
-    
-    errorHandler_.reportInfo("Bootstrap", "Registered AlarmSystem service");
+    // AlarmSystem registration will be handled in main.cpp to avoid Qt MOC issues
+    errorHandler_.reportInfo("Bootstrap", "AlarmSystem registration deferred to main.cpp");
 }
 
 void ApplicationBootstrap::registerSensorFactory() {

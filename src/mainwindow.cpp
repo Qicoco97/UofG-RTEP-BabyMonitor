@@ -426,5 +426,3 @@ void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarm
     injectedAlarmSystem_ = alarmSystem;
     errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
 }
-
-#include "mainwindow.moc"

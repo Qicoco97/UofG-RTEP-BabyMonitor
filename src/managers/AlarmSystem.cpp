@@ -120,5 +120,3 @@ QString AlarmSystem::formatAlarmMessage(const QString& message, int severity) co
 }
 
 } // namespace BabyMonitor
-
-#include "AlarmSystem.moc"

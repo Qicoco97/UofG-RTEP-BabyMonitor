@@ -161,5 +161,3 @@ void SensorManager::checkSensorHealth()
 }
 
 } // namespace BabyMonitor
-
-#include "SensorManager.moc"

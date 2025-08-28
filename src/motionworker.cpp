@@ -33,5 +33,3 @@ void MotionWorker::processFrame(const cv::Mat &currentFrame) {
     previousBlur_ = blur;
     emit motionDetected(detected);
 }
-
-#include "motionworker.moc"
