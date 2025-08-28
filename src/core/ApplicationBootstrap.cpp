@@ -12,7 +12,6 @@ class QWidget;
 
 namespace BabyMonitor {
     class AlarmSystem;
-}
 
 ApplicationBootstrap::ApplicationBootstrap()
     : container_(ServiceContainer::getInstance())
@@ -41,7 +40,7 @@ bool ApplicationBootstrap::configureServices() {
     }
 }
 
-std::unique_ptr<MainWindow> ApplicationBootstrap::createMainWindow(QWidget* parent) {
+void* ApplicationBootstrap::createMainWindow(QWidget* parent) {
     errorHandler_.reportInfo("Bootstrap", "Creating main window with dependency injection");
 
     // This method will be implemented in main.cpp to avoid Qt MOC issues

@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "ServiceContainer.h"
+#include "../ErrorHandler.h"
 
 // Forward declarations
 class MainWindow;
@@ -27,8 +28,9 @@ public:
     
     /**
      * Create and configure the main window with injected dependencies
+     * Returns nullptr - actual creation handled in main.cpp to avoid Qt MOC issues
      */
-    std::unique_ptr<MainWindow> createMainWindow(QWidget* parent = nullptr);
+    void* createMainWindow(QWidget* parent = nullptr);
     
     /**
      * Get service container for manual service access

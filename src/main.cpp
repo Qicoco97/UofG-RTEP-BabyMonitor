@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     }
 
     // Create MainWindow directly to avoid Qt MOC issues in ApplicationBootstrap
-    auto mainWindow = std::make_unique<MainWindow>();
+    MainWindow mainWindow;
 
     // Setup dependency injection manually
     auto& container = bootstrap.getServiceContainer();
@@ -34,9 +34,9 @@ int main(int argc, char *argv[])
     // Resolve and inject dependencies
     auto alarmSystem = container.resolve<BabyMonitor::IAlarmSystem>("AlarmSystem");
     if (alarmSystem) {
-        mainWindow->setAlarmSystem(alarmSystem);
+        mainWindow.setAlarmSystem(alarmSystem);
     }
 
-    mainWindow->show();
+    mainWindow.show();
     return a.exec();
 }
