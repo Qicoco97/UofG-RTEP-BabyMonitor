@@ -14,6 +14,7 @@
 #include "LedController.h"
 #include "Config.h"
 #include "SensorData.h"
+#include "SensorFactory.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -85,6 +86,10 @@ private:
     LEDController     led_;
 
     DHT11Worker   *dhtWorker_;
+
+    // Motion detection components
+    QThread* motionThread_;
+    MotionWorker* motionWorker_;
 
     // Structured sensor data
     BabyMonitor::TemperatureHumidityData lastTempHumData_;

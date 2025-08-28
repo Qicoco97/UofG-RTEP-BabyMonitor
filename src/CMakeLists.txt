@@ -36,6 +36,7 @@ add_executable(baby
     motionworker.cpp
     ErrorHandler.cpp
     mainwindow.h
+    SensorFactory.h
     mainwindow.ui
 
   )

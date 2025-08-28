@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
     , dht11ConsecutiveErrors_(0)
+    , motionThread_(nullptr)
+    , motionWorker_(nullptr)
 {
     ui->setupUi(this);
     setupCharts();
@@ -45,10 +47,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Start Qt timer: call timerEvent every 1000ms
     alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
 
-    dhtWorker_ = new DHT11Worker(BabyMonitorConfig::GPIO_CHIP_DEVICE /*gpiochip*/,
-                                 BabyMonitorConfig::DHT11_PIN_NUMBER /*BCM pin*/,
-                                 this,         // Make its lifecycle depend on MainWindow
-                                 BabyMonitorConfig::DHT11_READ_INTERVAL_S); // Use configured interval
+    // Create DHT11 sensor using factory
+    dhtWorker_ = BabyMonitor::SensorFactory::createDHT11Worker(this);
 
     // 2) Connect signals to UI slots
     connect(dhtWorker_, &DHT11Worker::newReading,
@@ -305,32 +305,28 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
 
 void MainWindow::initializeMotionDetection()
 {
-    QThread *motionThread = new QThread(this);
-    MotionWorker *worker = new MotionWorker(BabyMonitorConfig::MOTION_MIN_AREA,
-                                           BabyMonitorConfig::MOTION_THRESHOLD);
-    worker->moveToThread(motionThread);
+    // Create motion detection using factory
+    auto motionSetup = BabyMonitor::SensorFactory::createMotionDetection(this);
+    motionThread_ = motionSetup.thread;
+    motionWorker_ = motionSetup.worker;
 
-    connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &MainWindow::frameReady, worker, &MotionWorker::processFrame);
-    connect(worker, &MotionWorker::motionDetected,
-            this, &MainWindow::onMotionStatusChanged);
+    // Setup connections using factory
+    BabyMonitor::SensorFactory::connectMotionDetection(motionSetup, this, this);
 
     // Start thread
-    motionThread->start();
-
-    // Store references for cleanup (could be improved with member variables)
-    setProperty("motionThread", QVariant::fromValue(motionThread));
-    setProperty("motionWorker", QVariant::fromValue(worker));
+    motionThread_->start();
 }
 
 void MainWindow::cleanupMotionDetection()
 {
-    // Get stored references
-    QThread* motionThread = property("motionThread").value<QThread*>();
-    if (motionThread) {
-        motionThread->quit();
-        motionThread->wait();
+    if (motionThread_) {
+        motionThread_->quit();
+        motionThread_->wait();
         errorHandler_.reportInfo("MotionDetection", "Thread cleanup completed");
+
+        // Thread and worker will be cleaned up automatically as children of this
+        motionThread_ = nullptr;
+        motionWorker_ = nullptr;
     }
 }
 
