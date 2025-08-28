@@ -2,15 +2,17 @@
 #include <QObject>
 #include <thread>
 #include <atomic>
+#include <chrono>
 #include "DHT11Gpio.h"
 
 class DHT11Worker : public QObject {
     Q_OBJECT
 
 public:
-    explicit DHT11Worker(const QString &chip, unsigned int line, QObject *parent = nullptr)
+    explicit DHT11Worker(const QString &chip, unsigned int line, QObject *parent = nullptr, int readIntervalSeconds = 3)
       : QObject(parent)
       , sensor_(chip.toStdString(), line)
+      , readInterval_(readIntervalSeconds)
     {}
 
     ~DHT11Worker() {
@@ -38,7 +40,7 @@ public:
                 } else {
                     emit errorReading();
                 }
-                std::this_thread::sleep_for(std::chrono::seconds(2));
+                std::this_thread::sleep_for(std::chrono::seconds(readInterval_));
             }
         });
     }
@@ -58,5 +60,6 @@ private:
     DHT11Gpio            sensor_;
     std::thread          workerThread_;
     std::atomic<bool>    running_{false};
+    int                  readInterval_;  // Read interval in seconds
 };
 

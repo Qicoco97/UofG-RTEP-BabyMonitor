@@ -9,11 +9,19 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChart>
+#include <memory>
 #include "DHT11Worker.h"
 #include "AlarmPublisher.h"
 #include "LedController.h"
+#include "Config.h"
+#include "SensorData.h"
+#include "SensorFactory.h"
+#include "interfaces/IComponent.h"
+#include "managers/AlarmSystem.h"
 
 QT_CHARTS_USE_NAMESPACE
+
+#include "ErrorHandler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -29,16 +37,24 @@ public:
     void updateImage(const cv::Mat &mat);
     bool detectMotion(const cv::Mat &currentFrame);
     
-    struct MyCallback : Libcam2OpenCV::Callback {
-	    MainWindow* window = nullptr;
-	      virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-	    if (nullptr != window) {
-		window->updateImage(frame);
-	    }
-	}
+    struct CameraCallback : Libcam2OpenCV::Callback {
+        MainWindow* window = nullptr;
+
+        virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) override {
+            if (window != nullptr) {
+                window->processNewFrame(frame);
+            }
+        }
     };
-    Libcam2OpenCV camera;
-    MyCallback myCallback;
+
+    // Dependency injection methods (public for bootstrap access)
+    void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
+
+    // Public accessors for system status (read-only)
+    bool isMotionDetected() const { return motionDetected_; }
+    const BabyMonitor::SystemStatus& getSystemStatus() const { return systemStatus_; }
+    const BabyMonitor::TemperatureHumidityData& getLastTempHumData() const { return lastTempHumData_; }
+    const BabyMonitor::MotionData& getLastMotionData() const { return lastMotionData_; }
     
 protected:
     void timerEvent(QTimerEvent *event) override;
@@ -56,14 +72,13 @@ private slots:
 //    void onPMExceeded(float pm25, float pm10);
 
 private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
 
     cv::Mat previousFrame;
-    
 
     QtCharts::QLineSeries *motionSeries;
     QtCharts::QChart *motionChart;
-    
+
     QtCharts::QChart      *chart;
     QtCharts::QLineSeries *tempSeries;
     QtCharts::QLineSeries *humSeries;
@@ -73,15 +88,66 @@ private:
     
     int timeIndex;
     
-    AlarmPublisher alarmPub_; 
     int            alarmTimerId_{-1};
     uint32_t       samplesSent_{1};
     bool           motionDetected_{false};
-    LEDController     led_;  
-    
-    DHT11Worker   *dhtWorker_; 
+    LEDController     led_;
+
+    // Interface-based components (dependency injection)
+    std::shared_ptr<BabyMonitor::IAlarmSystem> injectedAlarmSystem_;
+    // Removed: redundant alarmSystem_ and alarmPub_ instances
+
+    DHT11Worker   *dhtWorker_;
+
+    // Motion detection components
+    QThread* motionThread_;
+    MotionWorker* motionWorker_;
+
+    // Structured sensor data
+    BabyMonitor::TemperatureHumidityData lastTempHumData_;
+    BabyMonitor::MotionData lastMotionData_;
+    BabyMonitor::SystemStatus systemStatus_;
+
+    // Error handling
+    BabyMonitor::ErrorHandler& errorHandler_;
+
+    // DHT11 error tracking
+    int dht11ConsecutiveErrors_;
+    static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
 
     void setupCharts();
+
+    // Chart management methods
+    void updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data);
+    void updateMotionChart(const BabyMonitor::MotionData& data);
+    void configureChartAxes();
+
+    // Frame processing methods
+    void processNewFrame(const cv::Mat& frame);
+
+    // Sensor management methods
+    void initializeSensors();
+    void startSensors();
+    void stopSensors();
+    void initializeMotionDetection();
+    void cleanupMotionDetection();
+    void initializeDHT11Sensor();
+    void cleanupDHT11Sensor();
+
+    // LED control methods
+    void initializeLED();
+    void triggerMotionAlert();
+
+    // Error handling methods
+    void handleSystemError(const QString& component, const QString& message);
+    void handleCriticalError(const QString& component, const QString& message);
+    void updateSystemStatus();
+
+    // Camera and callback (moved to private for better encapsulation)
+    Libcam2OpenCV camera;
+    CameraCallback cameraCallback;
+
+private:
 };
 
 #endif // MAINWINDOW_H

@@ -33,10 +33,20 @@ add_executable(baby
     main.cpp
     mainwindow.cpp
     libcam2opencv.cpp
-    motionworker.cpp 
+    motionworker.cpp
+    ErrorHandler.cpp
+    managers/AlarmSystem.cpp
+    managers/SensorManager.cpp
+    core/ServiceContainer.cpp
+    core/ApplicationBootstrap.cpp
     mainwindow.h
+    motionworker.h
+    managers/AlarmSystem.h
+    managers/SensorManager.h
+    interfaces/IComponent.h
+    SensorFactory.h
+    ErrorHandler.h
     mainwindow.ui
-
   )
 
 target_include_directories(baby

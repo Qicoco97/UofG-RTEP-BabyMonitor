@@ -13,67 +13,40 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
-    , led_(0, 27)
+    , ui(std::make_unique<Ui::MainWindow>())
+    , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
+    , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
+    , dht11ConsecutiveErrors_(0)
+    , motionThread_(nullptr)
+    , motionWorker_(nullptr)
+    , injectedAlarmSystem_(nullptr)
 {
     ui->setupUi(this);
     setupCharts();
- 	  myCallback.window = this;
-	  camera.registerCallback(&myCallback);
-    ui->motionStatusLabel->setText("No Motion");
+    initializeLED();
 
-    if (!alarmPub_.init()) {
-        qWarning() << "AlarmPublisher initialization failed";
-    }
+    // Initialize all sensors
+    initializeSensors();
+
+    // AlarmSystem will be initialized via dependency injection
+    systemStatus_.alarmSystemActive = false; // Will be set to true when injected system is initialized
 
     // Start Qt timer: call timerEvent every 1000ms
-    alarmTimerId_ = startTimer(1000);
+    alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
 
-
-    QThread *motionThread = new QThread(this);
-    MotionWorker *worker = new MotionWorker(500, 25);
-    worker->moveToThread(motionThread);
-
-    connect(motionThread, &QThread::finished, worker, &QObject::deleteLater);
-    connect(this, &MainWindow::frameReady, worker, &MotionWorker::processFrame);
-    connect(worker, &MotionWorker::motionDetected,
-            this, &MainWindow::onMotionStatusChanged);
-
-    // Start thread
-    motionThread->start();
-
-    dhtWorker_ = new DHT11Worker("/dev/gpiochip0" /*gpiochip*/,
-                                 17             /*BCM pin 17*/,
-                                 this);         // Make its lifecycle depend on MainWindow
-
-    // 2) Connect signals to UI slots
-    connect(dhtWorker_, &DHT11Worker::newReading,
-            this,       &MainWindow::onNewDHTReading);
-    connect(dhtWorker_, &DHT11Worker::errorReading,
-            this,       &MainWindow::onDHTError);
-
-    // 3) Start background thread loop reading
-    dhtWorker_->start();
-
-
-//    // PM2.5 detection
-//    pmSensor = new SDS011Detector("/dev/ttyUSB0", 9600, 75.0f);
-//    connect(pmSensor, &SDS011Detector::highPM, this, &MainWindow::onPMExceeded);
-//    pmSensor->start();
-    camera.start();
+    // Start all sensors
+    startSensors();
 }
 
 MainWindow::~MainWindow()
 {
+    // Stop all sensors
+    stopSensors();
 
     if (alarmTimerId_ != -1) killTimer(alarmTimerId_);
-    if (dhtWorker_) {
-        dhtWorker_->stop();
-        // dhtWorker_ is a child of this, no need to delete
-    }
-    camera.stop();
-    delete ui;
+
+    // ui is now managed by unique_ptr, no manual delete needed
 }
 
 void MainWindow::setupCharts()
@@ -83,31 +56,17 @@ void MainWindow::setupCharts()
     humSeries  = new QtCharts::QLineSeries();
     humSeries ->setName("humidity (%)");
 
-    // 2) Create a new Chart and add both series to it
+    // Create a new Chart and add both series to it
     chart = new QtCharts::QChart();
     chart->addSeries(tempSeries);
     chart->addSeries(humSeries);
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
 
-    // 3) Create unified X/Y axes
-    axisX = new QtCharts::QValueAxis();
-    axisX->setLabelFormat("%g");
-    axisX->setTitleText("Index");
-    chart->addAxis(axisX, Qt::AlignBottom);
-    tempSeries->attachAxis(axisX);
-    humSeries ->attachAxis(axisX);
+    // Configure chart axes
+    configureChartAxes();
 
-    axisY = new QtCharts::QValueAxis();
-    axisY->setRange(0, 100);  // Temperature and humidity both in 0-100 range
-    axisY->setTitleText("Value");
-    axisY->setLabelsVisible(true);
-
-    chart->addAxis(axisY, Qt::AlignLeft);
-    tempSeries->attachAxis(axisY);
-    humSeries ->attachAxis(axisY);
-
-    // 4) Bind this chart to the UI's ChartView
+    // Bind this chart to the UI's ChartView
     ui->thChartView->setChart(chart);
     ui->thChartView->setRenderHint(QPainter::Antialiasing);
 
@@ -127,8 +86,7 @@ void MainWindow::updateImage(const cv::Mat &mat) {
 			   QImage::Format_RGB888);
 	ui->cameraLabel->setPixmap(QPixmap::fromImage(frame));
   //bool motion = detectMotion(mat);
-  emit frameReady(mat.clone()); 
-	update();
+  // Note: frameReady emission moved to processNewFrame()
 }
 
 void MainWindow::timerEvent(QTimerEvent *event) {
@@ -136,37 +94,33 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         QMainWindow::timerEvent(event);
         return;
     }
-    if (!motionDetected_) {
-        AlarmMsg msg;
-        msg.index(samplesSent_++);
-        msg.message("No motion detected !!!! Dangerous!");
-        if (alarmPub_.publish(msg)) {
-            qDebug() << "No-motion alarm sent:" << QString::fromStdString(msg.message());
+
+    // Use injected alarm system
+    if (injectedAlarmSystem_) {
+        if (!motionDetected_) {
+            QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
+            injectedAlarmSystem_->publishAlarm(message, 3); // High severity
         } else {
-            qDebug() << "No listener, alarm not sent.";
+            QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
+            injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
+            motionDetected_ = false;
         }
-    }
-    else{
-        AlarmMsg msg;
-        msg.index(samplesSent_++);
-        msg.message("On motion !!!");
-        if (alarmPub_.publish(msg)) {
-            qDebug() << "motion msg sent:" << QString::fromStdString(msg.message());
-        } else {
-            qDebug() << "No listener, alarm not sent.";
-    }
-    motionDetected_ = false;
+    } else {
+        errorHandler_.reportWarning("MainWindow", "No AlarmSystem available for publishing");
     }
 }
 
 
 void MainWindow::onMotionStatusChanged(bool detected)
 {
+    // Update structured motion data
+    lastMotionData_ = BabyMonitor::MotionData(detected, 0.8);
+
     // Update UI here
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
-        led_.blink(5, 200, 100);
+        triggerMotionAlert();
         }
     else
         ui->motionStatusLabel->setText(tr("no motion"));
@@ -178,25 +132,40 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
     float temperature = t_int + t_dec / 100.0f;
     float humidity    = h_int + h_dec    / 100.0f;
 
+    // Update structured sensor data
+    lastTempHumData_ = BabyMonitor::TemperatureHumidityData(temperature, humidity, true);
+
+    // Check if this is a recovery from error state
+    bool wasInErrorState = (dht11ConsecutiveErrors_ > 0);
+
+    // Reset consecutive error count on successful reading
+    dht11ConsecutiveErrors_ = 0;
+    systemStatus_.dht11Active = true;
+
+    // Report successful reading
+    static int readingCount = 0;
+    readingCount++;
+
+    if (wasInErrorState) {
+        // Always report when recovering from error state
+        errorHandler_.reportInfo("DHT11", QString("Sensor recovered - Reading successful (T:%1°C, H:%2%)")
+                                .arg(temperature, 0, 'f', 1).arg(humidity, 0, 'f', 1));
+    } else if (readingCount % 20 == 0) {  // Report every 20th reading when stable
+        errorHandler_.reportInfo("DHT11", QString("Sensor stable - Reading #%1 (T:%2°C, H:%3%)")
+                                .arg(readingCount).arg(temperature, 0, 'f', 1).arg(humidity, 0, 'f', 1));
+    }
+
     // Display on labels, keep two decimal places
      // This slot is definitely called in the GUI thread
     ui->tempLabel->setText(
         QString::number(temperature, 'f', 2) + " ℃"
     );
-    //tempSeries->append(timeIndex, temperature);
     ui->humLabel->setText(
         QString::number(humidity,    'f', 2) + " %"
     );
-    //humSeries->append(timeIndex, humidity);
-    //timeIndex++;
 
-    tempSeries->append(timeIndex, temperature);
-    humSeries ->append(timeIndex, humidity);
-    timeIndex++;
-
-    // Make X-axis always show the latest 100 samples
-    int minX = std::max(0, timeIndex - 100);
-    axisX->setRange(minX, timeIndex);
+    // Update chart with structured data
+    updateTemperatureHumidityChart(lastTempHumData_);
 
 
 
@@ -204,6 +173,259 @@ void MainWindow::onNewDHTReading(int t_int, int t_dec,
 }
 void MainWindow::onDHTError()
 {
+    // Update structured sensor data with invalid reading
+    lastTempHumData_ = BabyMonitor::TemperatureHumidityData(0.0f, 0.0f, false);
+
+    // Increment consecutive error count
+    dht11ConsecutiveErrors_++;
+
+    // Only mark system as offline after multiple consecutive failures
+    if (dht11ConsecutiveErrors_ >= DHT11_MAX_CONSECUTIVE_ERRORS) {
+        if (systemStatus_.dht11Active) {  // Only report once when transitioning to offline
+            handleSystemError("DHT11", QString("Sensor offline after %1 consecutive failures")
+                            .arg(dht11ConsecutiveErrors_));
+        }
+    } else {
+        // Report individual errors but don't mark system as offline yet
+        errorHandler_.reportWarning("DHT11", QString("Reading failed (%1/%2)")
+                                  .arg(dht11ConsecutiveErrors_).arg(DHT11_MAX_CONSECUTIVE_ERRORS));
+    }
+
     ui->tempLabel->setText("Read Err");
     ui->humLabel->setText("Read Err");
+}
+
+// LED control methods implementation
+void MainWindow::initializeLED()
+{
+    // LED is initialized in constructor member initializer list
+    // This method can be extended for additional LED setup if needed
+}
+
+void MainWindow::triggerMotionAlert()
+{
+    led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
+               BabyMonitorConfig::LED_ON_DURATION_MS,
+               BabyMonitorConfig::LED_OFF_DURATION_MS);
+}
+
+// Chart management methods implementation
+void MainWindow::configureChartAxes()
+{
+    // Create unified X/Y axes
+    axisX = new QtCharts::QValueAxis();
+    axisX->setLabelFormat("%g");
+    axisX->setTitleText("Index");
+    chart->addAxis(axisX, Qt::AlignBottom);
+    tempSeries->attachAxis(axisX);
+    humSeries ->attachAxis(axisX);
+
+    axisY = new QtCharts::QValueAxis();
+    axisY->setRange(0, 100);  // Temperature and humidity both in 0-100 range
+    axisY->setTitleText("Value");
+    axisY->setLabelsVisible(true);
+
+    chart->addAxis(axisY, Qt::AlignLeft);
+    tempSeries->attachAxis(axisY);
+    humSeries ->attachAxis(axisY);
+}
+
+void MainWindow::updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data)
+{
+    if (!data.isValid) {
+        return; // Don't add invalid data to chart
+    }
+
+    tempSeries->append(timeIndex, data.temperature);
+    humSeries->append(timeIndex, data.humidity);
+    timeIndex++;
+
+    // Make X-axis always show the latest configured max points
+    int minX = std::max(0, timeIndex - BabyMonitorConfig::CHART_MAX_POINTS);
+    axisX->setRange(minX, timeIndex);
+}
+
+void MainWindow::updateMotionChart(const BabyMonitor::MotionData& data)
+{
+    // Motion chart implementation can be added here in future
+    // For now, we just store the data in lastMotionData_
+    Q_UNUSED(data);
+}
+
+// Frame processing methods implementation
+void MainWindow::processNewFrame(const cv::Mat& frame)
+{
+    // Update camera display
+    updateImage(frame);
+
+    // Emit frame for motion detection processing (using original logic)
+    emit frameReady(frame.clone());
+
+    // Trigger UI update (this was missing!)
+    update();
+}
+
+void MainWindow::initializeMotionDetection()
+{
+    // Create motion detection using factory
+    auto motionSetup = BabyMonitor::SensorFactory::createMotionDetection(this);
+    motionThread_ = motionSetup.thread;
+    motionWorker_ = motionSetup.worker;
+
+    // Setup connections using factory
+    BabyMonitor::SensorFactory::connectMotionDetection(motionSetup, this, this);
+
+    // Start thread
+    motionThread_->start();
+}
+
+void MainWindow::cleanupMotionDetection()
+{
+    if (motionThread_) {
+        motionThread_->quit();
+        motionThread_->wait();
+        errorHandler_.reportInfo("MotionDetection", "Thread cleanup completed");
+
+        // Thread and worker will be cleaned up automatically as children of this
+        motionThread_ = nullptr;
+        motionWorker_ = nullptr;
+    }
+}
+
+// Error handling methods implementation
+void MainWindow::handleSystemError(const QString& component, const QString& message)
+{
+    errorHandler_.reportError(component, message);
+
+    // Update system status
+    if (component == "DHT11") {
+        systemStatus_.dht11Active = false;
+    } else if (component == "Camera") {
+        systemStatus_.cameraActive = false;
+    } else if (component == "MotionDetection") {
+        systemStatus_.motionDetectionActive = false;
+    } else if (component == "AlarmPublisher") {
+        systemStatus_.alarmSystemActive = false;
+    }
+
+    updateSystemStatus();
+}
+
+void MainWindow::handleCriticalError(const QString& component, const QString& message)
+{
+    errorHandler_.reportCritical(component, message);
+
+    // For critical errors, we might want to disable the entire system
+    systemStatus_.cameraActive = false;
+    systemStatus_.dht11Active = false;
+    systemStatus_.motionDetectionActive = false;
+    systemStatus_.alarmSystemActive = false;
+
+    updateSystemStatus();
+
+    // Could show a critical error dialog to user
+    ui->motionStatusLabel->setText("SYSTEM ERROR");
+}
+
+void MainWindow::updateSystemStatus()
+{
+    systemStatus_.lastUpdate = QDateTime::currentDateTime();
+
+    // Update UI based on system status
+    QString statusText = systemStatus_.toString();
+
+    // Log system status
+    if (systemStatus_.isAllSystemsActive()) {
+        errorHandler_.reportInfo("System", "All systems operational");
+    } else {
+        errorHandler_.reportWarning("System", "Some systems offline: " + statusText);
+    }
+}
+
+// Sensor management methods implementation
+void MainWindow::initializeSensors()
+{
+    // Initialize camera
+    cameraCallback.window = this;
+    camera.registerCallback(&cameraCallback);
+    ui->motionStatusLabel->setText("No Motion");
+    errorHandler_.reportInfo("Camera", "Callback registered successfully");
+    systemStatus_.cameraActive = true;
+
+    // Initialize DHT11 sensor
+    initializeDHT11Sensor();
+
+    // Initialize motion detection
+    initializeMotionDetection();
+    errorHandler_.reportInfo("MotionDetection", "Initialization completed");
+    systemStatus_.motionDetectionActive = true;
+}
+
+void MainWindow::startSensors()
+{
+    // Start camera
+    camera.start();
+    errorHandler_.reportInfo("Camera", "Started successfully");
+
+    // Start DHT11 sensor
+    if (dhtWorker_) {
+        dhtWorker_->start();
+        errorHandler_.reportInfo("DHT11", "Started successfully");
+    }
+
+    // Motion detection starts automatically when thread starts
+}
+
+void MainWindow::stopSensors()
+{
+    // Stop camera
+    camera.stop();
+    errorHandler_.reportInfo("Camera", "Stopped");
+
+    // Stop and cleanup sensors
+    cleanupDHT11Sensor();
+    cleanupMotionDetection();
+}
+
+void MainWindow::initializeDHT11Sensor()
+{
+    // Create DHT11 sensor using factory
+    dhtWorker_ = BabyMonitor::SensorFactory::createDHT11Worker(this);
+
+    // Connect signals to UI slots
+    connect(dhtWorker_, &DHT11Worker::newReading,
+            this,       &MainWindow::onNewDHTReading);
+    connect(dhtWorker_, &DHT11Worker::errorReading,
+            this,       &MainWindow::onDHTError);
+
+    errorHandler_.reportInfo("DHT11", "Sensor initialized");
+}
+
+void MainWindow::cleanupDHT11Sensor()
+{
+    if (dhtWorker_) {
+        dhtWorker_->stop();
+        errorHandler_.reportInfo("DHT11", "Sensor stopped");
+        // dhtWorker_ is a child of this, no need to delete
+    }
+}
+
+// Dependency injection methods implementation
+void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem)
+{
+    injectedAlarmSystem_ = alarmSystem;
+
+    // Initialize and start the injected alarm system
+    if (injectedAlarmSystem_) {
+        if (injectedAlarmSystem_->initialize()) {
+            injectedAlarmSystem_->start();
+            systemStatus_.alarmSystemActive = true;
+            errorHandler_.reportInfo("DependencyInjection", "Injected AlarmSystem initialized and started");
+        } else {
+            systemStatus_.alarmSystemActive = false;
+            errorHandler_.reportError("DependencyInjection", "Failed to initialize injected AlarmSystem");
+        }
+    }
+
+    errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
 }
