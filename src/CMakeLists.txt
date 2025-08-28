@@ -23,8 +23,9 @@ pkg_check_modules(GPIOD REQUIRED IMPORTED_TARGET libgpiodcxx)
 # They need to be set before the find_package(Qt5 ...) call.
 include_directories(${CMAKE_SOURCE_DIR} ${LIBCAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
+# Multimedia
+find_package(Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
 
-find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
 add_subdirectory(${CMAKE_SOURCE_DIR}/dds_pub-sub
                  ${CMAKE_BINARY_DIR}/dds_pub-sub)
 add_subdirectory(${CMAKE_SOURCE_DIR}/DHT11)
@@ -36,20 +37,23 @@ add_executable(baby
     motionworker.cpp 
     mainwindow.h
     mainwindow.ui
-
-  )
+)
 
 target_include_directories(baby
     PRIVATE
       ${CMAKE_SOURCE_DIR}/DHT11
 )
 
-target_link_libraries(baby PRIVATE Qt5::Widgets Qt5::Charts
+target_link_libraries(baby PRIVATE
+    Qt5::Widgets
+    Qt5::Charts
+    Qt5::Multimedia   # QSoundEffect
     ${OpenCV_LIBS}
     Threads::Threads
     PkgConfig::LIBCAMERA
     PkgConfig::GPIOD
-    fastrtps      # library fas trtps
+    fastrtps
     fastcdr 
     alarmpublisher
-    dht11gpiod )
+    dht11gpiod
+)

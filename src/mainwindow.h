@@ -12,6 +12,7 @@
 #include "DHT11Worker.h"
 #include "AlarmPublisher.h"
 #include "LedController.h"
+#include <QSoundEffect>   // 🔔 新增
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -30,12 +31,12 @@ public:
     bool detectMotion(const cv::Mat &currentFrame);
     
     struct MyCallback : Libcam2OpenCV::Callback {
-	    MainWindow* window = nullptr;
-	      virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
-	    if (nullptr != window) {
-		window->updateImage(frame);
-	    }
-	}
+        MainWindow* window = nullptr;
+        virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) {
+            if (nullptr != window) {
+                window->updateImage(frame);
+            }
+        }
     };
     Libcam2OpenCV camera;
     MyCallback myCallback;
@@ -60,7 +61,6 @@ private:
 
     cv::Mat previousFrame;
     
-
     QtCharts::QLineSeries *motionSeries;
     QtCharts::QChart *motionChart;
     
@@ -69,7 +69,6 @@ private:
     QtCharts::QLineSeries *humSeries;
     QtCharts::QValueAxis  *axisX;
     QtCharts::QValueAxis  *axisY;       ///< Value axis Y
-     ///< Current data index
     
     int timeIndex;
     
@@ -77,9 +76,11 @@ private:
     int            alarmTimerId_{-1};
     uint32_t       samplesSent_{1};
     bool           motionDetected_{false};
-    LEDController     led_;  
+    LEDController  led_;  
     
     DHT11Worker   *dhtWorker_; 
+
+    QSoundEffect  *alertSound_;   // 🔔 新增：报警音效
 
     void setupCharts();
 };
