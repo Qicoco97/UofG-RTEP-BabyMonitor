@@ -102,14 +102,20 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     }
 
     // Use injected alarm system if available, fallback to local instance
-    auto alarmSystem = injectedAlarmSystem_ ? injectedAlarmSystem_ : alarmSystem_;
-
     if (!motionDetected_) {
         QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
-        alarmSystem->publishAlarm(message, 3); // High severity
+        if (injectedAlarmSystem_) {
+            injectedAlarmSystem_->publishAlarm(message, 3); // High severity
+        } else {
+            alarmSystem_->publishAlarm(message, 3); // High severity
+        }
     } else {
         QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
-        alarmSystem->publishAlarm(message, 1); // Low severity
+        if (injectedAlarmSystem_) {
+            injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
+        } else {
+            alarmSystem_->publishAlarm(message, 1); // Low severity
+        }
         motionDetected_ = false;
     }
 }
