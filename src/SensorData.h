@@ -1,4 +1,4 @@
-// SensorData.h - Structured sensor data types with proper encapsulation
+// SensorData.h - Structured sensor data types
 #pragma once
 
 #include <QDateTime>
@@ -7,219 +7,244 @@
 namespace BabyMonitor {
 
 /**
- * Temperature and Humidity sensor data class with proper encapsulation
- * Provides data validation and controlled access to sensor readings
+ * Temperature and Humidity sensor data class (improved from struct)
+ * Provides better encapsulation while maintaining backward compatibility
  */
 class TemperatureHumidityData {
-private:
-    float temperature_;      // Temperature in Celsius
-    float humidity_;         // Humidity in percentage
-    QDateTime timestamp_;    // When the reading was taken
-    bool isValid_;          // Whether the reading is valid
-
 public:
+    // Public member variables for backward compatibility
+    float temperature;      // Temperature in Celsius
+    float humidity;         // Humidity in percentage
+    QDateTime timestamp;    // When the reading was taken
+    bool isValid;          // Whether the reading is valid
+
     // Constructors
     TemperatureHumidityData()
-        : temperature_(0.0f), humidity_(0.0f), timestamp_(QDateTime::currentDateTime()), isValid_(false) {}
+        : temperature(0.0f), humidity(0.0f), timestamp(QDateTime::currentDateTime()), isValid(false) {}
 
     TemperatureHumidityData(float temp, float hum, bool valid = true)
-        : temperature_(temp), humidity_(hum), timestamp_(QDateTime::currentDateTime()), isValid_(valid) {
+        : temperature(temp), humidity(hum), timestamp(QDateTime::currentDateTime()), isValid(valid) {
         validateData();
     }
 
-    // Getters (const methods for read-only access)
-    float getTemperature() const { return temperature_; }
-    float getHumidity() const { return humidity_; }
-    QDateTime getTimestamp() const { return timestamp_; }
-    bool getIsValid() const { return isValid_; }
+    // Copy constructor
+    TemperatureHumidityData(const TemperatureHumidityData& other)
+        : temperature(other.temperature), humidity(other.humidity),
+          timestamp(other.timestamp), isValid(other.isValid) {}
 
-    // Setters with validation
+    // Assignment operator
+    TemperatureHumidityData& operator=(const TemperatureHumidityData& other) {
+        if (this != &other) {
+            temperature = other.temperature;
+            humidity = other.humidity;
+            timestamp = other.timestamp;
+            isValid = other.isValid;
+        }
+        return *this;
+    }
+
+    // Improved methods for better encapsulation (recommended for new code)
+    float getTemperature() const { return temperature; }
+    float getHumidity() const { return humidity; }
+    QDateTime getTimestamp() const { return timestamp; }
+    bool getIsValid() const { return isValid; }
+
     void setTemperature(float temp) {
-        temperature_ = temp;
+        temperature = temp;
         validateData();
     }
 
     void setHumidity(float hum) {
-        humidity_ = hum;
+        humidity = hum;
         validateData();
     }
 
     void setValid(bool valid) {
-        isValid_ = valid;
+        isValid = valid;
     }
 
     void updateTimestamp() {
-        timestamp_ = QDateTime::currentDateTime();
+        timestamp = QDateTime::currentDateTime();
     }
 
-    // Public methods
     QString toString() const {
         return QString("Temp: %1°C, Humidity: %2%, Time: %3, Valid: %4")
-               .arg(temperature_, 0, 'f', 1)
-               .arg(humidity_, 0, 'f', 1)
-               .arg(timestamp_.toString("hh:mm:ss"))
-               .arg(isValid_ ? "Yes" : "No");
+               .arg(temperature, 0, 'f', 1)
+               .arg(humidity, 0, 'f', 1)
+               .arg(timestamp.toString("hh:mm:ss"))
+               .arg(isValid ? "Yes" : "No");
     }
 
-    // Backward compatibility - public member access (deprecated but functional)
-    // These allow existing code to continue working while we transition to getters/setters
-    float& temperature = temperature_;
-    float& humidity = humidity_;
-    QDateTime& timestamp = timestamp_;
-    bool& isValid = isValid_;
-
-private:
+    // Data validation method
     void validateData() {
         // Validate temperature range (-40°C to 80°C is reasonable for DHT11)
-        if (temperature_ < -40.0f || temperature_ > 80.0f) {
-            isValid_ = false;
+        if (temperature < -40.0f || temperature > 80.0f) {
+            isValid = false;
             return;
         }
 
         // Validate humidity range (0% to 100%)
-        if (humidity_ < 0.0f || humidity_ > 100.0f) {
-            isValid_ = false;
+        if (humidity < 0.0f || humidity > 100.0f) {
+            isValid = false;
             return;
         }
 
         // If we reach here, data is valid
-        if (isValid_ != false) { // Don't override if explicitly set to false
-            isValid_ = true;
+        if (isValid != false) { // Don't override if explicitly set to false
+            isValid = true;
         }
     }
 };
 
 /**
- * Motion detection data class with proper encapsulation
+ * Motion detection data class (improved from struct)
+ * Provides better encapsulation while maintaining backward compatibility
  */
 class MotionData {
-private:
-    bool detected_;          // Whether motion was detected
-    double confidence_;      // Confidence level (0.0 - 1.0)
-    QDateTime timestamp_;    // When the detection occurred
-
 public:
+    // Public member variables for backward compatibility
+    bool detected;          // Whether motion was detected
+    double confidence;      // Confidence level (0.0 - 1.0)
+    QDateTime timestamp;    // When the detection occurred
+
     // Constructors
     MotionData()
-        : detected_(false), confidence_(0.0), timestamp_(QDateTime::currentDateTime()) {}
+        : detected(false), confidence(0.0), timestamp(QDateTime::currentDateTime()) {}
 
     MotionData(bool motion, double conf = 0.8)
-        : detected_(motion), confidence_(conf), timestamp_(QDateTime::currentDateTime()) {
+        : detected(motion), confidence(conf), timestamp(QDateTime::currentDateTime()) {
         validateData();
     }
 
-    // Getters
-    bool getDetected() const { return detected_; }
-    double getConfidence() const { return confidence_; }
-    QDateTime getTimestamp() const { return timestamp_; }
+    // Copy constructor
+    MotionData(const MotionData& other)
+        : detected(other.detected), confidence(other.confidence), timestamp(other.timestamp) {}
 
-    // Setters with validation
+    // Assignment operator
+    MotionData& operator=(const MotionData& other) {
+        if (this != &other) {
+            detected = other.detected;
+            confidence = other.confidence;
+            timestamp = other.timestamp;
+        }
+        return *this;
+    }
+
+    // Improved methods for better encapsulation (recommended for new code)
+    bool getDetected() const { return detected; }
+    double getConfidence() const { return confidence; }
+    QDateTime getTimestamp() const { return timestamp; }
+
     void setDetected(bool motion) {
-        detected_ = motion;
+        detected = motion;
     }
 
     void setConfidence(double conf) {
-        confidence_ = conf;
+        confidence = conf;
         validateData();
     }
 
     void updateTimestamp() {
-        timestamp_ = QDateTime::currentDateTime();
+        timestamp = QDateTime::currentDateTime();
     }
 
-    // Public methods
     QString toString() const {
         return QString("Motion: %1, Confidence: %2%, Time: %3")
-               .arg(detected_ ? "Detected" : "None")
-               .arg(confidence_ * 100, 0, 'f', 1)
-               .arg(timestamp_.toString("hh:mm:ss"));
+               .arg(detected ? "Detected" : "None")
+               .arg(confidence * 100, 0, 'f', 1)
+               .arg(timestamp.toString("hh:mm:ss"));
     }
 
-    // Backward compatibility - public member access (deprecated but functional)
-    bool& detected = detected_;
-    double& confidence = confidence_;
-    QDateTime& timestamp = timestamp_;
-
-private:
+    // Data validation method
     void validateData() {
         // Validate confidence range (0.0 to 1.0)
-        if (confidence_ < 0.0) {
-            confidence_ = 0.0;
-        } else if (confidence_ > 1.0) {
-            confidence_ = 1.0;
+        if (confidence < 0.0) {
+            confidence = 0.0;
+        } else if (confidence > 1.0) {
+            confidence = 1.0;
         }
     }
 };
 
 /**
- * System status data class with proper encapsulation
+ * System status data class (improved from struct)
+ * Provides better encapsulation while maintaining backward compatibility
  */
 class SystemStatus {
-private:
-    bool cameraActive_;
-    bool dht11Active_;
-    bool motionDetectionActive_;
-    bool alarmSystemActive_;
-    QDateTime lastUpdate_;
-
 public:
+    // Public member variables for backward compatibility
+    bool cameraActive;
+    bool dht11Active;
+    bool motionDetectionActive;
+    bool alarmSystemActive;
+    QDateTime lastUpdate;
+
     // Constructor
     SystemStatus()
-        : cameraActive_(false), dht11Active_(false),
-          motionDetectionActive_(false), alarmSystemActive_(false),
-          lastUpdate_(QDateTime::currentDateTime()) {}
+        : cameraActive(false), dht11Active(false),
+          motionDetectionActive(false), alarmSystemActive(false),
+          lastUpdate(QDateTime::currentDateTime()) {}
 
-    // Getters
-    bool getCameraActive() const { return cameraActive_; }
-    bool getDht11Active() const { return dht11Active_; }
-    bool getMotionDetectionActive() const { return motionDetectionActive_; }
-    bool getAlarmSystemActive() const { return alarmSystemActive_; }
-    QDateTime getLastUpdate() const { return lastUpdate_; }
+    // Copy constructor
+    SystemStatus(const SystemStatus& other)
+        : cameraActive(other.cameraActive), dht11Active(other.dht11Active),
+          motionDetectionActive(other.motionDetectionActive),
+          alarmSystemActive(other.alarmSystemActive), lastUpdate(other.lastUpdate) {}
 
-    // Setters
+    // Assignment operator
+    SystemStatus& operator=(const SystemStatus& other) {
+        if (this != &other) {
+            cameraActive = other.cameraActive;
+            dht11Active = other.dht11Active;
+            motionDetectionActive = other.motionDetectionActive;
+            alarmSystemActive = other.alarmSystemActive;
+            lastUpdate = other.lastUpdate;
+        }
+        return *this;
+    }
+
+    // Improved methods for better encapsulation (recommended for new code)
+    bool getCameraActive() const { return cameraActive; }
+    bool getDht11Active() const { return dht11Active; }
+    bool getMotionDetectionActive() const { return motionDetectionActive; }
+    bool getAlarmSystemActive() const { return alarmSystemActive; }
+    QDateTime getLastUpdate() const { return lastUpdate; }
+
     void setCameraActive(bool active) {
-        cameraActive_ = active;
+        cameraActive = active;
         updateTimestamp();
     }
 
     void setDht11Active(bool active) {
-        dht11Active_ = active;
+        dht11Active = active;
         updateTimestamp();
     }
 
     void setMotionDetectionActive(bool active) {
-        motionDetectionActive_ = active;
+        motionDetectionActive = active;
         updateTimestamp();
     }
 
     void setAlarmSystemActive(bool active) {
-        alarmSystemActive_ = active;
+        alarmSystemActive = active;
         updateTimestamp();
     }
 
     void updateTimestamp() {
-        lastUpdate_ = QDateTime::currentDateTime();
+        lastUpdate = QDateTime::currentDateTime();
     }
 
-    // Public methods
     bool isAllSystemsActive() const {
-        return cameraActive_ && dht11Active_ && motionDetectionActive_ && alarmSystemActive_;
+        return cameraActive && dht11Active && motionDetectionActive && alarmSystemActive;
     }
 
     QString toString() const {
         return QString("Camera: %1, DHT11: %2, Motion: %3, Alarm: %4")
-               .arg(cameraActive_ ? "OK" : "OFF")
-               .arg(dht11Active_ ? "OK" : "OFF")
-               .arg(motionDetectionActive_ ? "OK" : "OFF")
-               .arg(alarmSystemActive_ ? "OK" : "OFF");
+               .arg(cameraActive ? "OK" : "OFF")
+               .arg(dht11Active ? "OK" : "OFF")
+               .arg(motionDetectionActive ? "OK" : "OFF")
+               .arg(alarmSystemActive ? "OK" : "OFF");
     }
-
-    // Backward compatibility - public member access (deprecated but functional)
-    bool& cameraActive = cameraActive_;
-    bool& dht11Active = dht11Active_;
-    bool& motionDetectionActive = motionDetectionActive_;
-    bool& alarmSystemActive = alarmSystemActive_;
-    QDateTime& lastUpdate = lastUpdate_;
 };
 
 } // namespace BabyMonitor
