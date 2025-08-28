@@ -138,8 +138,11 @@ private:
     void handleCriticalError(const QString& component, const QString& message);
     void updateSystemStatus();
 
-    // Dependency injection methods
+public:
+    // Dependency injection methods (public for bootstrap access)
     void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
+
+private:
 };
 
 #endif // MAINWINDOW_H

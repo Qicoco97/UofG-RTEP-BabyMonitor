@@ -1,10 +1,12 @@
 // ApplicationBootstrap.h - Application startup and dependency configuration
 #pragma once
 
-#include <QObject>
 #include <memory>
 #include "ServiceContainer.h"
-#include "../mainwindow.h"
+
+// Forward declarations
+class MainWindow;
+class QWidget;
 
 namespace BabyMonitor {
 

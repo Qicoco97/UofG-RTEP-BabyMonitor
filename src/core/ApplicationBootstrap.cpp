@@ -1,5 +1,6 @@
 // ApplicationBootstrap.cpp - Application startup implementation
 #include "ApplicationBootstrap.h"
+#include "../mainwindow.h"
 #include "../managers/AlarmSystem.h"
 #include "../SensorFactory.h"
 
