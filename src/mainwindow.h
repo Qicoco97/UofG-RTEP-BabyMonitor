@@ -112,8 +112,15 @@ private:
 
     // Frame processing methods
     void processNewFrame(const cv::Mat& frame);
+
+    // Sensor management methods
+    void initializeSensors();
+    void startSensors();
+    void stopSensors();
     void initializeMotionDetection();
     void cleanupMotionDetection();
+    void initializeDHT11Sensor();
+    void cleanupDHT11Sensor();
 
     // LED control methods
     void initializeLED();

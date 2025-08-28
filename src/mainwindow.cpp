@@ -25,58 +25,31 @@ MainWindow::MainWindow(QWidget *parent)
     setupCharts();
     initializeLED();
 
-    // Initialize camera callback
-    cameraCallback.window = this;
-    camera.registerCallback(&cameraCallback);
-    ui->motionStatusLabel->setText("No Motion");
-    errorHandler_.reportInfo("Camera", "Callback registered successfully");
-    systemStatus_.cameraActive = true;  // Mark camera as active
+    // Initialize all sensors
+    initializeSensors();
 
-    // Initialize motion detection
-    initializeMotionDetection();
-    errorHandler_.reportInfo("MotionDetection", "Initialization completed");
-    systemStatus_.motionDetectionActive = true;  // Mark motion detection as active
-
+    // Initialize alarm system
     if (!alarmPub_.init()) {
         handleSystemError("AlarmPublisher", "Initialization failed");
     } else {
         errorHandler_.reportInfo("AlarmPublisher", "Initialized successfully");
-        systemStatus_.alarmSystemActive = true;  // Mark alarm system as active
+        systemStatus_.alarmSystemActive = true;
     }
 
     // Start Qt timer: call timerEvent every 1000ms
     alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
 
-    // Create DHT11 sensor using factory
-    dhtWorker_ = BabyMonitor::SensorFactory::createDHT11Worker(this);
-
-    // 2) Connect signals to UI slots
-    connect(dhtWorker_, &DHT11Worker::newReading,
-            this,       &MainWindow::onNewDHTReading);
-    connect(dhtWorker_, &DHT11Worker::errorReading,
-            this,       &MainWindow::onDHTError);
-
-    // 3) Start background thread loop reading
-    dhtWorker_->start();
-
-
-//    // PM2.5 detection
-//    pmSensor = new SDS011Detector("/dev/ttyUSB0", 9600, 75.0f);
-//    connect(pmSensor, &SDS011Detector::highPM, this, &MainWindow::onPMExceeded);
-//    pmSensor->start();
-    camera.start();
+    // Start all sensors
+    startSensors();
 }
 
 MainWindow::~MainWindow()
 {
+    // Stop all sensors
+    stopSensors();
 
     if (alarmTimerId_ != -1) killTimer(alarmTimerId_);
-    if (dhtWorker_) {
-        dhtWorker_->stop();
-        // dhtWorker_ is a child of this, no need to delete
-    }
-    cleanupMotionDetection();
-    camera.stop();
+
     delete ui;
 }
 
@@ -306,7 +279,7 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
 void MainWindow::initializeMotionDetection()
 {
     // Create motion detection using factory
-    auto motionSetup = BabyMonitor::SensorFactory::createMotionDetection(this);
+  o motionSetup = BabyMonitor::SensorFactory::  autcreateMotionDetection(this);
     motionThread_ = motionSetup.thread;
     motionWorker_ = motionSetup.worker;
 
@@ -377,5 +350,73 @@ void MainWindow::updateSystemStatus()
         errorHandler_.reportInfo("System", "All systems operational");
     } else {
         errorHandler_.reportWarning("System", "Some systems offline: " + statusText);
+    }
+}
+
+// Sensor management methods implementation
+void MainWindow::initializeSensors()
+{
+    // Initialize camera
+    cameraCallback.window = this;
+    camera.registerCallback(&cameraCallback);
+    ui->motionStatusLabel->setText("No Motion");
+    errorHandler_.reportInfo("Camera", "Callback registered successfully");
+    systemStatus_.cameraActive = true;
+
+    // Initialize DHT11 sensor
+    initializeDHT11Sensor();
+
+    // Initialize motion detection
+    initializeMotionDetection();
+    errorHandler_.reportInfo("MotionDetection", "Initialization completed");
+    systemStatus_.motionDetectionActive = true;
+}
+
+void MainWindow::startSensors()
+{
+    // Start camera
+    camera.start();
+    errorHandler_.reportInfo("Camera", "Started successfully");
+
+    // Start DHT11 sensor
+    if (dhtWorker_) {
+        dhtWorker_->start();
+        errorHandler_.reportInfo("DHT11", "Started successfully");
+    }
+
+    // Motion detection starts automatically when thread starts
+}
+
+void MainWindow::stopSensors()
+{
+    // Stop camera
+    camera.stop();
+    errorHandler_.reportInfo("Camera", "Stopped");
+
+    // Stop and cleanup sensors
+    cleanupDHT11Sensor();
+    cleanupMotionDetection();
+}
+
+void MainWindow::initializeDHT11Sensor()
+{
+    // Create DHT11 sensor using factory
+    dhtWorker_ = BabyMonitor::SensorFactory::createDHT11Worker(this);
+
+    // Connect signals to UI slots
+    connect(dhtWorker_, &DHT11Worker::newReading,
+            this,       &MainWindow::onNewDHTReading);
+    connect(dhtWorker_, &DHT11Worker::errorReading,
+            this,       &MainWindow::onDHTError);
+
+    errorHandler_.reportInfo("DHT11", "Sensor initialized");
+}
+
+void MainWindow::cleanupDHT11Sensor()
+{
+    if (dhtWorker_) {
+        dhtWorker_->stop();
+        errorHandler_.reportInfo("DHT11", "Sensor stopped");
+        // dhtWorker_ is a child of this, no need to delete
     }
 }
