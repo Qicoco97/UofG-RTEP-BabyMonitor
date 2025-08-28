@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 /**
 * Header version of LEDController,
@@ -42,19 +43,27 @@ public:
 
     // Asynchronously blink n times, each onMs on, offMs off
     void blink(int n = 3, int onMs = 200, int offMs = 100) {
-        // Need to capture member variable in lambda
+        // Prevent multiple concurrent blink operations
+        if (blinking_.load()) {
+            return; // Already blinking, ignore new request
+        }
+
+        blinking_.store(true);
         auto *line = line_;
-        std::thread([line, n, onMs, offMs]{
-            for (int i = 0; i < n; ++i) {
+        std::thread([this, line, n, onMs, offMs]{
+            for (int i = 0; i < n && line_; ++i) { // Check line_ is still valid
                 gpiod_line_set_value(line, 1);
                 std::this_thread::sleep_for(std::chrono::milliseconds(onMs));
+                if (!line_) break; // Exit if object is being destroyed
                 gpiod_line_set_value(line, 0);
                 std::this_thread::sleep_for(std::chrono::milliseconds(offMs));
             }
+            blinking_.store(false);
         }).detach();
     }
 
 private:
     gpiod_chip *chip_;
     gpiod_line *line_;
+    std::atomic<bool> blinking_{false};
 };

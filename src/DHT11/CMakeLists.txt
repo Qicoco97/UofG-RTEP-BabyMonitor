@@ -21,20 +21,17 @@ add_library(dht11gpiod STATIC
     DHT11Worker.h
     DHT11Worker.cpp
 )
-target_link_libraries(dht11gpiod
-    PUBLIC PkgConfig::GPIOD
-)
 target_include_directories(dht11gpiod
     PUBLIC ${CMAKE_SOURCE_DIR}
+)
+
+# Link libraries (consolidated to avoid duplication)
+target_link_libraries(dht11gpiod
+  PUBLIC
+    PkgConfig::GPIOD
+    Qt5::Core
 )
 
 #add_executable(dht11_test
 #    main.cpp
 #)
-
-# ���� libgpiodcxx��C++ binding��
-target_link_libraries(dht11gpiod
-  PUBLIC
-    PkgConfig::GPIOD
-    Qt5::Core 
-)

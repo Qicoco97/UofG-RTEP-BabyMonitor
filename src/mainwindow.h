@@ -82,7 +82,6 @@ private:
     
     int timeIndex;
     
-    AlarmPublisher alarmPub_;
     int            alarmTimerId_{-1};
     uint32_t       samplesSent_{1};
     bool           motionDetected_{false};
@@ -90,7 +89,7 @@ private:
 
     // Interface-based components (dependency injection)
     std::shared_ptr<BabyMonitor::IAlarmSystem> injectedAlarmSystem_;
-    std::unique_ptr<BabyMonitor::AlarmSystem> alarmSystem_; // Fallback for backward compatibility
+    // Removed: redundant alarmSystem_ and alarmPub_ instances
 
     DHT11Worker   *dhtWorker_;
 

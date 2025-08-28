@@ -21,7 +21,6 @@ MainWindow::MainWindow(QWidget *parent)
     , motionThread_(nullptr)
     , motionWorker_(nullptr)
     , injectedAlarmSystem_(nullptr)
-    , alarmSystem_(std::make_unique<BabyMonitor::AlarmSystem>(this))
 {
     ui->setupUi(this);
     setupCharts();
@@ -30,13 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize all sensors
     initializeSensors();
 
-    // Initialize alarm system using interface
-    if (alarmSystem_->initialize()) {
-        alarmSystem_->start();
-        systemStatus_.alarmSystemActive = true;
-    } else {
-        handleSystemError("AlarmPublisher", "Initialization failed");
-    }
+    // AlarmSystem will be initialized via dependency injection
+    systemStatus_.alarmSystemActive = false; // Will be set to true when injected system is initialized
 
     // Start Qt timer: call timerEvent every 1000ms
     alarmTimerId_ = startTimer(BabyMonitorConfig::ALARM_TIMER_INTERVAL_MS);
@@ -101,22 +95,18 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         return;
     }
 
-    // Use injected alarm system if available, fallback to local instance
-    if (!motionDetected_) {
-        QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
-        if (injectedAlarmSystem_) {
+    // Use injected alarm system
+    if (injectedAlarmSystem_) {
+        if (!motionDetected_) {
+            QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
         } else {
-            alarmSystem_->publishAlarm(message, 3); // High severity
+            QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
+            injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
+            motionDetected_ = false;
         }
     } else {
-        QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
-        if (injectedAlarmSystem_) {
-            injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
-        } else {
-            alarmSystem_->publishAlarm(message, 1); // Low severity
-        }
-        motionDetected_ = false;
+        errorHandler_.reportWarning("MainWindow", "No AlarmSystem available for publishing");
     }
 }
 
@@ -429,8 +419,10 @@ void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarm
     if (injectedAlarmSystem_) {
         if (injectedAlarmSystem_->initialize()) {
             injectedAlarmSystem_->start();
+            systemStatus_.alarmSystemActive = true;
             errorHandler_.reportInfo("DependencyInjection", "Injected AlarmSystem initialized and started");
         } else {
+            systemStatus_.alarmSystemActive = false;
             errorHandler_.reportError("DependencyInjection", "Failed to initialize injected AlarmSystem");
         }
     }

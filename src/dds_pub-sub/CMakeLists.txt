@@ -39,7 +39,7 @@ target_include_directories(alarmpublisher
 
 # Publisher
 
-target_link_libraries(alarmpublisher PUBLIC fastrtps fastcdr HellowWorldMsg cam2opencv PkgConfig::LIBCAMERA ${OpenCV_LIBS} gpiod)
+target_link_libraries(alarmpublisher PUBLIC fastrtps fastcdr HellowWorldMsg PkgConfig::LIBCAMERA ${OpenCV_LIBS} gpiod)
 
 
 
