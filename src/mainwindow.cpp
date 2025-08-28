@@ -279,7 +279,7 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
 void MainWindow::initializeMotionDetection()
 {
     // Create motion detection using factory
-  o motionSetup = BabyMonitor::SensorFactory::  autcreateMotionDetection(this);
+    auto motionSetup = BabyMonitor::SensorFactory::createMotionDetection(this);
     motionThread_ = motionSetup.thread;
     motionWorker_ = motionSetup.worker;
 
