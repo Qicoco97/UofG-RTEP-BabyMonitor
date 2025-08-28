@@ -72,14 +72,13 @@ private slots:
 //    void onPMExceeded(float pm25, float pm10);
 
 private:
-    Ui::MainWindow *ui;
+    std::unique_ptr<Ui::MainWindow> ui;
 
     cv::Mat previousFrame;
-    
 
     QtCharts::QLineSeries *motionSeries;
     QtCharts::QChart *motionChart;
-    
+
     QtCharts::QChart      *chart;
     QtCharts::QLineSeries *tempSeries;
     QtCharts::QLineSeries *humSeries;

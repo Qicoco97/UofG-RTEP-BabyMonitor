@@ -18,6 +18,8 @@ class SensorFactory {
 public:
     /**
      * Create DHT11 temperature/humidity sensor worker
+     * @param parent Qt parent object for automatic memory management
+     * @return Raw pointer managed by Qt object tree (parent will delete)
      */
     static DHT11Worker* createDHT11Worker(QObject* parent = nullptr) {
         return new DHT11Worker(
@@ -30,10 +32,12 @@ public:
 
     /**
      * Create motion detection worker with thread
+     * @param parent Qt parent object for automatic memory management
+     * @return Setup struct with raw pointers managed by Qt object tree
      */
     struct MotionDetectionSetup {
-        QThread* thread;
-        MotionWorker* worker;
+        QThread* thread;      // Managed by Qt parent-child relationship
+        MotionWorker* worker; // Managed by Qt parent-child relationship
     };
 
     static MotionDetectionSetup createMotionDetection(QObject* parent = nullptr) {

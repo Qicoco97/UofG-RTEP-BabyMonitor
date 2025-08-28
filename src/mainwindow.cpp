@@ -13,7 +13,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(std::make_unique<Ui::MainWindow>())
     , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
@@ -46,7 +46,7 @@ MainWindow::~MainWindow()
 
     if (alarmTimerId_ != -1) killTimer(alarmTimerId_);
 
-    delete ui;
+    // ui is now managed by unique_ptr, no manual delete needed
 }
 
 void MainWindow::setupCharts()

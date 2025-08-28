@@ -33,12 +33,19 @@ public:
     }
 
     ~LEDController() {
+        // Signal any running threads to stop
+        blinking_.store(false);
+
         // Turn off and release resources
         if (line_) {
             gpiod_line_set_value(line_, 0);
             gpiod_line_release(line_);
+            line_ = nullptr;  // ✅ 防止悬空指针
         }
-        if (chip_) gpiod_chip_close(chip_);
+        if (chip_) {
+            gpiod_chip_close(chip_);
+            chip_ = nullptr;  // ✅ 防止悬空指针
+        }
     }
 
     // Asynchronously blink n times, each onMs on, offMs off
