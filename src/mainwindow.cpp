@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
     , led_(0, 27)
     , timeIndex(0)
-    , alertSound_(new QSoundEffect(this))   // 🔔 初始化声音对象
+    , alertSound_(new QSoundEffect(this))   // 初始化声音对象
 {
     ui->setupUi(this);
     setupCharts();
@@ -27,8 +27,8 @@ MainWindow::MainWindow(QWidget *parent)
         qWarning() << "AlarmPublisher initialization failed";
     }
 
-    // 配置声音文件（请确保项目目录或资源中有 alarm.wav）
-    alertSound_->setSource(QUrl::fromLocalFile("alarm.wav"));
+    // 配置声音文件
+    alertSound_->setSource(QUrl::fromLocalFile("../img&demo/alarm.wav"));
     alertSound_->setLoopCount(QSoundEffect::Infinite);
     alertSound_->setVolume(0.8f);
 
@@ -129,7 +129,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         if (alarmPub_.publish(msg)) {
             qDebug() << "No-motion alarm sent:" << QString::fromStdString(msg.message());
             if (alertSound_ && !alertSound_->isPlaying()) {
-                alertSound_->play();   // 🔔 播放报警音
+                alertSound_->play();   // 播放报警音
             }
         } else {
             qDebug() << "No listener, alarm not sent.";
