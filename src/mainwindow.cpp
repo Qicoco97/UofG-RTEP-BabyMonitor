@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     , dht11ConsecutiveErrors_(0)
     , motionThread_(nullptr)
     , motionWorker_(nullptr)
+    , alarmSystem_(std::make_unique<BabyMonitor::AlarmSystem>(this))
 {
     ui->setupUi(this);
     setupCharts();
@@ -28,12 +29,12 @@ MainWindow::MainWindow(QWidget *parent)
     // Initialize all sensors
     initializeSensors();
 
-    // Initialize alarm system
-    if (!alarmPub_.init()) {
-        handleSystemError("AlarmPublisher", "Initialization failed");
-    } else {
-        errorHandler_.reportInfo("AlarmPublisher", "Initialized successfully");
+    // Initialize alarm system using interface
+    if (alarmSystem_->initialize()) {
+        alarmSystem_->start();
         systemStatus_.alarmSystemActive = true;
+    } else {
+        handleSystemError("AlarmPublisher", "Initialization failed");
     }
 
     // Start Qt timer: call timerEvent every 1000ms
@@ -98,26 +99,15 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         QMainWindow::timerEvent(event);
         return;
     }
+
+    // Use interface-based alarm system
     if (!motionDetected_) {
-        AlarmMsg msg;
-        msg.index(samplesSent_++);
-        msg.message("No motion detected !!!! Dangerous!");
-        if (alarmPub_.publish(msg)) {
-            qDebug() << "No-motion alarm sent:" << QString::fromStdString(msg.message());
-        } else {
-            qDebug() << "No listener, alarm not sent.";
-        }
-    }
-    else{
-        AlarmMsg msg;
-        msg.index(samplesSent_++);
-        msg.message("On motion !!!");
-        if (alarmPub_.publish(msg)) {
-            qDebug() << "motion msg sent:" << QString::fromStdString(msg.message());
-        } else {
-            qDebug() << "No listener, alarm not sent.";
-    }
-    motionDetected_ = false;
+        QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
+        alarmSystem_->publishAlarm(message, 3); // High severity
+    } else {
+        QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
+        alarmSystem_->publishAlarm(message, 1); // Low severity
+        motionDetected_ = false;
     }
 }
 

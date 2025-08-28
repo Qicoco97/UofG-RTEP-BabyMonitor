@@ -1,0 +1,50 @@
+// AlarmSystem.h - Simple alarm system implementation
+#pragma once
+
+#include <QObject>
+#include <QTimer>
+#include "../interfaces/IComponent.h"
+#include "../dds_pub-sub/AlarmPublisher.h"
+#include "../ErrorHandler.h"
+
+namespace BabyMonitor {
+
+/**
+ * Simple alarm system implementation
+ * Wraps the existing AlarmPublisher with interface compliance
+ */
+class AlarmSystem : public QObject, public IAlarmSystem {
+    Q_OBJECT
+
+public:
+    explicit AlarmSystem(QObject* parent = nullptr);
+    ~AlarmSystem();
+
+    // IComponent interface
+    bool initialize() override;
+    void start() override;
+    void stop() override;
+    bool isRunning() const override;
+    QString getName() const override { return "AlarmSystem"; }
+    bool isHealthy() const override;
+
+    // IAlarmSystem interface
+    bool publishAlarm(const QString& message, int severity = 1) override;
+    bool hasSubscribers() const override;
+    void setPublishInterval(int intervalMs) override;
+
+signals:
+    void alarmPublished(const QString& message);
+    void publishFailed(const QString& error);
+
+private:
+    AlarmPublisher alarmPublisher_;
+    bool isInitialized_;
+    bool isRunning_;
+    int publishInterval_;
+    ErrorHandler& errorHandler_;
+    
+    QString formatAlarmMessage(const QString& message, int severity) const;
+};
+
+} // namespace BabyMonitor

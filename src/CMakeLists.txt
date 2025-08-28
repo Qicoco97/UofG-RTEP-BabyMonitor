@@ -35,6 +35,7 @@ add_executable(baby
     libcam2opencv.cpp
     motionworker.cpp
     ErrorHandler.cpp
+    managers/AlarmSystem.cpp
     mainwindow.h
     SensorFactory.h
     mainwindow.ui

@@ -9,12 +9,15 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChart>
+#include <memory>
 #include "DHT11Worker.h"
 #include "AlarmPublisher.h"
 #include "LedController.h"
 #include "Config.h"
 #include "SensorData.h"
 #include "SensorFactory.h"
+#include "interfaces/IComponent.h"
+#include "managers/AlarmSystem.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -79,11 +82,14 @@ private:
     
     int timeIndex;
     
-    AlarmPublisher alarmPub_; 
+    AlarmPublisher alarmPub_;
     int            alarmTimerId_{-1};
     uint32_t       samplesSent_{1};
     bool           motionDetected_{false};
     LEDController     led_;
+
+    // Interface-based components
+    std::unique_ptr<BabyMonitor::AlarmSystem> alarmSystem_;
 
     DHT11Worker   *dhtWorker_;
 
