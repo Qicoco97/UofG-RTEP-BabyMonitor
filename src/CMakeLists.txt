@@ -46,6 +46,7 @@ add_executable(baby
     interfaces/IComponent.h
     SensorFactory.h
     ErrorHandler.h
+    performance/PerformanceMonitor.h
     mainwindow.ui
   )
 

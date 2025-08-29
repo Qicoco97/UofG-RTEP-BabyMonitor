@@ -4,6 +4,7 @@
 #include <atomic>
 #include <chrono>
 #include "DHT11Gpio.h"
+#include "../performance/PerformanceMonitor.h"
 
 class DHT11Worker : public QObject {
     Q_OBJECT
@@ -13,6 +14,7 @@ public:
       : QObject(parent)
       , sensor_(chip.toStdString(), line)
       , readInterval_(readIntervalSeconds)
+      , perfMonitor_(BabyMonitor::PerformanceMonitor::getInstance())
     {}
 
     ~DHT11Worker() {
@@ -30,7 +32,15 @@ public:
                 return;
             }
             while (running_) {
+                // Start sensor read timing
+                BabyMonitor::HighPrecisionTimer readTimer;
+                readTimer.start();
+
                 if (sensor_.read()) {
+                    // Record successful read performance
+                    double readTime = readTimer.elapsedMs();
+                    perfMonitor_.recordLatency("DHT11Worker", "SensorReading", readTime);
+
                     emit newReading(
                         sensor_.temperatureInt(),
                         sensor_.temperatureDec(),
@@ -38,6 +48,10 @@ public:
                         sensor_.humidityDec()
                     );
                 } else {
+                    // Record failed read performance (still useful for monitoring)
+                    double readTime = readTimer.elapsedMs();
+                    perfMonitor_.recordLatency("DHT11Worker", "SensorReading", readTime);
+
                     emit errorReading();
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(readInterval_));
@@ -61,5 +75,8 @@ private:
     std::thread          workerThread_;
     std::atomic<bool>    running_{false};
     int                  readInterval_;  // Read interval in seconds
+
+    // Performance monitoring
+    BabyMonitor::PerformanceMonitor& perfMonitor_;
 };
 

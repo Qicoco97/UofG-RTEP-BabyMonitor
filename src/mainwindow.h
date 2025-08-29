@@ -20,6 +20,7 @@
 #include "SensorFactory.h"
 #include "interfaces/IComponent.h"
 #include "managers/AlarmSystem.h"
+#include "performance/PerformanceMonitor.h"
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -113,6 +114,16 @@ private:
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
+    // Performance monitoring
+    BabyMonitor::PerformanceMonitor& perfMonitor_;
+    BabyMonitor::HighPrecisionTimer frameTimer_;
+    BabyMonitor::HighPrecisionTimer alarmTimer_;
+
+    // Adaptive frame processing
+    bool isFrameProcessingAdapted_;
+    int frameSkipCounter_;
+    int adaptiveFrameSkip_;
+
     // DHT11 error tracking
     int dht11ConsecutiveErrors_;
     static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
@@ -154,6 +165,12 @@ private:
     void initializeAudioPlayer();
     void playAlarmSound();
     void onAudioPlayerStateChanged(QMediaPlayer::State state);
+
+    // Performance monitoring methods
+    void initializePerformanceMonitoring();
+    void adaptFrameProcessing();
+    void recoverFrameProcessing();
+    void onMotionWorkerPerformanceAlert(const QString& message);
 
     // Camera and callback (moved to private for better encapsulation)
     Libcam2OpenCV camera;

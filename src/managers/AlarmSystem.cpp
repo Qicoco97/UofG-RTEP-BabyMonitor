@@ -11,6 +11,9 @@ AlarmSystem::AlarmSystem(QObject* parent)
     , isRunning_(false)
     , publishInterval_(1000)
     , errorHandler_(ErrorHandler::getInstance())
+    , perfMonitor_(PerformanceMonitor::getInstance())
+    , isAdaptedPublishMode_(false)
+    , adaptivePublishInterval_(1000)
 {
 }
 
@@ -72,6 +75,9 @@ bool AlarmSystem::publishAlarm(const QString& message, int severity)
         errorHandler_.reportWarning("AlarmSystem", "Cannot publish - system not running");
         return false;
     }
+
+    // Start publish timing
+    publishTimer_.start();
     
     QString formattedMessage = formatAlarmMessage(message, severity);
 
@@ -80,7 +86,20 @@ bool AlarmSystem::publishAlarm(const QString& message, int severity)
     msg.index(severity);
     msg.message(formattedMessage.toStdString());
 
-    if (alarmPublisher_.publish(msg)) {
+    bool publishResult = alarmPublisher_.publish(msg);
+
+    // Record publish performance
+    double publishTime = publishTimer_.elapsedMs();
+    perfMonitor_.recordLatency("AlarmSystem", "AlarmResponse", publishTime);
+
+    // Check if publish frequency adaptation is needed
+    if (perfMonitor_.shouldAdaptPerformance("AlarmSystem", "AlarmResponse")) {
+        adaptPublishFrequency();
+    } else if (isAdaptedPublishMode_ && perfMonitor_.canRecoverPerformance("AlarmSystem", "AlarmResponse")) {
+        recoverPublishFrequency();
+    }
+
+    if (publishResult) {
         // Successfully published to subscribers
         errorHandler_.reportInfo("AlarmSystem", QString("Alarm published: %1").arg(message));
         emit alarmPublished(message);
@@ -129,6 +148,32 @@ QString AlarmSystem::formatAlarmMessage(const QString& message, int severity) co
            .arg(now.toString("yyyy-MM-dd hh:mm:ss"))
            .arg(severity)
            .arg(message);
+}
+
+void AlarmSystem::adaptPublishFrequency()
+{
+    if (isAdaptedPublishMode_) return; // Already adapted
+
+    // Reduce publish frequency to improve performance
+    adaptivePublishInterval_ = publishInterval_ * 2; // Double the interval
+    isAdaptedPublishMode_ = true;
+
+    errorHandler_.reportInfo("AlarmSystem",
+        QString("Publish frequency adapted: interval increased to %1ms for performance")
+        .arg(adaptivePublishInterval_));
+}
+
+void AlarmSystem::recoverPublishFrequency()
+{
+    if (!isAdaptedPublishMode_) return; // Not in adapted mode
+
+    // Restore original publish frequency
+    adaptivePublishInterval_ = publishInterval_;
+    isAdaptedPublishMode_ = false;
+
+    errorHandler_.reportInfo("AlarmSystem",
+        QString("Publish frequency recovered: restored to %1ms interval")
+        .arg(publishInterval_));
 }
 
 } // namespace BabyMonitor

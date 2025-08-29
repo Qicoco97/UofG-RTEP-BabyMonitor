@@ -6,6 +6,7 @@
 #include "../interfaces/IComponent.h"
 #include "../dds_pub-sub/AlarmPublisher.h"
 #include "../ErrorHandler.h"
+#include "../performance/PerformanceMonitor.h"
 
 namespace BabyMonitor {
 
@@ -43,8 +44,16 @@ private:
     bool isRunning_;
     int publishInterval_;
     ErrorHandler& errorHandler_;
-    
+
+    // Performance monitoring
+    PerformanceMonitor& perfMonitor_;
+    HighPrecisionTimer publishTimer_;
+    bool isAdaptedPublishMode_;
+    int adaptivePublishInterval_;
+
     QString formatAlarmMessage(const QString& message, int severity) const;
+    void adaptPublishFrequency();
+    void recoverPublishFrequency();
 };
 
 } // namespace BabyMonitor
