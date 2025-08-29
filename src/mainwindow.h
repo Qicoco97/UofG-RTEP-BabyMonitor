@@ -182,6 +182,7 @@ private:
     void onMotionWorkerPerformanceAlert(const QString& message);
     void logPerformanceReport(); // New method for periodic performance logging
     void triggerPerformanceTest(); // Manual performance test trigger
+    void updatePerformanceDisplay(); // Update UI with performance info
 
     // Camera and callback (moved to private for better encapsulation)
     Libcam2OpenCV camera;

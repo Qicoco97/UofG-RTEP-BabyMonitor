@@ -542,7 +542,10 @@ void MainWindow::initializePerformanceMonitoring()
     performanceReportTimer_->start(BabyMonitorConfig::PERFORMANCE_CHECK_INTERVAL_MS); // Every 5 seconds
 
     errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized with periodic reporting");
-    errorHandler_.reportInfo("PerformanceTest", "HOTKEYS: P=Report, T=Progressive Test, S=Severe Test, A=Force Adapt, R=Reset&Recover");
+    errorHandler_.reportInfo("PerformanceTest", "HOTKEYS: P=Report, T=Progressive, S=Severe, A=Force Adapt, X=Extreme, R=Reset&Recover");
+
+    // Initialize performance display
+    updatePerformanceDisplay();
 }
 
 void MainWindow::adaptFrameProcessing()
@@ -555,6 +558,9 @@ void MainWindow::adaptFrameProcessing()
 
     errorHandler_.reportInfo("PerformanceMonitor",
         "Frame processing adapted: skipping frames for performance");
+
+    // Update UI immediately
+    updatePerformanceDisplay();
 }
 
 void MainWindow::recoverFrameProcessing()
@@ -567,6 +573,9 @@ void MainWindow::recoverFrameProcessing()
 
     errorHandler_.reportInfo("PerformanceMonitor",
         "Frame processing recovered: restored full frame rate");
+
+    // Update UI immediately
+    updatePerformanceDisplay();
 }
 
 void MainWindow::onMotionWorkerPerformanceAlert(const QString& message)
@@ -581,7 +590,49 @@ void MainWindow::logPerformanceReport()
 {
     if (perfMonitor_) {
         perfMonitor_->logPerformanceReport();
+        updatePerformanceDisplay(); // Also update UI display
     }
+}
+
+void MainWindow::updatePerformanceDisplay()
+{
+    if (!perfMonitor_) return;
+
+    // Create performance status text
+    QString perfText = "PERFORMANCE: ";
+
+    auto motionStats = perfMonitor_->getStats("MotionWorker", "MotionDetection");
+    auto frameStats = perfMonitor_->getStats("MainWindow", "FrameProcessing");
+    auto alarmStats = perfMonitor_->getStats("AlarmSystem", "AlarmResponse");
+
+    if (motionStats && frameStats) {
+        double motionLevel = perfMonitor_->getPerformanceLevel("MotionWorker", "MotionDetection") * 100;
+        double frameLevel = perfMonitor_->getPerformanceLevel("MainWindow", "FrameProcessing") * 100;
+
+        perfText += QString("Motion:%1%(%2ms) Frame:%3%(%4ms)")
+                   .arg(motionLevel, 0, 'f', 0)
+                   .arg(motionStats->getAverage(), 0, 'f', 1)
+                   .arg(frameLevel, 0, 'f', 0)
+                   .arg(frameStats->getAverage(), 0, 'f', 1);
+
+        if (alarmStats) {
+            double alarmLevel = perfMonitor_->getPerformanceLevel("AlarmSystem", "AlarmResponse") * 100;
+            perfText += QString(" Alarm:%1%(%2ms)")
+                       .arg(alarmLevel, 0, 'f', 0)
+                       .arg(alarmStats->getAverage(), 0, 'f', 1);
+        }
+    } else {
+        perfText += "No data yet";
+    }
+
+    if (isFrameProcessingAdapted_) {
+        perfText += " ⚠️ADAPTED⚠️";
+    }
+
+    // Update the motion status label with performance info
+    ui->motionStatusLabel->setText(perfText);
+
+    errorHandler_.reportInfo("UI", QString("Performance display updated: %1").arg(perfText));
 }
 
 void MainWindow::triggerPerformanceTest()
@@ -653,6 +704,24 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
 
         errorHandler_.reportInfo("PerformanceTest", "All adaptations triggered - check UI for ADAPTED status");
+        updatePerformanceDisplay(); // Update UI immediately
+        break;
+    case Qt::Key_X:
+        // Press 'X' to trigger EXTREME stress test (guaranteed auto-adaptation)
+        if (perfMonitor_) {
+            errorHandler_.reportInfo("PerformanceTest", "=== EXTREME STRESS TEST - GUARANTEED AUTO-ADAPTATION ===");
+
+            // Clear stats first to ensure clean test
+            perfMonitor_->clearStats();
+
+            // Add extreme stress that will definitely trigger auto-adaptation
+            perfMonitor_->simulatePerformanceStress("MotionWorker", "MotionDetection", 200.0);  // Way over limit
+            perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", 100.0);    // Way over limit
+            perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", 500.0);     // Way over limit
+
+            errorHandler_.reportInfo("PerformanceTest", "Extreme stress applied - auto-adaptation should trigger on next frame");
+            updatePerformanceDisplay();
+        }
         break;
     case Qt::Key_R:
         // Press 'R' to reset performance statistics and recover
@@ -667,6 +736,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             }
 
             errorHandler_.reportInfo("PerformanceTest", "All components recovered to normal performance mode");
+            updatePerformanceDisplay(); // Update UI immediately
         }
         break;
     default:

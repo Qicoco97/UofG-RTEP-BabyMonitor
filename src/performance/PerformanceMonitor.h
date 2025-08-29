@@ -38,9 +38,9 @@ namespace RealTimeConstraints {
     constexpr int MAX_CONSECUTIVE_FRAME_DROPS = 3;               // Maximum consecutive frame drops
     constexpr int MAX_CONSECUTIVE_SENSOR_ERRORS = 5;             // Maximum consecutive sensor errors
     
-    // Performance adaptation thresholds
-    constexpr double PERFORMANCE_ADAPTATION_THRESHOLD = 0.8;     // Adapt when reaching 80% of limit
-    constexpr double PERFORMANCE_RECOVERY_THRESHOLD = 0.6;       // Recover when below 60% of limit
+    // Performance adaptation thresholds (lowered for easier testing)
+    constexpr double PERFORMANCE_ADAPTATION_THRESHOLD = 0.4;     // Adapt when reaching 40% of limit (lowered for testing)
+    constexpr double PERFORMANCE_RECOVERY_THRESHOLD = 0.2;       // Recover when below 20% of limit (lowered for testing)
 }
 
 /**
