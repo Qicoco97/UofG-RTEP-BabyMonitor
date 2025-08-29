@@ -9,6 +9,8 @@
 #include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 #include <QtCharts/QChart>
+#include <QMediaPlayer>
+#include <QUrl>
 #include <memory>
 #include "DHT11Worker.h"
 #include "AlarmPublisher.h"
@@ -115,6 +117,11 @@ private:
     int dht11ConsecutiveErrors_;
     static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
 
+    // Audio alarm system
+    QMediaPlayer* audioPlayer_;
+    int noMotionCount_;
+    bool alarmPlaying_;
+
     void setupCharts();
 
     // Chart management methods
@@ -142,6 +149,11 @@ private:
     void handleSystemError(const QString& component, const QString& message);
     void handleCriticalError(const QString& component, const QString& message);
     void updateSystemStatus();
+
+    // Audio alarm methods
+    void initializeAudioPlayer();
+    void playAlarmSound();
+    void onAudioPlayerStateChanged(QMediaPlayer::State state);
 
     // Camera and callback (moved to private for better encapsulation)
     Libcam2OpenCV camera;
