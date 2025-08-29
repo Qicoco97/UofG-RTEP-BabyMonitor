@@ -407,15 +407,25 @@ void MainWindow::updateSystemStatus()
     if (BabyMonitorConfig::ENABLE_PERFORMANCE_MONITORING && perfMonitor_) {
         auto motionStats = perfMonitor_->getStats("MotionWorker", "MotionDetection");
         auto frameStats = perfMonitor_->getStats("MainWindow", "FrameProcessing");
+        auto alarmStats = perfMonitor_->getStats("AlarmSystem", "AlarmResponse");
 
         if (motionStats && frameStats) {
-            statusText += QString(" | Motion: %1ms | Frame: %2ms")
-                         .arg(motionStats->getAverage(), 0, 'f', 1)
-                         .arg(frameStats->getAverage(), 0, 'f', 1);
+            // Show performance levels as percentages
+            double motionLevel = perfMonitor_->getPerformanceLevel("MotionWorker", "MotionDetection") * 100;
+            double frameLevel = perfMonitor_->getPerformanceLevel("MainWindow", "FrameProcessing") * 100;
+
+            statusText += QString(" | PERF: M:%1% F:%2%")
+                         .arg(motionLevel, 0, 'f', 0)
+                         .arg(frameLevel, 0, 'f', 0);
+
+            if (alarmStats) {
+                double alarmLevel = perfMonitor_->getPerformanceLevel("AlarmSystem", "AlarmResponse") * 100;
+                statusText += QString(" A:%1%").arg(alarmLevel, 0, 'f', 0);
+            }
         }
 
         if (isFrameProcessingAdapted_) {
-            statusText += " | ADAPTED";
+            statusText += " | ⚠️ADAPTED";
         }
     }
 
@@ -577,18 +587,30 @@ void MainWindow::triggerPerformanceTest()
 {
     if (!perfMonitor_) return;
 
-    errorHandler_.reportInfo("PerformanceTest", "=== PERFORMANCE STRESS TEST STARTED ===");
+    static int testLevel = 1;
 
-    // Simulate motion detection stress
-    perfMonitor_->simulatePerformanceStress("MotionWorker", "MotionDetection", 50.0);
+    errorHandler_.reportInfo("PerformanceTest",
+        QString("=== PERFORMANCE STRESS TEST LEVEL %1 STARTED ===").arg(testLevel));
 
-    // Simulate frame processing stress
-    perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", 20.0);
+    // Progressive stress testing - each press increases stress level
+    double motionStress = 25.0 * testLevel;    // Will exceed 50ms limit at level 3
+    double frameStress = 10.0 * testLevel;     // Will exceed 20ms limit at level 3
+    double alarmStress = 50.0 * testLevel;     // Will exceed 100ms limit at level 3
 
-    // Simulate alarm response stress
-    perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", 100.0);
+    // Simulate stress with increasing intensity
+    perfMonitor_->simulatePerformanceStress("MotionWorker", "MotionDetection", motionStress);
+    perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", frameStress);
+    perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", alarmStress);
 
-    errorHandler_.reportInfo("PerformanceTest", "Performance stress simulation completed - check for adaptation messages");
+    errorHandler_.reportInfo("PerformanceTest",
+        QString("Applied stress: Motion +%1ms, Frame +%2ms, Alarm +%3ms")
+        .arg(motionStress).arg(frameStress).arg(alarmStress));
+
+    testLevel++;
+    if (testLevel > 5) testLevel = 1; // Reset after 5 levels
+
+    errorHandler_.reportInfo("PerformanceTest",
+        "Performance stress simulation completed - watch for adaptation in next few frames");
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -599,14 +621,27 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         logPerformanceReport();
         break;
     case Qt::Key_T:
-        // Press 'T' to trigger performance stress test
+        // Press 'T' to trigger progressive performance stress test
         triggerPerformanceTest();
+        break;
+    case Qt::Key_S:
+        // Press 'S' to trigger SEVERE stress test (guaranteed to trigger adaptation)
+        if (perfMonitor_) {
+            errorHandler_.reportInfo("PerformanceTest", "=== SEVERE STRESS TEST - FORCING ADAPTATION ===");
+
+            // Add stress that will definitely exceed 80% threshold
+            perfMonitor_->simulatePerformanceStress("MotionWorker", "MotionDetection", 45.0);  // Will push to ~90%
+            perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", 18.0);    // Will push to ~90%
+            perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", 90.0);     // Will push to ~90%
+
+            errorHandler_.reportInfo("PerformanceTest", "Severe stress applied - adaptation should trigger immediately");
+        }
         break;
     case Qt::Key_R:
         // Press 'R' to reset performance statistics
         if (perfMonitor_) {
             perfMonitor_->clearStats();
-            errorHandler_.reportInfo("PerformanceTest", "Performance statistics cleared");
+            errorHandler_.reportInfo("PerformanceTest", "Performance statistics cleared - system will recover to normal");
         }
         break;
     default:
