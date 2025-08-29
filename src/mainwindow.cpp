@@ -418,7 +418,8 @@ void MainWindow::updateSystemStatus()
         }
     }
 
-    ui->systemStatusLabel->setText(statusText);
+    // Update motion status label with performance info
+    ui->motionStatusLabel->setText(statusText);
 
     // Log system status
     if (systemStatus_.isAllSystemsActive()) {
@@ -549,46 +550,6 @@ void MainWindow::recoverFrameProcessing()
 
     errorHandler_.reportInfo("PerformanceMonitor",
         "Frame processing recovered: restored full frame rate");
-}
-
-void MainWindow::initializePerformanceMonitoring()
-{
-    // Initialize performance monitoring state
-    isFrameProcessingAdapted_ = false;
-    frameSkipCounter_ = 0;
-    adaptiveFrameSkip_ = 1;
-
-    errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized");
-}
-
-void MainWindow::adaptFrameProcessing()
-{
-    if (isFrameProcessingAdapted_) return; // Already adapted
-
-    // Start skipping every other frame to improve performance
-    adaptiveFrameSkip_ = 2;
-    isFrameProcessingAdapted_ = true;
-
-    errorHandler_.reportInfo("PerformanceMonitor",
-        "Frame processing adapted: skipping frames for performance");
-
-    // Update system status to reflect adaptation
-    updateSystemStatus();
-}
-
-void MainWindow::recoverFrameProcessing()
-{
-    if (!isFrameProcessingAdapted_) return; // Not in adapted mode
-
-    // Restore normal frame processing
-    adaptiveFrameSkip_ = 1;
-    isFrameProcessingAdapted_ = false;
-
-    errorHandler_.reportInfo("PerformanceMonitor",
-        "Frame processing recovered: restored full frame rate");
-
-    // Update system status to reflect recovery
-    updateSystemStatus();
 }
 
 void MainWindow::onMotionWorkerPerformanceAlert(const QString& message)
