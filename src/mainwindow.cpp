@@ -597,7 +597,7 @@ void MainWindow::updatePerformanceDisplay()
     }
 
     if (isFrameProcessingAdapted_) {
-        perfText += "\n\n⚠️ SYSTEM ADAPTED FOR PERFORMANCE ⚠️";
+        perfText += "\n\n!! SYSTEM ADAPTED FOR PERFORMANCE !!";
     }
 
     // Update the dedicated performance status label
