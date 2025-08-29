@@ -21,6 +21,12 @@
 #include "interfaces/IComponent.h"
 #include "managers/AlarmSystem.h"
 
+// Forward declarations for performance monitoring
+namespace BabyMonitor {
+    class PerformanceMonitor;
+    class HighPrecisionTimer;
+}
+
 QT_CHARTS_USE_NAMESPACE
 
 #include "ErrorHandler.h"
@@ -60,6 +66,7 @@ public:
     
 protected:
     void timerEvent(QTimerEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override; // For performance testing hotkeys
     
 signals:
     // Emit this signal every time there is a new frame.
@@ -113,6 +120,19 @@ private:
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
+    // Performance monitoring (using raw pointers to avoid incomplete type issues)
+    BabyMonitor::PerformanceMonitor* perfMonitor_;
+    BabyMonitor::HighPrecisionTimer* frameTimer_;
+    BabyMonitor::HighPrecisionTimer* alarmTimer_;
+
+    // Adaptive frame processing
+    bool isFrameProcessingAdapted_;
+    int frameSkipCounter_;
+    int adaptiveFrameSkip_;
+
+    // Performance reporting
+    QTimer* performanceReportTimer_;
+
     // DHT11 error tracking
     int dht11ConsecutiveErrors_;
     static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
@@ -154,6 +174,14 @@ private:
     void initializeAudioPlayer();
     void playAlarmSound();
     void onAudioPlayerStateChanged(QMediaPlayer::State state);
+
+    // Performance monitoring methods
+    void initializePerformanceMonitoring();
+    void adaptFrameProcessing();
+    void recoverFrameProcessing();
+    void onMotionWorkerPerformanceAlert(const QString& message);
+    void logPerformanceReport();
+    void updatePerformanceDisplay();
 
     // Camera and callback (moved to private for better encapsulation)
     Libcam2OpenCV camera;

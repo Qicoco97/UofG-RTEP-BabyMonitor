@@ -3,9 +3,16 @@
 
 #include <QObject>
 #include <QTimer>
+#include <memory>
 #include "../interfaces/IComponent.h"
 #include "../dds_pub-sub/AlarmPublisher.h"
 #include "../ErrorHandler.h"
+
+// Forward declarations
+namespace BabyMonitor {
+    class PerformanceMonitor;
+    class HighPrecisionTimer;
+}
 
 namespace BabyMonitor {
 
@@ -43,8 +50,16 @@ private:
     bool isRunning_;
     int publishInterval_;
     ErrorHandler& errorHandler_;
-    
+
+    // Performance monitoring (using raw pointers to avoid incomplete type issues)
+    BabyMonitor::PerformanceMonitor* perfMonitor_;
+    BabyMonitor::HighPrecisionTimer* publishTimer_;
+    bool isAdaptedPublishMode_;
+    int adaptivePublishInterval_;
+
     QString formatAlarmMessage(const QString& message, int severity) const;
+    void adaptPublishFrequency();
+    void recoverPublishFrequency();
 };
 
 } // namespace BabyMonitor

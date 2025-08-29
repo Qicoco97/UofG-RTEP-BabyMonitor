@@ -11,7 +11,9 @@
 #include <QCoreApplication>
 #include <QMediaPlayer>
 #include <QUrl>
+#include <QKeyEvent>
 #include <motionworker.h>
+#include "performance/PerformanceMonitor.h"
 #include <opencv2/opencv.hpp>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -20,6 +22,12 @@ MainWindow::MainWindow(QWidget *parent)
     , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
+    , perfMonitor_(&BabyMonitor::PerformanceMonitor::getInstance())
+    , frameTimer_(new BabyMonitor::HighPrecisionTimer())
+    , alarmTimer_(new BabyMonitor::HighPrecisionTimer())
+    , isFrameProcessingAdapted_(false)
+    , frameSkipCounter_(0)
+    , adaptiveFrameSkip_(1)
     , dht11ConsecutiveErrors_(0)
     , motionThread_(nullptr)
     , motionWorker_(nullptr)
@@ -32,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupCharts();
     initializeLED();
     initializeAudioPlayer();
+    initializePerformanceMonitoring();
 
     // Initialize all sensors
     initializeSensors();
@@ -59,6 +68,10 @@ MainWindow::~MainWindow()
         delete audioPlayer_;
         audioPlayer_ = nullptr;
     }
+
+    // Clean up performance timers
+    delete frameTimer_;
+    delete alarmTimer_;
 
     // ui is now managed by unique_ptr, no manual delete needed
 }
@@ -109,6 +122,9 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         return;
     }
 
+    // Start alarm response timing
+    alarmTimer_->start();
+
     // Use injected alarm system
     if (injectedAlarmSystem_) {
         if (!motionDetected_) {
@@ -131,6 +147,12 @@ void MainWindow::timerEvent(QTimerEvent *event) {
         }
     } else {
         errorHandler_.reportWarning("MainWindow", "No AlarmSystem available for publishing");
+    }
+
+    // Record alarm response performance
+    double alarmResponseTime = alarmTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("MainWindow", "AlarmResponse", alarmResponseTime);
     }
 }
 
@@ -281,6 +303,15 @@ void MainWindow::updateMotionChart(const BabyMonitor::MotionData& data)
 // Frame processing methods implementation
 void MainWindow::processNewFrame(const cv::Mat& frame)
 {
+    // Start frame processing timing
+    frameTimer_->start();
+
+    // Adaptive frame processing - skip frames if performance is poor
+    frameSkipCounter_++;
+    if (isFrameProcessingAdapted_ && frameSkipCounter_ % adaptiveFrameSkip_ != 0) {
+        return; // Skip this frame for performance
+    }
+
     // Update camera display
     updateImage(frame);
 
@@ -289,6 +320,19 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
 
     // Trigger UI update (this was missing!)
     update();
+
+    // Record frame processing performance
+    double frameProcessingTime = frameTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("MainWindow", "FrameProcessing", frameProcessingTime);
+
+        // Check if frame processing adaptation is needed
+        if (perfMonitor_->shouldAdaptPerformance("MainWindow", "FrameProcessing")) {
+            adaptFrameProcessing();
+        } else if (isFrameProcessingAdapted_ && perfMonitor_->canRecoverPerformance("MainWindow", "FrameProcessing")) {
+            recoverFrameProcessing();
+        }
+    }
 }
 
 void MainWindow::initializeMotionDetection()
@@ -300,6 +344,10 @@ void MainWindow::initializeMotionDetection()
 
     // Setup connections using factory
     BabyMonitor::SensorFactory::connectMotionDetection(motionSetup, this, this);
+
+    // Connect performance alert signal
+    connect(motionWorker_, &MotionWorker::performanceAlert,
+            this, &MainWindow::onMotionWorkerPerformanceAlert);
 
     // Start thread
     motionThread_->start();
@@ -359,6 +407,9 @@ void MainWindow::updateSystemStatus()
 
     // Update UI based on system status
     QString statusText = systemStatus_.toString();
+
+    // Keep motion status simple - just show motion detection result
+    ui->motionStatusLabel->setText(motionDetected_ ? "Motion Detected" : "No Motion");
 
     // Log system status
     if (systemStatus_.isAllSystemsActive()) {
@@ -454,6 +505,145 @@ void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarm
     }
 
     errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
+}
+
+// Performance monitoring methods implementation
+void MainWindow::initializePerformanceMonitoring()
+{
+    // Initialize performance monitoring state
+    isFrameProcessingAdapted_ = false;
+    frameSkipCounter_ = 0;
+    adaptiveFrameSkip_ = 1;
+
+    // Setup performance reporting timer
+    performanceReportTimer_ = new QTimer(this);
+    connect(performanceReportTimer_, &QTimer::timeout, this, &MainWindow::logPerformanceReport);
+    performanceReportTimer_->start(BabyMonitorConfig::PERFORMANCE_CHECK_INTERVAL_MS); // Every 5 seconds
+
+    errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized with periodic reporting");
+    errorHandler_.reportInfo("PerformanceTest", "HOTKEYS: P=Report, A=Adapt, R=Reset");
+
+    // Initialize performance display
+    updatePerformanceDisplay();
+}
+
+void MainWindow::adaptFrameProcessing()
+{
+    if (isFrameProcessingAdapted_) return; // Already adapted
+
+    // Start skipping every other frame to improve performance
+    adaptiveFrameSkip_ = 2;
+    isFrameProcessingAdapted_ = true;
+
+    errorHandler_.reportInfo("PerformanceMonitor", "Frame processing adapted: skipping frames");
+    updatePerformanceDisplay();
+}
+
+void MainWindow::recoverFrameProcessing()
+{
+    if (!isFrameProcessingAdapted_) return; // Not in adapted mode
+
+    // Restore normal frame processing
+    adaptiveFrameSkip_ = 1;
+    isFrameProcessingAdapted_ = false;
+
+    errorHandler_.reportInfo("PerformanceMonitor", "Frame processing recovered");
+    updatePerformanceDisplay();
+}
+
+void MainWindow::onMotionWorkerPerformanceAlert(const QString& message)
+{
+    errorHandler_.reportInfo("MotionWorker", message);
+    updatePerformanceDisplay(); // Update performance display instead of system status
+}
+
+void MainWindow::logPerformanceReport()
+{
+    if (perfMonitor_) {
+        perfMonitor_->logPerformanceReport();
+        updatePerformanceDisplay(); // Also update UI display
+    }
+}
+
+void MainWindow::updatePerformanceDisplay()
+{
+    if (!perfMonitor_) return;
+
+    QString perfText;
+
+    auto motionStats = perfMonitor_->getStats("MotionWorker", "MotionDetection");
+    auto frameStats = perfMonitor_->getStats("MainWindow", "FrameProcessing");
+    auto alarmStats = perfMonitor_->getStats("AlarmSystem", "AlarmResponse");
+
+    if (motionStats && frameStats) {
+        double motionLevel = perfMonitor_->getPerformanceLevel("MotionWorker", "MotionDetection") * 100;
+        double frameLevel = perfMonitor_->getPerformanceLevel("MainWindow", "FrameProcessing") * 100;
+
+        perfText += QString("Motion Detection: %1ms (%2%)\n")
+                   .arg(motionStats->getAverage(), 0, 'f', 1)
+                   .arg(motionLevel, 0, 'f', 0);
+
+        perfText += QString("Frame Processing: %1ms (%2%)\n")
+                   .arg(frameStats->getAverage(), 0, 'f', 1)
+                   .arg(frameLevel, 0, 'f', 0);
+
+        if (alarmStats) {
+            double alarmLevel = perfMonitor_->getPerformanceLevel("AlarmSystem", "AlarmResponse") * 100;
+            perfText += QString("Alarm Response: %1ms (%2%)\n")
+                       .arg(alarmStats->getAverage(), 0, 'f', 1)
+                       .arg(alarmLevel, 0, 'f', 0);
+        }
+
+        perfText += QString("\nSamples: M:%1 F:%2")
+                   .arg(motionStats->getSampleCount())
+                   .arg(frameStats->getSampleCount());
+    } else {
+        perfText = "Collecting performance data...";
+    }
+
+    if (isFrameProcessingAdapted_) {
+        perfText += "\n\n!! SYSTEM ADAPTED FOR PERFORMANCE !!";
+    }
+
+    // Update the dedicated performance status label
+    ui->performanceStatusLabel->setText(perfText);
+}
+
+
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_P:
+        // Press 'P' to show performance report
+        logPerformanceReport();
+        updatePerformanceDisplay();
+        break;
+    case Qt::Key_A:
+        // Press 'A' to manually trigger adaptation (for demonstration)
+        errorHandler_.reportInfo("PerformanceTest", "Manual adaptation triggered");
+        adaptFrameProcessing();
+        if (motionWorker_) {
+            motionWorker_->forceAdaptation();
+        }
+        updatePerformanceDisplay();
+        break;
+    case Qt::Key_R:
+        // Press 'R' to reset and recover
+        if (perfMonitor_) {
+            perfMonitor_->clearStats();
+            recoverFrameProcessing();
+            if (motionWorker_) {
+                motionWorker_->forceRecovery();
+            }
+            errorHandler_.reportInfo("PerformanceTest", "System reset to normal mode");
+            updatePerformanceDisplay();
+        }
+        break;
+    default:
+        QMainWindow::keyPressEvent(event);
+        break;
+    }
 }
 
 // Audio alarm methods implementation

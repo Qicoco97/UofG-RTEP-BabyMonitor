@@ -34,4 +34,10 @@ namespace BabyMonitorConfig {
 
     // Device Paths
     constexpr const char* GPIO_CHIP_DEVICE = "/dev/gpiochip0";
+
+    // Performance Monitoring Configuration
+    constexpr bool ENABLE_PERFORMANCE_MONITORING = true;
+    constexpr int PERFORMANCE_STATS_WINDOW_SIZE = 50;  // Number of samples to keep for statistics
+    constexpr int PERFORMANCE_CHECK_INTERVAL_MS = 5000; // Check performance every 5 seconds
+    constexpr bool ENABLE_ADAPTIVE_PERFORMANCE = true;  // Enable automatic performance adaptation
 }
