@@ -8,6 +8,9 @@
 #include <QString>
 #include <QThread>
 #include <QImage>
+#include <QCoreApplication>
+#include <QMediaPlayer>
+#include <QUrl>
 #include <motionworker.h>
 #include <opencv2/opencv.hpp>
 
@@ -21,10 +24,14 @@ MainWindow::MainWindow(QWidget *parent)
     , motionThread_(nullptr)
     , motionWorker_(nullptr)
     , injectedAlarmSystem_(nullptr)
+    , audioPlayer_(nullptr)
+    , noMotionCount_(0)
+    , alarmPlaying_(false)
 {
     ui->setupUi(this);
     setupCharts();
     initializeLED();
+    initializeAudioPlayer();
 
     // Initialize all sensors
     initializeSensors();
@@ -45,6 +52,13 @@ MainWindow::~MainWindow()
     stopSensors();
 
     if (alarmTimerId_ != -1) killTimer(alarmTimerId_);
+
+    // Clean up audio player
+    if (audioPlayer_) {
+        audioPlayer_->stop();
+        delete audioPlayer_;
+        audioPlayer_ = nullptr;
+    }
 
     // ui is now managed by unique_ptr, no manual delete needed
 }
@@ -98,9 +112,16 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     // Use injected alarm system
     if (injectedAlarmSystem_) {
         if (!motionDetected_) {
-            QString message = QString("No motion detected !!!! Dangerous! (Sample #%1)").arg(samplesSent_++);
+            noMotionCount_++;
+            QString message = QString("No motion detected !!!! Dangerous! (Sample #%1, Count: %2)").arg(samplesSent_++).arg(noMotionCount_);
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
+
+            // Play alarm sound after reaching threshold
+            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
+                playAlarmSound();
+            }
         } else {
+            noMotionCount_ = 0; // Reset counter when motion is detected
             QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
             injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
             motionDetected_ = false;
@@ -428,4 +449,41 @@ void MainWindow::setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarm
     }
 
     errorHandler_.reportInfo("DependencyInjection", "AlarmSystem dependency injected successfully");
+}
+
+// Audio alarm methods implementation
+void MainWindow::initializeAudioPlayer()
+{
+    audioPlayer_ = new QMediaPlayer(this);
+
+    // Connect state change signal to handle playback completion
+    connect(audioPlayer_, &QMediaPlayer::stateChanged,
+            this, &MainWindow::onAudioPlayerStateChanged);
+
+    // Set the alarm sound file path
+    QString alarmPath = QCoreApplication::applicationDirPath() + "/" + BabyMonitorConfig::ALARM_SOUND_FILE;
+    audioPlayer_->setMedia(QUrl::fromLocalFile(alarmPath));
+
+    errorHandler_.reportInfo("AudioPlayer", "Audio player initialized with alarm file: " + alarmPath);
+}
+
+void MainWindow::playAlarmSound()
+{
+    if (!audioPlayer_ || alarmPlaying_) {
+        return; // Don't play if already playing or player not initialized
+    }
+
+    alarmPlaying_ = true;
+    audioPlayer_->play();
+    errorHandler_.reportInfo("AudioPlayer", "Playing alarm sound due to no motion detected");
+}
+
+void MainWindow::onAudioPlayerStateChanged(QMediaPlayer::State state)
+{
+    if (state == QMediaPlayer::StoppedState) {
+        alarmPlaying_ = false;
+        // Reset the media position for next playback
+        audioPlayer_->setPosition(0);
+        errorHandler_.reportInfo("AudioPlayer", "Alarm sound playback completed");
+    }
 }
