@@ -1,5 +1,5 @@
 # FAST DDS Demo
-We referred to Professor Bernd Porr's demo of dds.
+We referred to Professor Bernd Porr's demo of dds. https://github.com/berndporr/fastdds_demo.git
 
 Based on this tutorial: https://fast-dds.docs.eprosima.com/en/latest/fastdds/getting_started/simple_app/simple_app.html
 
