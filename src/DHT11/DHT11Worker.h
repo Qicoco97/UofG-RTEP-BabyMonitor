@@ -5,12 +5,6 @@
 #include <chrono>
 #include "DHT11Gpio.h"
 
-// Forward declarations
-namespace BabyMonitor {
-    class PerformanceMonitor;
-    class HighPrecisionTimer;
-}
-
 class DHT11Worker : public QObject {
     Q_OBJECT
 
@@ -19,7 +13,6 @@ public:
       : QObject(parent)
       , sensor_(chip.toStdString(), line)
       , readInterval_(readIntervalSeconds)
-      , perfMonitor_(nullptr)
     {}
 
     ~DHT11Worker() {
@@ -37,19 +30,7 @@ public:
                 return;
             }
             while (running_) {
-                auto startTime = std::chrono::high_resolution_clock::now();
-
                 if (sensor_.read()) {
-                    // Calculate read time and emit reading
-                    auto endTime = std::chrono::high_resolution_clock::now();
-                    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-                    double readTimeMs = duration.count() / 1000.0;
-
-                    // Simple performance logging (avoid complex monitoring in thread)
-                    if (readTimeMs > 500.0) { // 500ms threshold
-                        // Log performance issue but don't use complex monitoring here
-                    }
-
                     emit newReading(
                         sensor_.temperatureInt(),
                         sensor_.temperatureDec(),
@@ -80,8 +61,5 @@ private:
     std::thread          workerThread_;
     std::atomic<bool>    running_{false};
     int                  readInterval_;  // Read interval in seconds
-
-    // Performance monitoring (simplified for thread safety)
-    BabyMonitor::PerformanceMonitor* perfMonitor_;
 };
 

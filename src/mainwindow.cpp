@@ -22,8 +22,8 @@ MainWindow::MainWindow(QWidget *parent)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
     , perfMonitor_(&BabyMonitor::PerformanceMonitor::getInstance())
-    , frameTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
-    , alarmTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
+    , frameTimer_(new BabyMonitor::HighPrecisionTimer())
+    , alarmTimer_(new BabyMonitor::HighPrecisionTimer())
     , isFrameProcessingAdapted_(false)
     , frameSkipCounter_(0)
     , adaptiveFrameSkip_(1)
@@ -67,6 +67,10 @@ MainWindow::~MainWindow()
         delete audioPlayer_;
         audioPlayer_ = nullptr;
     }
+
+    // Clean up performance timers
+    delete frameTimer_;
+    delete alarmTimer_;
 
     // ui is now managed by unique_ptr, no manual delete needed
 }

@@ -4,7 +4,7 @@
 
 MotionWorker::MotionWorker(double minArea, int thresh)
     : thresh_(thresh), minArea_(minArea)
-    , performanceTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
+    , performanceTimer_(new BabyMonitor::HighPrecisionTimer())
     , currentBlurKernel_(21, 21)
     , adaptiveThresh_(thresh)
     , adaptiveMinArea_(minArea)
@@ -12,6 +12,11 @@ MotionWorker::MotionWorker(double minArea, int thresh)
 {
     // Initialize performance monitor pointer
     perfMonitor_ = &BabyMonitor::PerformanceMonitor::getInstance();
+}
+
+MotionWorker::~MotionWorker()
+{
+    delete performanceTimer_;
 }
 
 void MotionWorker::processFrame(const cv::Mat &currentFrame) {

@@ -51,9 +51,9 @@ private:
     int publishInterval_;
     ErrorHandler& errorHandler_;
 
-    // Performance monitoring (using pointers to avoid include issues)
+    // Performance monitoring (using raw pointers to avoid incomplete type issues)
     BabyMonitor::PerformanceMonitor* perfMonitor_;
-    std::unique_ptr<BabyMonitor::HighPrecisionTimer> publishTimer_;
+    BabyMonitor::HighPrecisionTimer* publishTimer_;
     bool isAdaptedPublishMode_;
     int adaptivePublishInterval_;
 

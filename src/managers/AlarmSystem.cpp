@@ -13,7 +13,7 @@ AlarmSystem::AlarmSystem(QObject* parent)
     , publishInterval_(1000)
     , errorHandler_(ErrorHandler::getInstance())
     , perfMonitor_(&BabyMonitor::PerformanceMonitor::getInstance())
-    , publishTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
+    , publishTimer_(new BabyMonitor::HighPrecisionTimer())
     , isAdaptedPublishMode_(false)
     , adaptivePublishInterval_(1000)
 {
@@ -22,6 +22,7 @@ AlarmSystem::AlarmSystem(QObject* parent)
 AlarmSystem::~AlarmSystem()
 {
     stop();
+    delete publishTimer_;
 }
 
 bool AlarmSystem::initialize()

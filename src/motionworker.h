@@ -14,6 +14,7 @@ class MotionWorker : public QObject {
     Q_OBJECT
 public:
     MotionWorker(double minArea = 500, int thresh = 25);
+    ~MotionWorker();
 public slots:
     void processFrame(const cv::Mat &frame);
 signals:
@@ -24,8 +25,8 @@ private:
     int thresh_;
     double minArea_;
 
-    // Performance monitoring (using pointers to avoid include issues)
-    std::unique_ptr<BabyMonitor::HighPrecisionTimer> performanceTimer_;
+    // Performance monitoring (using raw pointers to avoid incomplete type issues)
+    BabyMonitor::HighPrecisionTimer* performanceTimer_;
     BabyMonitor::PerformanceMonitor* perfMonitor_;
 
     // Adaptive quality parameters

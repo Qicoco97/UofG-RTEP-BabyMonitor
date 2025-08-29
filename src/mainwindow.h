@@ -119,10 +119,10 @@ private:
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
-    // Performance monitoring (using pointers to avoid include issues)
+    // Performance monitoring (using raw pointers to avoid incomplete type issues)
     BabyMonitor::PerformanceMonitor* perfMonitor_;
-    std::unique_ptr<BabyMonitor::HighPrecisionTimer> frameTimer_;
-    std::unique_ptr<BabyMonitor::HighPrecisionTimer> alarmTimer_;
+    BabyMonitor::HighPrecisionTimer* frameTimer_;
+    BabyMonitor::HighPrecisionTimer* alarmTimer_;
 
     // Adaptive frame processing
     bool isFrameProcessingAdapted_;
