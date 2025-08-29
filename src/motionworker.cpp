@@ -61,7 +61,7 @@ void MotionWorker::processFrame(const cv::Mat &currentFrame) {
     if (perfMonitor_) {
         perfMonitor_->recordLatency("MotionWorker", "MotionDetection", processingTime);
 
-        // Check if performance adaptation is needed
+        // Check if performance adaptation is needed based on average performance
         if (perfMonitor_->shouldAdaptPerformance("MotionWorker", "MotionDetection")) {
             adaptForPerformance();
         } else if (isAdaptedMode_ && perfMonitor_->canRecoverPerformance("MotionWorker", "MotionDetection")) {

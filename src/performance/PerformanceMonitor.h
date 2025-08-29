@@ -371,16 +371,46 @@ public:
         auto& requirements = PerformanceRequirements::getInstance();
         auto* req = requirements.getRequirement(operation);
         if (req) {
-            // Add samples that exceed the threshold
-            double stressLatency = req->maxLatencyMs + extraDelayMs;
-            for (int i = 0; i < 5; i++) {
+            // Add enough samples to push average above 80% threshold
+            double stressLatency = req->maxLatencyMs * 0.9; // 90% of limit
+            for (int i = 0; i < 20; i++) { // More samples to ensure average exceeds threshold
                 stats_[key].addSample(stressLatency);
             }
 
             auto& errorHandler = ErrorHandler::getInstance();
             errorHandler.reportInfo("PerformanceMonitor",
-                QString("Simulated stress for %1::%2 - added %3ms delay")
-                .arg(component).arg(operation).arg(extraDelayMs));
+                QString("Simulated stress for %1::%2 - added %3ms delay (pushed to %4% of limit)")
+                .arg(component).arg(operation).arg(extraDelayMs).arg(90));
+
+            // Force immediate constraint check
+            checkConstraints(component, operation, stressLatency);
+        }
+    }
+
+    /**
+     * Force check all components for adaptation needs (for testing)
+     */
+    void forceAdaptationCheck() {
+        auto& errorHandler = ErrorHandler::getInstance();
+        errorHandler.reportInfo("PerformanceMonitor", "=== FORCING ADAPTATION CHECK FOR ALL COMPONENTS ===");
+
+        for (auto it = stats_.begin(); it != stats_.end(); ++it) {
+            const QString& key = it.key();
+            const PerformanceStats& stats = it.value();
+
+            if (stats.getSampleCount() > 0) {
+                QStringList parts = key.split("::");
+                if (parts.size() == 2) {
+                    QString component = parts[0];
+                    QString operation = parts[1];
+
+                    if (shouldAdaptPerformance(component, operation)) {
+                        errorHandler.reportWarning(component,
+                            QString("ADAPTATION NEEDED: %1 average %2ms exceeds threshold")
+                            .arg(operation).arg(stats.getAverage(), 0, 'f', 2));
+                    }
+                }
+            }
         }
     }
 

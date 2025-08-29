@@ -542,6 +542,7 @@ void MainWindow::initializePerformanceMonitoring()
     performanceReportTimer_->start(BabyMonitorConfig::PERFORMANCE_CHECK_INTERVAL_MS); // Every 5 seconds
 
     errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized with periodic reporting");
+    errorHandler_.reportInfo("PerformanceTest", "HOTKEYS: P=Report, T=Progressive Test, S=Severe Test, A=Force Adapt, R=Reset&Recover");
 }
 
 void MainWindow::adaptFrameProcessing()
@@ -634,14 +635,38 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", 18.0);    // Will push to ~90%
             perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", 90.0);     // Will push to ~90%
 
-            errorHandler_.reportInfo("PerformanceTest", "Severe stress applied - adaptation should trigger immediately");
+            // Force immediate adaptation check
+            perfMonitor_->forceAdaptationCheck();
+
+            errorHandler_.reportInfo("PerformanceTest", "Severe stress applied - checking for immediate adaptation");
         }
         break;
+    case Qt::Key_A:
+        // Press 'A' to manually trigger adaptation (for demonstration)
+        errorHandler_.reportInfo("PerformanceTest", "=== MANUAL ADAPTATION TRIGGER ===");
+        adaptFrameProcessing();
+
+        // Trigger motion worker adaptation
+        if (motionWorker_) {
+            motionWorker_->forceAdaptation();
+            errorHandler_.reportInfo("PerformanceTest", "Motion detection adaptation triggered manually");
+        }
+
+        errorHandler_.reportInfo("PerformanceTest", "All adaptations triggered - check UI for ADAPTED status");
+        break;
     case Qt::Key_R:
-        // Press 'R' to reset performance statistics
+        // Press 'R' to reset performance statistics and recover
         if (perfMonitor_) {
             perfMonitor_->clearStats();
-            errorHandler_.reportInfo("PerformanceTest", "Performance statistics cleared - system will recover to normal");
+            errorHandler_.reportInfo("PerformanceTest", "Performance statistics cleared");
+
+            // Force recovery for all components
+            recoverFrameProcessing();
+            if (motionWorker_) {
+                motionWorker_->forceRecovery();
+            }
+
+            errorHandler_.reportInfo("PerformanceTest", "All components recovered to normal performance mode");
         }
         break;
     default:

@@ -17,6 +17,10 @@ public:
     ~MotionWorker();
 public slots:
     void processFrame(const cv::Mat &frame);
+public:
+    // Public methods for testing
+    void forceAdaptation() { adaptForPerformance(); }
+    void forceRecovery() { recoverPerformance(); }
 signals:
     void motionDetected(bool detected);
     void performanceAlert(const QString& message); // New signal for performance issues
