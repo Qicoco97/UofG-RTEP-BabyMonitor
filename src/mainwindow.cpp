@@ -404,7 +404,7 @@ void MainWindow::updateSystemStatus()
     QString statusText = systemStatus_.toString();
 
     // Keep motion status simple - just show motion detection result
-    ui->motionStatusLabel->setText(systemStatus_.motionActive ? "Motion Detected" : "No Motion");
+    ui->motionStatusLabel->setText(motionDetected_ ? "Motion Detected" : "No Motion");
 
     // Log system status
     if (systemStatus_.isAllSystemsActive()) {
