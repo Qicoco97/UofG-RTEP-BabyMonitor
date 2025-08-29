@@ -38,9 +38,9 @@ namespace RealTimeConstraints {
     constexpr int MAX_CONSECUTIVE_FRAME_DROPS = 3;               // Maximum consecutive frame drops
     constexpr int MAX_CONSECUTIVE_SENSOR_ERRORS = 5;             // Maximum consecutive sensor errors
     
-    // Performance adaptation thresholds (lowered for easier testing)
-    constexpr double PERFORMANCE_ADAPTATION_THRESHOLD = 0.4;     // Adapt when reaching 40% of limit (lowered for testing)
-    constexpr double PERFORMANCE_RECOVERY_THRESHOLD = 0.2;       // Recover when below 20% of limit (lowered for testing)
+    // Performance adaptation thresholds
+    constexpr double PERFORMANCE_ADAPTATION_THRESHOLD = 0.6;     // Adapt when reaching 60% of limit
+    constexpr double PERFORMANCE_RECOVERY_THRESHOLD = 0.4;       // Recover when below 40% of limit
 }
 
 /**
@@ -357,62 +357,7 @@ public:
         }
     }
 
-    /**
-     * Simulate performance stress for testing (adds artificial delay)
-     */
-    void simulatePerformanceStress(const QString& component, const QString& operation, double extraDelayMs) {
-        QString key = component + "::" + operation;
 
-        // Add artificial delay samples to trigger adaptation
-        if (!stats_.contains(key)) {
-            stats_[key] = PerformanceStats();
-        }
-
-        auto& requirements = PerformanceRequirements::getInstance();
-        auto* req = requirements.getRequirement(operation);
-        if (req) {
-            // Add enough samples to push average above 80% threshold
-            double stressLatency = req->maxLatencyMs * 0.9; // 90% of limit
-            for (int i = 0; i < 20; i++) { // More samples to ensure average exceeds threshold
-                stats_[key].addSample(stressLatency);
-            }
-
-            auto& errorHandler = ErrorHandler::getInstance();
-            errorHandler.reportInfo("PerformanceMonitor",
-                QString("Simulated stress for %1::%2 - added %3ms delay (pushed to %4% of limit)")
-                .arg(component).arg(operation).arg(extraDelayMs).arg(90));
-
-            // Force immediate constraint check
-            checkConstraints(component, operation, stressLatency);
-        }
-    }
-
-    /**
-     * Force check all components for adaptation needs (for testing)
-     */
-    void forceAdaptationCheck() {
-        auto& errorHandler = ErrorHandler::getInstance();
-        errorHandler.reportInfo("PerformanceMonitor", "=== FORCING ADAPTATION CHECK FOR ALL COMPONENTS ===");
-
-        for (auto it = stats_.begin(); it != stats_.end(); ++it) {
-            const QString& key = it.key();
-            const PerformanceStats& stats = it.value();
-
-            if (stats.getSampleCount() > 0) {
-                QStringList parts = key.split("::");
-                if (parts.size() == 2) {
-                    QString component = parts[0];
-                    QString operation = parts[1];
-
-                    if (shouldAdaptPerformance(component, operation)) {
-                        errorHandler.reportWarning(component,
-                            QString("ADAPTATION NEEDED: %1 average %2ms exceeds threshold")
-                            .arg(operation).arg(stats.getAverage(), 0, 'f', 2));
-                    }
-                }
-            }
-        }
-    }
 
 private:
     PerformanceMonitor() = default;

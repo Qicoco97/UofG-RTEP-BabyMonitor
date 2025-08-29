@@ -102,6 +102,45 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="performancePage">
+       <attribute name="title">
+        <string>performance monitor</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="performanceLayout">
+        <item>
+         <widget class="QGroupBox" name="performanceGroup">
+          <property name="title">
+           <string>Real-time Performance</string>
+          </property>
+          <layout class="QVBoxLayout" name="performanceGroupLayout">
+           <item>
+            <widget class="QLabel" name="performanceStatusLabel">
+             <property name="text">
+              <string>Performance monitoring active...</string>
+             </property>
+             <property name="styleSheet">
+              <string>font-family: monospace; font-size: 10pt;</string>
+             </property>
+             <property name="wordWrap">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="performanceHelpLabel">
+             <property name="text">
+              <string>Hotkeys: P=Report, A=Adapt, R=Reset</string>
+             </property>
+             <property name="styleSheet">
+              <string>color: gray; font-size: 9pt;</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
