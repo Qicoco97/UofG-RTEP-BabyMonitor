@@ -66,6 +66,7 @@ public:
     
 protected:
     void timerEvent(QTimerEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override; // For performance testing hotkeys
     
 signals:
     // Emit this signal every time there is a new frame.
@@ -129,6 +130,9 @@ private:
     int frameSkipCounter_;
     int adaptiveFrameSkip_;
 
+    // Performance reporting
+    QTimer* performanceReportTimer_;
+
     // DHT11 error tracking
     int dht11ConsecutiveErrors_;
     static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
@@ -176,6 +180,8 @@ private:
     void adaptFrameProcessing();
     void recoverFrameProcessing();
     void onMotionWorkerPerformanceAlert(const QString& message);
+    void logPerformanceReport(); // New method for periodic performance logging
+    void triggerPerformanceTest(); // Manual performance test trigger
 
     // Camera and callback (moved to private for better encapsulation)
     Libcam2OpenCV camera;

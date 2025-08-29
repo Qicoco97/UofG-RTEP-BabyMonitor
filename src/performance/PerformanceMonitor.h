@@ -18,12 +18,12 @@ namespace BabyMonitor {
  * These define the acceptable performance thresholds for the baby monitoring system
  */
 namespace RealTimeConstraints {
-    // Critical timing constraints (in milliseconds)
-    constexpr double MAX_MOTION_DETECTION_LATENCY_MS = 100.0;    // Motion must be detected within 100ms
-    constexpr double MAX_ALARM_RESPONSE_LATENCY_MS = 200.0;      // Alarm must trigger within 200ms
-    constexpr double MAX_FRAME_PROCESSING_LATENCY_MS = 33.0;     // Frame processing must complete within 33ms (30fps)
-    constexpr double MAX_SENSOR_READ_LATENCY_MS = 500.0;         // Sensor reading should complete within 500ms
-    constexpr double MAX_UI_UPDATE_LATENCY_MS = 50.0;            // UI updates should be smooth (20fps)
+    // Critical timing constraints (in milliseconds) - Lowered for easier testing
+    constexpr double MAX_MOTION_DETECTION_LATENCY_MS = 50.0;     // Motion must be detected within 50ms (lowered for testing)
+    constexpr double MAX_ALARM_RESPONSE_LATENCY_MS = 100.0;      // Alarm must trigger within 100ms (lowered for testing)
+    constexpr double MAX_FRAME_PROCESSING_LATENCY_MS = 20.0;     // Frame processing must complete within 20ms (lowered for testing)
+    constexpr double MAX_SENSOR_READ_LATENCY_MS = 300.0;         // Sensor reading should complete within 300ms (lowered for testing)
+    constexpr double MAX_UI_UPDATE_LATENCY_MS = 30.0;            // UI updates should be smooth (lowered for testing)
     
     // Throughput requirements
     constexpr double MIN_CAMERA_FPS = 25.0;                      // Minimum acceptable frame rate
@@ -309,6 +309,79 @@ public:
      */
     void clearStats() {
         stats_.clear();
+    }
+
+    /**
+     * Generate performance report for debugging
+     */
+    QString generatePerformanceReport() const {
+        QString report = "=== Performance Monitor Report ===\n";
+
+        for (auto it = stats_.begin(); it != stats_.end(); ++it) {
+            const QString& key = it.key();
+            const PerformanceStats& stats = it.value();
+
+            if (stats.getSampleCount() > 0) {
+                report += QString("%1:\n").arg(key);
+                report += QString("  Average: %1ms\n").arg(stats.getAverage(), 0, 'f', 2);
+                report += QString("  Min: %1ms, Max: %2ms\n").arg(stats.getMin(), 0, 'f', 2).arg(stats.getMax(), 0, 'f', 2);
+                report += QString("  Samples: %1\n").arg(stats.getSampleCount());
+
+                // Check constraint status
+                QStringList parts = key.split("::");
+                if (parts.size() == 2) {
+                    auto& requirements = PerformanceRequirements::getInstance();
+                    auto* req = requirements.getRequirement(parts[1]);
+                    if (req) {
+                        double level = stats.getAverage() / req->maxLatencyMs;
+                        QString status = (level > 1.0) ? "VIOLATION" :
+                                       (level > 0.8) ? "WARNING" : "OK";
+                        report += QString("  Status: %1 (%2%)\n").arg(status).arg(level * 100, 0, 'f', 1);
+                    }
+                }
+                report += "\n";
+            }
+        }
+
+        return report;
+    }
+
+    /**
+     * Log current performance statistics
+     */
+    void logPerformanceReport() const {
+        QString report = generatePerformanceReport();
+        if (!report.isEmpty()) {
+            auto& errorHandler = ErrorHandler::getInstance();
+            errorHandler.reportInfo("PerformanceMonitor", "Performance Report:\n" + report);
+        }
+    }
+
+    /**
+     * Simulate performance stress for testing (adds artificial delay)
+     */
+    void simulatePerformanceStress(const QString& component, const QString& operation, double extraDelayMs) {
+        QString key = component + "::" + operation;
+
+        // Add artificial delay samples to trigger adaptation
+        if (!stats_.contains(key)) {
+            stats_[key] = PerformanceStats();
+        }
+
+        auto& requirements = PerformanceRequirements::getInstance();
+        auto* req = requirements.getRequirement(operation);
+        if (req) {
+            // Add samples that exceed the threshold
+            double stressLatency = req->maxLatencyMs + extraDelayMs;
+            for (int i = 0; i < 5; i++) {
+                stats_[key].addSample(stressLatency);
+            }
+
+            auto& errorHandler = ErrorHandler::getInstance();
+            errorHandler.reportInfo("PerformanceMonitor",
+                QString("Simulated stress for %1::%2 - added %3ms delay")
+                .arg(component).arg(operation).arg(extraDelayMs));
+        }
     }
 
 private:

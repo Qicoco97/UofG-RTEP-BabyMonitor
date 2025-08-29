@@ -11,6 +11,7 @@
 #include <QCoreApplication>
 #include <QMediaPlayer>
 #include <QUrl>
+#include <QKeyEvent>
 #include <motionworker.h>
 #include "performance/PerformanceMonitor.h"
 #include <opencv2/opencv.hpp>
@@ -525,7 +526,12 @@ void MainWindow::initializePerformanceMonitoring()
     frameSkipCounter_ = 0;
     adaptiveFrameSkip_ = 1;
 
-    errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized");
+    // Setup performance reporting timer
+    performanceReportTimer_ = new QTimer(this);
+    connect(performanceReportTimer_, &QTimer::timeout, this, &MainWindow::logPerformanceReport);
+    performanceReportTimer_->start(BabyMonitorConfig::PERFORMANCE_CHECK_INTERVAL_MS); // Every 5 seconds
+
+    errorHandler_.reportInfo("PerformanceMonitor", "Performance monitoring initialized with periodic reporting");
 }
 
 void MainWindow::adaptFrameProcessing()
@@ -558,6 +564,55 @@ void MainWindow::onMotionWorkerPerformanceAlert(const QString& message)
 
     // Update system status when motion worker adapts
     updateSystemStatus();
+}
+
+void MainWindow::logPerformanceReport()
+{
+    if (perfMonitor_) {
+        perfMonitor_->logPerformanceReport();
+    }
+}
+
+void MainWindow::triggerPerformanceTest()
+{
+    if (!perfMonitor_) return;
+
+    errorHandler_.reportInfo("PerformanceTest", "=== PERFORMANCE STRESS TEST STARTED ===");
+
+    // Simulate motion detection stress
+    perfMonitor_->simulatePerformanceStress("MotionWorker", "MotionDetection", 50.0);
+
+    // Simulate frame processing stress
+    perfMonitor_->simulatePerformanceStress("MainWindow", "FrameProcessing", 20.0);
+
+    // Simulate alarm response stress
+    perfMonitor_->simulatePerformanceStress("AlarmSystem", "AlarmResponse", 100.0);
+
+    errorHandler_.reportInfo("PerformanceTest", "Performance stress simulation completed - check for adaptation messages");
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key()) {
+    case Qt::Key_P:
+        // Press 'P' to trigger performance report
+        logPerformanceReport();
+        break;
+    case Qt::Key_T:
+        // Press 'T' to trigger performance stress test
+        triggerPerformanceTest();
+        break;
+    case Qt::Key_R:
+        // Press 'R' to reset performance statistics
+        if (perfMonitor_) {
+            perfMonitor_->clearStats();
+            errorHandler_.reportInfo("PerformanceTest", "Performance statistics cleared");
+        }
+        break;
+    default:
+        QMainWindow::keyPressEvent(event);
+        break;
+    }
 }
 
 // Audio alarm methods implementation
