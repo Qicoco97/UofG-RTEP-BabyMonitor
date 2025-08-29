@@ -120,10 +120,12 @@ void MainWindow::onMotionStatusChanged(bool detected)
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
+        
+        }
+    else{
+        ui->motionStatusLabel->setText(tr("no motion"));
         triggerMotionAlert();
         }
-    else
-        ui->motionStatusLabel->setText(tr("no motion"));
 }
 
 void MainWindow::onNewDHTReading(int t_int, int t_dec,
