@@ -12,6 +12,7 @@
 #include <QMediaPlayer>
 #include <QUrl>
 #include <motionworker.h>
+#include "performance/PerformanceMonitor.h"
 #include <opencv2/opencv.hpp>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -20,7 +21,9 @@ MainWindow::MainWindow(QWidget *parent)
     , led_(BabyMonitorConfig::LED_CHIP_NUMBER, BabyMonitorConfig::LED_PIN_NUMBER)
     , timeIndex(0)
     , errorHandler_(BabyMonitor::ErrorHandler::getInstance())
-    , perfMonitor_(BabyMonitor::PerformanceMonitor::getInstance())
+    , perfMonitor_(&BabyMonitor::PerformanceMonitor::getInstance())
+    , frameTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
+    , alarmTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
     , isFrameProcessingAdapted_(false)
     , frameSkipCounter_(0)
     , adaptiveFrameSkip_(1)
@@ -115,7 +118,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     }
 
     // Start alarm response timing
-    alarmTimer_.start();
+    alarmTimer_->start();
 
     // Use injected alarm system
     if (injectedAlarmSystem_) {
@@ -139,8 +142,10 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     }
 
     // Record alarm response performance
-    double alarmResponseTime = alarmTimer_.elapsedMs();
-    perfMonitor_.recordLatency("MainWindow", "AlarmResponse", alarmResponseTime);
+    double alarmResponseTime = alarmTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("MainWindow", "AlarmResponse", alarmResponseTime);
+    }
 }
 
 
@@ -289,7 +294,7 @@ void MainWindow::updateMotionChart(const BabyMonitor::MotionData& data)
 void MainWindow::processNewFrame(const cv::Mat& frame)
 {
     // Start frame processing timing
-    frameTimer_.start();
+    frameTimer_->start();
 
     // Adaptive frame processing - skip frames if performance is poor
     frameSkipCounter_++;
@@ -307,14 +312,16 @@ void MainWindow::processNewFrame(const cv::Mat& frame)
     update();
 
     // Record frame processing performance
-    double frameProcessingTime = frameTimer_.elapsedMs();
-    perfMonitor_.recordLatency("MainWindow", "FrameProcessing", frameProcessingTime);
+    double frameProcessingTime = frameTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("MainWindow", "FrameProcessing", frameProcessingTime);
 
-    // Check if frame processing adaptation is needed
-    if (perfMonitor_.shouldAdaptPerformance("MainWindow", "FrameProcessing")) {
-        adaptFrameProcessing();
-    } else if (isFrameProcessingAdapted_ && perfMonitor_.canRecoverPerformance("MainWindow", "FrameProcessing")) {
-        recoverFrameProcessing();
+        // Check if frame processing adaptation is needed
+        if (perfMonitor_->shouldAdaptPerformance("MainWindow", "FrameProcessing")) {
+            adaptFrameProcessing();
+        } else if (isFrameProcessingAdapted_ && perfMonitor_->canRecoverPerformance("MainWindow", "FrameProcessing")) {
+            recoverFrameProcessing();
+        }
     }
 }
 
@@ -392,9 +399,9 @@ void MainWindow::updateSystemStatus()
     QString statusText = systemStatus_.toString();
 
     // Add performance information to status
-    if (BabyMonitorConfig::ENABLE_PERFORMANCE_MONITORING) {
-        auto motionStats = perfMonitor_.getStats("MotionWorker", "MotionDetection");
-        auto frameStats = perfMonitor_.getStats("MainWindow", "FrameProcessing");
+    if (BabyMonitorConfig::ENABLE_PERFORMANCE_MONITORING && perfMonitor_) {
+        auto motionStats = perfMonitor_->getStats("MotionWorker", "MotionDetection");
+        auto frameStats = perfMonitor_->getStats("MainWindow", "FrameProcessing");
 
         if (motionStats && frameStats) {
             statusText += QString(" | Motion: %1ms | Frame: %2ms")

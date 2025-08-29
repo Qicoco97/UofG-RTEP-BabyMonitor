@@ -1,18 +1,22 @@
 // motionworker.cpp
 #include "motionworker.h"
+#include "performance/PerformanceMonitor.h"
 
 MotionWorker::MotionWorker(double minArea, int thresh)
     : thresh_(thresh), minArea_(minArea)
-    , perfMonitor_(BabyMonitor::PerformanceMonitor::getInstance())
+    , performanceTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
     , currentBlurKernel_(21, 21)
     , adaptiveThresh_(thresh)
     , adaptiveMinArea_(minArea)
     , isAdaptedMode_(false)
-{}
+{
+    // Initialize performance monitor pointer
+    perfMonitor_ = &BabyMonitor::PerformanceMonitor::getInstance();
+}
 
 void MotionWorker::processFrame(const cv::Mat &currentFrame) {
     // Start performance timing
-    performanceTimer_.start();
+    performanceTimer_->start();
 
     cv::Mat gray, blur;
     cv::cvtColor(currentFrame, gray, cv::COLOR_BGR2GRAY);
@@ -25,8 +29,8 @@ void MotionWorker::processFrame(const cv::Mat &currentFrame) {
         emit motionDetected(false);
 
         // Record performance even for first frame
-        double processingTime = performanceTimer_.elapsedMs();
-        perfMonitor_.recordLatency("MotionWorker", "MotionDetection", processingTime);
+        double processingTime = performanceTimer_->elapsedMs();
+        perfMonitor_->recordLatency("MotionWorker", "MotionDetection", processingTime);
         return;
     }
 
@@ -48,14 +52,16 @@ void MotionWorker::processFrame(const cv::Mat &currentFrame) {
     previousBlur_ = blur;
 
     // Record performance and check for adaptation needs
-    double processingTime = performanceTimer_.elapsedMs();
-    perfMonitor_.recordLatency("MotionWorker", "MotionDetection", processingTime);
+    double processingTime = performanceTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("MotionWorker", "MotionDetection", processingTime);
 
-    // Check if performance adaptation is needed
-    if (perfMonitor_.shouldAdaptPerformance("MotionWorker", "MotionDetection")) {
-        adaptForPerformance();
-    } else if (isAdaptedMode_ && perfMonitor_.canRecoverPerformance("MotionWorker", "MotionDetection")) {
-        recoverPerformance();
+        // Check if performance adaptation is needed
+        if (perfMonitor_->shouldAdaptPerformance("MotionWorker", "MotionDetection")) {
+            adaptForPerformance();
+        } else if (isAdaptedMode_ && perfMonitor_->canRecoverPerformance("MotionWorker", "MotionDetection")) {
+            recoverPerformance();
+        }
     }
 
     emit motionDetected(detected);

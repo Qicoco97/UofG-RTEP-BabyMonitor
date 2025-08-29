@@ -2,7 +2,13 @@
 #pragma once
 #include <QObject>
 #include <opencv2/opencv.hpp>
-#include "performance/PerformanceMonitor.h"
+#include <memory>
+
+// Forward declarations to avoid circular includes
+namespace BabyMonitor {
+    class PerformanceMonitor;
+    class HighPrecisionTimer;
+}
 
 class MotionWorker : public QObject {
     Q_OBJECT
@@ -18,9 +24,9 @@ private:
     int thresh_;
     double minArea_;
 
-    // Performance monitoring
-    BabyMonitor::HighPrecisionTimer performanceTimer_;
-    BabyMonitor::PerformanceMonitor& perfMonitor_;
+    // Performance monitoring (using pointers to avoid include issues)
+    std::unique_ptr<BabyMonitor::HighPrecisionTimer> performanceTimer_;
+    BabyMonitor::PerformanceMonitor* perfMonitor_;
 
     // Adaptive quality parameters
     cv::Size currentBlurKernel_;

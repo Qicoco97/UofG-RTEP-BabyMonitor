@@ -1,5 +1,5 @@
-// PerformanceMonitor.h - Lightweight real-time performance monitoring
-#pragma once
+#ifndef PERFORMANCEMONITOR_H
+#define PERFORMANCEMONITOR_H
 
 #include <QDateTime>
 #include <QString>
@@ -142,8 +142,17 @@ struct RealTimeRequirements {
     double minThroughputHz;
     double maxCpuPercent;
     size_t maxMemoryMB;
-    
-    RealTimeRequirements(const QString& name, double latency, double throughput, 
+
+    // Default constructor for QMap compatibility
+    RealTimeRequirements()
+        : operationName("")
+        , maxLatencyMs(1000.0)
+        , minThroughputHz(1.0)
+        , maxCpuPercent(50.0)
+        , maxMemoryMB(100)
+    {}
+
+    RealTimeRequirements(const QString& name, double latency, double throughput,
                         double cpu = 50.0, size_t memory = 100)
         : operationName(name)
         , maxLatencyMs(latency)

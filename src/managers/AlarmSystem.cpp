@@ -1,6 +1,7 @@
 // AlarmSystem.cpp - Alarm system implementation
 #include "AlarmSystem.h"
 #include "../dds_pub-sub/AlarmMsg.h"
+#include "../performance/PerformanceMonitor.h"
 #include <QDateTime>
 
 namespace BabyMonitor {
@@ -11,7 +12,8 @@ AlarmSystem::AlarmSystem(QObject* parent)
     , isRunning_(false)
     , publishInterval_(1000)
     , errorHandler_(ErrorHandler::getInstance())
-    , perfMonitor_(PerformanceMonitor::getInstance())
+    , perfMonitor_(&BabyMonitor::PerformanceMonitor::getInstance())
+    , publishTimer_(std::make_unique<BabyMonitor::HighPrecisionTimer>())
     , isAdaptedPublishMode_(false)
     , adaptivePublishInterval_(1000)
 {
@@ -77,7 +79,7 @@ bool AlarmSystem::publishAlarm(const QString& message, int severity)
     }
 
     // Start publish timing
-    publishTimer_.start();
+    publishTimer_->start();
     
     QString formattedMessage = formatAlarmMessage(message, severity);
 
@@ -89,14 +91,16 @@ bool AlarmSystem::publishAlarm(const QString& message, int severity)
     bool publishResult = alarmPublisher_.publish(msg);
 
     // Record publish performance
-    double publishTime = publishTimer_.elapsedMs();
-    perfMonitor_.recordLatency("AlarmSystem", "AlarmResponse", publishTime);
+    double publishTime = publishTimer_->elapsedMs();
+    if (perfMonitor_) {
+        perfMonitor_->recordLatency("AlarmSystem", "AlarmResponse", publishTime);
 
-    // Check if publish frequency adaptation is needed
-    if (perfMonitor_.shouldAdaptPerformance("AlarmSystem", "AlarmResponse")) {
-        adaptPublishFrequency();
-    } else if (isAdaptedPublishMode_ && perfMonitor_.canRecoverPerformance("AlarmSystem", "AlarmResponse")) {
-        recoverPublishFrequency();
+        // Check if publish frequency adaptation is needed
+        if (perfMonitor_->shouldAdaptPerformance("AlarmSystem", "AlarmResponse")) {
+            adaptPublishFrequency();
+        } else if (isAdaptedPublishMode_ && perfMonitor_->canRecoverPerformance("AlarmSystem", "AlarmResponse")) {
+            recoverPublishFrequency();
+        }
     }
 
     if (publishResult) {

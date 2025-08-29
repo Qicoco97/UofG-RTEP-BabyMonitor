@@ -20,7 +20,12 @@
 #include "SensorFactory.h"
 #include "interfaces/IComponent.h"
 #include "managers/AlarmSystem.h"
-#include "performance/PerformanceMonitor.h"
+
+// Forward declarations for performance monitoring
+namespace BabyMonitor {
+    class PerformanceMonitor;
+    class HighPrecisionTimer;
+}
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -114,10 +119,10 @@ private:
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
-    // Performance monitoring
-    BabyMonitor::PerformanceMonitor& perfMonitor_;
-    BabyMonitor::HighPrecisionTimer frameTimer_;
-    BabyMonitor::HighPrecisionTimer alarmTimer_;
+    // Performance monitoring (using pointers to avoid include issues)
+    BabyMonitor::PerformanceMonitor* perfMonitor_;
+    std::unique_ptr<BabyMonitor::HighPrecisionTimer> frameTimer_;
+    std::unique_ptr<BabyMonitor::HighPrecisionTimer> alarmTimer_;
 
     // Adaptive frame processing
     bool isFrameProcessingAdapted_;

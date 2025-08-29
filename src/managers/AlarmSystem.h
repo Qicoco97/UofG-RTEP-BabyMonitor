@@ -3,10 +3,16 @@
 
 #include <QObject>
 #include <QTimer>
+#include <memory>
 #include "../interfaces/IComponent.h"
 #include "../dds_pub-sub/AlarmPublisher.h"
 #include "../ErrorHandler.h"
-#include "../performance/PerformanceMonitor.h"
+
+// Forward declarations
+namespace BabyMonitor {
+    class PerformanceMonitor;
+    class HighPrecisionTimer;
+}
 
 namespace BabyMonitor {
 
@@ -45,9 +51,9 @@ private:
     int publishInterval_;
     ErrorHandler& errorHandler_;
 
-    // Performance monitoring
-    PerformanceMonitor& perfMonitor_;
-    HighPrecisionTimer publishTimer_;
+    // Performance monitoring (using pointers to avoid include issues)
+    BabyMonitor::PerformanceMonitor* perfMonitor_;
+    std::unique_ptr<BabyMonitor::HighPrecisionTimer> publishTimer_;
     bool isAdaptedPublishMode_;
     int adaptivePublishInterval_;
 
