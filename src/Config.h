@@ -28,6 +28,10 @@ namespace BabyMonitorConfig {
     constexpr int CAMERA_HEIGHT = 480;
     constexpr int CAMERA_FRAMERATE = 30;
     
+    // Audio Configuration
+    constexpr int NO_MOTION_ALARM_THRESHOLD = 5;  // Play alarm after 5 consecutive "No Motion" detections
+    constexpr const char* ALARM_SOUND_FILE = "../img&demo/alarm.wav";
+
     // Device Paths
     constexpr const char* GPIO_CHIP_DEVICE = "/dev/gpiochip0";
 }

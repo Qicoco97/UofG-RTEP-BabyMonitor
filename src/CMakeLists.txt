@@ -24,7 +24,7 @@ pkg_check_modules(GPIOD REQUIRED IMPORTED_TARGET libgpiodcxx)
 include_directories(${CMAKE_SOURCE_DIR} ${LIBCAMERA_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 
-find_package(Qt5 COMPONENTS Widgets Charts REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
 add_subdirectory(${CMAKE_SOURCE_DIR}/dds_pub-sub
                  ${CMAKE_BINARY_DIR}/dds_pub-sub)
 add_subdirectory(${CMAKE_SOURCE_DIR}/DHT11)
@@ -54,12 +54,12 @@ target_include_directories(baby
       ${CMAKE_SOURCE_DIR}/DHT11
 )
 
-target_link_libraries(baby PRIVATE Qt5::Widgets Qt5::Charts
+target_link_libraries(baby PRIVATE Qt5::Widgets Qt5::Charts Qt5::Multimedia
     ${OpenCV_LIBS}
     Threads::Threads
     PkgConfig::LIBCAMERA
     PkgConfig::GPIOD
     fastrtps      # library fas trtps
-    fastcdr 
+    fastcdr
     alarmpublisher
     dht11gpiod )
