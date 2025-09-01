@@ -1,7 +1,7 @@
 // ApplicationBootstrap.cpp - Application startup implementation
 #include "ApplicationBootstrap.h"
 #include "../interfaces/IComponent.h"
-#include "../ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 #include <QStringList>
 #include <QString>
 #include <memory>

@@ -3,7 +3,7 @@
 
 #include <memory>
 #include "ServiceContainer.h"
-#include "../ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 
 // Forward declarations
 class MainWindow;

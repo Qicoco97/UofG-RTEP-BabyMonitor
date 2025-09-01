@@ -5,7 +5,7 @@
 #include <QMap>
 #include <memory>
 #include "../interfaces/IComponent.h"
-#include "../ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 
 namespace BabyMonitor {
 

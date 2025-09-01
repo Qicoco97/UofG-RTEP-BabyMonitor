@@ -6,7 +6,7 @@
 #include <unordered_map>
 #include <QString>
 #include "../interfaces/IComponent.h"
-#include "../ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 
 namespace BabyMonitor {
 
