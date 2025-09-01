@@ -37,8 +37,8 @@ MainWindow::MainWindow(QWidget *parent)
     , alarmPlaying_(false)
 {
     ui->setupUi(this);
-    this->setMinimumSize(800, 600);
-    ui->thChartView->setMinimumSize(600, 300);
+    this->setMinimumSize(800, 1000);
+    ui->thChartView->setMinimumSize(400, 150);
     setupCharts();
     initializeLED();
     initializeAudioPlayer();
