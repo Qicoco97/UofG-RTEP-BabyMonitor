@@ -5,6 +5,17 @@
 #include <memory>
 #include "../../interfaces/IComponent.h"
 
+// Ensure Qt macros are defined
+#ifndef signals
+#define signals Q_SIGNALS
+#endif
+#ifndef slots
+#define slots Q_SLOTS
+#endif
+#ifndef emit
+#define emit Q_EMIT
+#endif
+
 namespace BabyMonitor {
 
 /**

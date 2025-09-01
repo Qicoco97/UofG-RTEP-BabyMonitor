@@ -2,6 +2,17 @@
 #include "ChartController.h"
 #include <QDebug>
 
+// Ensure Qt macros are defined
+#ifndef signals
+#define signals Q_SIGNALS
+#endif
+#ifndef slots
+#define slots Q_SLOTS
+#endif
+#ifndef emit
+#define emit Q_EMIT
+#endif
+
 namespace BabyMonitor {
 
 ChartController::ChartController(QChartView* tempHumChartView, QChartView* motionChartView, 

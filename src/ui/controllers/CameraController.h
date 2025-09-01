@@ -2,7 +2,6 @@
 #pragma once
 
 #include "IUIController.h"
-#include "../../camera/libcam2opencv.h"
 #include "../../utils/Config.h"
 #include "../../utils/ErrorHandler.h"
 #include "../../performance/PerformanceMonitor.h"
@@ -11,6 +10,20 @@
 #include <QImage>
 #include <opencv2/opencv.hpp>
 #include <memory>
+
+// Include libcamera last and redefine Qt macros
+#include "../../camera/libcam2opencv.h"
+
+// Redefine Qt macros after libcamera (which undefines them)
+#ifndef signals
+#define signals Q_SIGNALS
+#endif
+#ifndef slots
+#define slots Q_SLOTS
+#endif
+#ifndef emit
+#define emit Q_EMIT
+#endif
 
 namespace BabyMonitor {
 

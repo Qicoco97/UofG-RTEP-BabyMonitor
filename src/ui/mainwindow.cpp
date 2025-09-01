@@ -36,7 +36,7 @@ void MainWindow::initializeControllers()
 {
     try {
         // Initialize camera controller
-        cameraController_ = std::make_unique<BabyMonitor::CameraController>(ui->label, this);
+        cameraController_ = std::make_unique<BabyMonitor::CameraController>(ui->cameraLabel, this);
 
         // Initialize chart controller
         chartController_ = std::make_unique<BabyMonitor::ChartController>(
@@ -44,14 +44,15 @@ void MainWindow::initializeControllers()
 
         // Initialize sensor controller
         sensorController_ = std::make_unique<BabyMonitor::SensorController>(
-            ui->tempLabel, ui->humLabel, ui->motionLabel, this);
+            ui->tempLabel, ui->humLabel, ui->motionStatusLabel, this);
 
         // Initialize alarm controller
         alarmController_ = std::make_unique<BabyMonitor::AlarmController>(this);
 
-        // Initialize performance controller
+        // Initialize performance controller (performanceStatusLabel may not exist in UI)
+        QLabel* perfLabel = ui->findChild<QLabel*>("performanceStatusLabel");
         performanceController_ = std::make_unique<BabyMonitor::PerformanceController>(
-            ui->performanceLabel, this);
+            perfLabel, this);
 
         // Initialize all controllers
         cameraController_->initialize();
