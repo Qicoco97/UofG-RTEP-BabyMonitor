@@ -122,6 +122,13 @@ void AlarmController::setAlarmSystem(std::shared_ptr<IAlarmSystem> alarmSystem)
 {
     alarmSystem_ = alarmSystem;
     if (alarmSystem_) {
+        // Initialize and start the injected alarm system
+        if (alarmSystem_->initialize()) {
+            alarmSystem_->start();
+            errorHandler_.reportInfo("AlarmController", "Injected AlarmSystem initialized and started");
+        } else {
+            errorHandler_.reportError("AlarmController", "Failed to initialize injected AlarmSystem");
+        }
         errorHandler_.reportInfo("AlarmController", "Alarm system injected successfully");
     }
 }
