@@ -84,22 +84,6 @@
         <item>
          <widget class="QtCharts::QChartView" name="thChartView" native="true"/>
         </item>
-        <item>
-         <widget class="QChartView" name="graphicsView"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="motionPage">
-       <attribute name="title">
-        <string>motion history</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="motionChartLayout">
-        <item>
-         <widget class="QtCharts::QChartView" name="motionChartView" native="true"/>
-        </item>
-        <item>
-         <widget class="QChartView" name="graphicsView_2"/>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="performancePage">
