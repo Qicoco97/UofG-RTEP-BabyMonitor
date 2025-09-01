@@ -40,6 +40,7 @@ public:
                 } else {
                     emit errorReading();
                 }
+                std::this_thread::sleep_for(std::chrono::seconds(readInterval_));
                 // Precise delay using recommended C++ pattern
                 {
                     auto start = std::chrono::system_clock::now();
@@ -47,7 +48,6 @@ public:
                         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::system_clock::now() - start).count();
                         if (duration >= readInterval_) break;
-                        if (!blinking_.load()) break; // Allow early exit
                     }
                 }
             }
