@@ -135,6 +135,9 @@ void MainWindow::timerEvent(QTimerEvent *event) {
             // Play alarm sound after reaching threshold
             if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
                 playAlarmSound();
+                triggerMotionAlert();
+
+
             }
         } else {
             noMotionCount_ = 0; // Reset counter when motion is detected
@@ -163,10 +166,12 @@ void MainWindow::onMotionStatusChanged(bool detected)
     motionDetected_ = detected;
     if (detected){
         ui->motionStatusLabel->setText(tr("On motion"));
-        triggerMotionAlert();
+        
         }
-    else
+    else{
         ui->motionStatusLabel->setText(tr("no motion"));
+        
+        }
 }
 
 void MainWindow::onNewDHTReading(int t_int, int t_dec,
