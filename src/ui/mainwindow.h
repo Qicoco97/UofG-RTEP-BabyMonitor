@@ -1,51 +1,21 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-// Qt includes first (before libcamera which undefines Qt macros)
 #include <QMainWindow>
-#include <QLabel>
-#include <QTimer>
-#include <QTimerEvent>
-#include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
-#include <QtCharts/QValueAxis>
-#include <QtCharts/QChart>
-#include <QMediaPlayer>
-#include <QUrl>
+#include <QKeyEvent>
 #include <memory>
 
-// Qt-based components (must come before libcamera)
-#include "../sensors/DHT11Worker.h"
-#include "../communication/dds/AlarmPublisher.h"
-#include "../hardware/LedController.h"
-#include "../utils/Config.h"
-#include "../utils/SensorData.h"
-#include "../sensors/SensorFactory.h"
-#include "../interfaces/IComponent.h"
+// Controller includes
+#include "controllers/CameraController.h"
+#include "controllers/ChartController.h"
+#include "controllers/SensorController.h"
+#include "controllers/AlarmController.h"
+#include "controllers/PerformanceController.h"
+
+// Core interfaces
 #include "../managers/AlarmSystem.h"
+#include "../utils/SensorData.h"
 #include "../utils/ErrorHandler.h"
-
-QT_CHARTS_USE_NAMESPACE
-
-// Forward declarations for performance monitoring
-namespace BabyMonitor {
-    class PerformanceMonitor;
-    class HighPrecisionTimer;
-}
-
-// libcamera include LAST (it undefines Qt macros)
-#include "../camera/libcam2opencv.h"
-
-// Redefine Qt macros after libcamera (which undefines them)
-#ifndef signals
-#define signals Q_SIGNALS
-#endif
-#ifndef slots
-#define slots Q_SLOTS
-#endif
-#ifndef emit
-#define emit Q_EMIT
-#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -58,152 +28,41 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    void updateImage(const cv::Mat &mat);
-    bool detectMotion(const cv::Mat &currentFrame);
-    
-    struct CameraCallback : Libcam2OpenCV::Callback {
-        MainWindow* window = nullptr;
-
-        virtual void hasFrame(const cv::Mat &frame, const libcamera::ControlList &) override {
-            if (window != nullptr) {
-                window->processNewFrame(frame);
-            }
-        }
-    };
 
     // Dependency injection methods (public for bootstrap access)
     void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
 
     // Public accessors for system status (read-only)
-    bool isMotionDetected() const { return motionDetected_; }
-    const BabyMonitor::SystemStatus& getSystemStatus() const { return systemStatus_; }
-    const BabyMonitor::TemperatureHumidityData& getLastTempHumData() const { return lastTempHumData_; }
-    const BabyMonitor::MotionData& getLastMotionData() const { return lastMotionData_; }
+    bool isMotionDetected() const;
+    const BabyMonitor::SystemStatus& getSystemStatus() const;
+    const BabyMonitor::TemperatureHumidityData& getLastTempHumData() const;
+    const BabyMonitor::MotionData& getLastMotionData() const;
     
 protected:
-    void timerEvent(QTimerEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override; // For performance testing hotkeys
-    
-signals:
-    // Emit this signal every time there is a new frame.
-    void frameReady(const cv::Mat &mat);
+    void keyPressEvent(QKeyEvent *event) override;
 
 private slots:
-    void onMotionStatusChanged(bool detected);
-    void onNewDHTReading(int t_int, int t_dec,
-                         int h_int, int h_dec);
-    void onDHTError();
-
-//    void onPMExceeded(float pm25, float pm10);
+    void onControllerStatusChanged(const QString& status);
+    void onControllerError(const QString& component, const QString& message);
 
 private:
     std::unique_ptr<Ui::MainWindow> ui;
 
-    cv::Mat previousFrame;
-
-    QtCharts::QLineSeries *motionSeries;
-    QtCharts::QChart *motionChart;
-
-    QtCharts::QChart      *chart;
-    QtCharts::QLineSeries *tempSeries;
-    QtCharts::QLineSeries *humSeries;
-    QtCharts::QValueAxis  *axisX;
-    QtCharts::QValueAxis  *axisY;       ///< Value axis Y
-     ///< Current data index
-    
-    int timeIndex;
-    
-    int            alarmTimerId_{-1};
-    uint32_t       samplesSent_{1};
-    bool           motionDetected_{false};
-    LEDController     led_;
-
-    // Interface-based components (dependency injection)
-    std::shared_ptr<BabyMonitor::IAlarmSystem> injectedAlarmSystem_;
-    // Removed: redundant alarmSystem_ and alarmPub_ instances
-
-    DHT11Worker   *dhtWorker_;
-
-    // Motion detection components
-    QThread* motionThread_;
-    MotionWorker* motionWorker_;
-
-    // Structured sensor data
-    BabyMonitor::TemperatureHumidityData lastTempHumData_;
-    BabyMonitor::MotionData lastMotionData_;
-    BabyMonitor::SystemStatus systemStatus_;
+    // Controllers (single responsibility)
+    std::unique_ptr<BabyMonitor::CameraController> cameraController_;
+    std::unique_ptr<BabyMonitor::ChartController> chartController_;
+    std::unique_ptr<BabyMonitor::SensorController> sensorController_;
+    std::unique_ptr<BabyMonitor::AlarmController> alarmController_;
+    std::unique_ptr<BabyMonitor::PerformanceController> performanceController_;
 
     // Error handling
     BabyMonitor::ErrorHandler& errorHandler_;
 
-    // Performance monitoring (using raw pointers to avoid incomplete type issues)
-    BabyMonitor::PerformanceMonitor* perfMonitor_;
-    BabyMonitor::HighPrecisionTimer* frameTimer_;
-    BabyMonitor::HighPrecisionTimer* alarmTimer_;
-
-    // Adaptive frame processing
-    bool isFrameProcessingAdapted_;
-    int frameSkipCounter_;
-    int adaptiveFrameSkip_;
-
-    // Performance reporting
-    QTimer* performanceReportTimer_;
-
-    // DHT11 error tracking
-    int dht11ConsecutiveErrors_;
-    static constexpr int DHT11_MAX_CONSECUTIVE_ERRORS = 5;
-
-    // Audio alarm system
-    QMediaPlayer* audioPlayer_;
-    int noMotionCount_;
-    bool alarmPlaying_;
-
-    void setupCharts();
-
-    // Chart management methods
-    void updateTemperatureHumidityChart(const BabyMonitor::TemperatureHumidityData& data);
-    void updateMotionChart(const BabyMonitor::MotionData& data);
-    void configureChartAxes();
-
-    // Frame processing methods
-    void processNewFrame(const cv::Mat& frame);
-
-    // Sensor management methods
-    void initializeSensors();
-    void startSensors();
-    void stopSensors();
-    void initializeMotionDetection();
-    void cleanupMotionDetection();
-    void initializeDHT11Sensor();
-    void cleanupDHT11Sensor();
-
-    // LED control methods
-    void initializeLED();
-    void triggerMotionAlert();
-
-    // Error handling methods
-    void handleSystemError(const QString& component, const QString& message);
-    void handleCriticalError(const QString& component, const QString& message);
-    void updateSystemStatus();
-
-    // Audio alarm methods
-    void initializeAudioPlayer();
-    void playAlarmSound();
-    void onAudioPlayerStateChanged(QMediaPlayer::State state);
-
-    // Performance monitoring methods
-    void initializePerformanceMonitoring();
-    void adaptFrameProcessing();
-    void recoverFrameProcessing();
-    void onMotionWorkerPerformanceAlert(const QString& message);
-    void logPerformanceReport();
-    void updatePerformanceDisplay();
-
-    // Camera and callback (moved to private for better encapsulation)
-    Libcam2OpenCV camera;
-    CameraCallback cameraCallback;
-
-private:
+    // Helper methods
+    void initializeControllers();
+    void startAllControllers();
+    void stopAllControllers();
+    void connectControllerSignals();
 };
 
 #endif // MAINWINDOW_H

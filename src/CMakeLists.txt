@@ -32,6 +32,11 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/sensors)
 add_executable(baby
     main.cpp
     ui/mainwindow.cpp
+    ui/controllers/CameraController.cpp
+    ui/controllers/ChartController.cpp
+    ui/controllers/SensorController.cpp
+    ui/controllers/AlarmController.cpp
+    ui/controllers/PerformanceController.cpp
     camera/libcam2opencv.cpp
     detection/motionworker.cpp
     utils/ErrorHandler.cpp
@@ -40,6 +45,12 @@ add_executable(baby
     core/ServiceContainer.cpp
     core/ApplicationBootstrap.cpp
     ui/mainwindow.h
+    ui/controllers/IUIController.h
+    ui/controllers/CameraController.h
+    ui/controllers/ChartController.h
+    ui/controllers/SensorController.h
+    ui/controllers/AlarmController.h
+    ui/controllers/PerformanceController.h
     detection/motionworker.h
     managers/AlarmSystem.h
     managers/SensorManager.h
