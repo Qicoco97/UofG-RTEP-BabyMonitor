@@ -164,9 +164,9 @@ void AlarmController::onAlarmTimerTimeout()
 void AlarmController::triggerMotionAlert()
 {
     try {
-        led_.blinkLED(BabyMonitorConfig::LED_BLINK_COUNT,
-                     BabyMonitorConfig::LED_ON_DURATION_MS,
-                     BabyMonitorConfig::LED_OFF_DURATION_MS);
+        led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
+                   BabyMonitorConfig::LED_ON_DURATION_MS,
+                   BabyMonitorConfig::LED_OFF_DURATION_MS);
         
         emit ledStatusChanged(true);
         errorHandler_.reportInfo("AlarmController", "Motion alert LED triggered");
