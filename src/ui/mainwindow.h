@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "../camera/libcam2opencv.h"
+
+// Qt includes first (before libcamera which undefines Qt macros)
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
@@ -12,6 +13,8 @@
 #include <QMediaPlayer>
 #include <QUrl>
 #include <memory>
+
+// Qt-based components (must come before libcamera)
 #include "../sensors/DHT11Worker.h"
 #include "../communication/dds/AlarmPublisher.h"
 #include "../hardware/LedController.h"
@@ -20,6 +23,9 @@
 #include "../sensors/SensorFactory.h"
 #include "../interfaces/IComponent.h"
 #include "../managers/AlarmSystem.h"
+#include "../utils/ErrorHandler.h"
+
+QT_CHARTS_USE_NAMESPACE
 
 // Forward declarations for performance monitoring
 namespace BabyMonitor {
@@ -27,9 +33,19 @@ namespace BabyMonitor {
     class HighPrecisionTimer;
 }
 
-QT_CHARTS_USE_NAMESPACE
+// libcamera include LAST (it undefines Qt macros)
+#include "../camera/libcam2opencv.h"
 
-#include "../utils/ErrorHandler.h"
+// Redefine Qt macros after libcamera (which undefines them)
+#ifndef signals
+#define signals Q_SIGNALS
+#endif
+#ifndef slots
+#define slots Q_SLOTS
+#endif
+#ifndef emit
+#define emit Q_EMIT
+#endif
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
