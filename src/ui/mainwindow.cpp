@@ -50,7 +50,7 @@ void MainWindow::initializeControllers()
         alarmController_ = std::make_unique<BabyMonitor::AlarmController>(this);
 
         // Initialize performance controller (performanceStatusLabel may not exist in UI)
-        QLabel* perfLabel = ui->findChild<QLabel*>("performanceStatusLabel");
+        QLabel* perfLabel = this->findChild<QLabel*>("performanceStatusLabel");
         performanceController_ = std::make_unique<BabyMonitor::PerformanceController>(
             perfLabel, this);
 
