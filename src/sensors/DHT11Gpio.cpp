@@ -29,7 +29,13 @@ bool DHT11Gpio::begin() {
         std::cerr << "DHT11Gpio::begin() failed: " << e.what() << "\n";
         return false;
     }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // Precise delay using recommended C++ pattern (1 second = 1000ms)
+    auto start = std::chrono::system_clock::now();
+    while (true) {
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::system_clock::now() - start).count();
+        if (duration >= 1000) break;
+    }
     return true;
 }
 

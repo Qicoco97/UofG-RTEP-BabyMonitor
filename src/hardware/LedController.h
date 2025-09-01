@@ -72,13 +72,31 @@ public:
                 if (!line_ || !chip_) break;
 
                 gpiod_line_set_value(line_, 1);
-                std::this_thread::sleep_for(std::chrono::milliseconds(onMs));
+                // Precise delay using recommended C++ pattern
+                {
+                    auto start = std::chrono::system_clock::now();
+                    while (true) {
+                        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now() - start).count();
+                        if (duration >= onMs) break;
+                        if (!blinking_.load()) break; // Allow early exit
+                    }
+                }
 
                 // Check again before turning off
                 if (!blinking_.load() || !line_ || !chip_) break;
 
                 gpiod_line_set_value(line_, 0);
-                std::this_thread::sleep_for(std::chrono::milliseconds(offMs));
+                // Precise delay using recommended C++ pattern
+                {
+                    auto start = std::chrono::system_clock::now();
+                    while (true) {
+                        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now() - start).count();
+                        if (duration >= offMs) break;
+                        if (!blinking_.load()) break; // Allow early exit
+                    }
+                }
             }
             blinking_.store(false);
         });
