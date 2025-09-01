@@ -4,9 +4,9 @@
 #include <memory>
 #include <QObject>
 #include <QThread>
-#include "DHT11/DHT11Worker.h"
-#include "motionworker.h"
-#include "Config.h"
+#include "DHT11Worker.h"
+#include "../detection/motionworker.h"
+#include "../utils/Config.h"
 
 namespace BabyMonitor {
 

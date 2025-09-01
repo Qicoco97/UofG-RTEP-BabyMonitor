@@ -1,6 +1,6 @@
 // motionworker.cpp
 #include "motionworker.h"
-#include "performance/PerformanceMonitor.h"
+#include "../performance/PerformanceMonitor.h"
 
 MotionWorker::MotionWorker(double minArea, int thresh)
     : thresh_(thresh), minArea_(minArea)

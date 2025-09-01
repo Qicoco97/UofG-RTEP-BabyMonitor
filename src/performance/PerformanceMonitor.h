@@ -9,7 +9,7 @@
 #include <atomic>
 #include <algorithm>
 #include <cmath>
-#include "../ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 
 namespace BabyMonitor {
 

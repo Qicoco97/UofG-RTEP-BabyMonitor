@@ -1,6 +1,6 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "libcam2opencv.h"
+#include "../camera/libcam2opencv.h"
 #include <QMainWindow>
 #include <QLabel>
 #include <QTimer>
@@ -12,14 +12,14 @@
 #include <QMediaPlayer>
 #include <QUrl>
 #include <memory>
-#include "DHT11Worker.h"
-#include "AlarmPublisher.h"
-#include "LedController.h"
-#include "Config.h"
-#include "SensorData.h"
-#include "SensorFactory.h"
-#include "interfaces/IComponent.h"
-#include "managers/AlarmSystem.h"
+#include "../sensors/DHT11Worker.h"
+#include "../communication/dds/AlarmPublisher.h"
+#include "../hardware/LedController.h"
+#include "../utils/Config.h"
+#include "../utils/SensorData.h"
+#include "../sensors/SensorFactory.h"
+#include "../interfaces/IComponent.h"
+#include "../managers/AlarmSystem.h"
 
 // Forward declarations for performance monitoring
 namespace BabyMonitor {
@@ -29,7 +29,7 @@ namespace BabyMonitor {
 
 QT_CHARTS_USE_NAMESPACE
 
-#include "ErrorHandler.h"
+#include "../utils/ErrorHandler.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

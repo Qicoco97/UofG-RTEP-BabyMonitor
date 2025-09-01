@@ -1,6 +1,6 @@
 // AlarmSystem.cpp - Alarm system implementation
 #include "AlarmSystem.h"
-#include "../dds_pub-sub/AlarmMsg.h"
+#include "../communication/dds/AlarmMsg.h"
 #include "../performance/PerformanceMonitor.h"
 #include <QDateTime>
 

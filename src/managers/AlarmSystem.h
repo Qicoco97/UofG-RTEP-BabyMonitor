@@ -5,8 +5,8 @@
 #include <QTimer>
 #include <memory>
 #include "../interfaces/IComponent.h"
-#include "../dds_pub-sub/AlarmPublisher.h"
-#include "../ErrorHandler.h"
+#include "../communication/dds/AlarmPublisher.h"
+#include "../utils/ErrorHandler.h"
 
 // Forward declarations
 namespace BabyMonitor {

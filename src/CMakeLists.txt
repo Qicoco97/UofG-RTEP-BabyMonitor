@@ -25,34 +25,34 @@ include_directories(${CMAKE_SOURCE_DIR} ${LIBCAMERA_INCLUDE_DIRS} ${OpenCV_INCLU
 
 
 find_package(Qt5 COMPONENTS Widgets Charts Multimedia REQUIRED)
-add_subdirectory(${CMAKE_SOURCE_DIR}/dds_pub-sub
-                 ${CMAKE_BINARY_DIR}/dds_pub-sub)
-add_subdirectory(${CMAKE_SOURCE_DIR}/DHT11)
+add_subdirectory(${CMAKE_SOURCE_DIR}/communication/dds
+                 ${CMAKE_BINARY_DIR}/communication/dds)
+add_subdirectory(${CMAKE_SOURCE_DIR}/sensors)
 
 add_executable(baby
     main.cpp
-    mainwindow.cpp
-    libcam2opencv.cpp
-    motionworker.cpp
-    ErrorHandler.cpp
+    ui/mainwindow.cpp
+    camera/libcam2opencv.cpp
+    detection/motionworker.cpp
+    utils/ErrorHandler.cpp
     managers/AlarmSystem.cpp
     managers/SensorManager.cpp
     core/ServiceContainer.cpp
     core/ApplicationBootstrap.cpp
-    mainwindow.h
-    motionworker.h
+    ui/mainwindow.h
+    detection/motionworker.h
     managers/AlarmSystem.h
     managers/SensorManager.h
     interfaces/IComponent.h
-    SensorFactory.h
-    ErrorHandler.h
+    sensors/SensorFactory.h
+    utils/ErrorHandler.h
     performance/PerformanceMonitor.h
-    mainwindow.ui
+    ui/mainwindow.ui
   )
 
 target_include_directories(baby
     PRIVATE
-      ${CMAKE_SOURCE_DIR}/DHT11
+      ${CMAKE_SOURCE_DIR}/sensors
 )
 
 target_link_libraries(baby PRIVATE Qt5::Widgets Qt5::Charts Qt5::Multimedia

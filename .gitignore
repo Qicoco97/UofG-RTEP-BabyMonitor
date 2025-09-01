@@ -26,8 +26,8 @@ Makefile
 # Qt auto-generated files
 *_autogen/
 **/*_autogen/
-src/dds_pub-sub/*_autogen/
-src/DHT11/*_autogen/
+src/communication/dds/*_autogen/
+src/sensors/*_autogen/
 
 
 # Logs and temporary files
