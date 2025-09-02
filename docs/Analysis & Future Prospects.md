@@ -4,8 +4,7 @@
 
 **Hardware Limitations**  
 - The DHT11 sensor has low accuracy and limited sampling frequency, unsuitable for high-precision monitoring.  
-- Camera relies on `libcamera`, which suffers from poor cross-platform compatibility and driver configuration issues.  
-- LED/GPIO control is too basic, lacking more sophisticated local alert mechanisms.  
+
 
 **Software Limitations**  
 - Motion detection algorithm is based on frame-difference and thresholding, prone to false positives under lighting changes or background noise.  
@@ -36,6 +35,4 @@
 - Connect to cloud platforms for data storage and long-term trend analysis.  
 - Allow user-defined rules (e.g., automatic notification when temperature exceeds a threshold).  
 
-**Application Expansion**  
-- Extend from baby monitoring to elderly care, pet monitoring, and home security.  
-- Integrate into smart home ecosystems, linking with smart locks, cameras, and air purifiers.  
+  
