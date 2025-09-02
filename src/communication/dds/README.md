@@ -7,7 +7,6 @@ Based on this tutorial: https://fast-dds.docs.eprosima.com/en/latest/fastdds/get
 
 It demonstrates a realtime publisher / subscriber application.
 
-![alt tag](screenshot.png)
 
 ## Prereqisites
 

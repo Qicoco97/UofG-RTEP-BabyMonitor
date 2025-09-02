@@ -1,100 +1,107 @@
 # Utils Module
 
-## 概述
+## Overview
 
-Utils模块是UofG-RTEP-BabyMonitor项目的核心工具库，提供系统配置管理、错误处理和数据结构定义等基础功能。该模块为整个项目提供统一的配置中心、结构化的错误管理和标准化的数据类型，是系统架构的重要基础组件。
+The Utils module is the core utility library of the UofG-RTEP-BabyMonitor project, providing basic functions such as system configuration management, error handling, and data structure definitions. This module provides a unified configuration center, structured error management, and standardized data types for the entire project, serving as an important foundational component of the system architecture.
 
+## Core Components
 
-## 核心组件
+### 1. Config.h - Configuration Management Center
 
-### 1. Config.h - 配置管理中心
+Centrally manages all system configuration constants, following the single configuration source principle:
 
-集中管理系统所有配置常量，遵循单一配置源原则
+**Main Functions**:
+- Define GPIO pin numbers for hardware like DHT11, LED; configure sensor reading intervals, error thresholds and other parameters; set motion detection thresholds and algorithm parameters; define performance monitoring thresholds and adaptation parameters
 
+### 2. ErrorHandler - Error Handling System
 
-### 2. ErrorHandler - 错误处理系统
+Provides unified error management and reporting mechanisms:
 
-提供统一的错误管理和报告机制
+**Main Functions**:
+- Unified error reporting interface
+- Support multi-level error management (Info, Warning, Error, Critical)
+- Maintain error history records and statistical information
+- Automatically record to console and log files
 
-#### 核心功能
+### 3. SensorData.h - Data Structure Definitions
 
-- **错误报告**: 统一的错误报告接口
-- **错误分级**: 支持多级别错误管理
-- **历史记录**: 维护错误历史记录
-- **控制台输出**: 自动记录到控制台
+Defines standardized data structures used in the system:
 
+**Main Data Structures**:
+- TemperatureHumidityData: Temperature and humidity sensor data structure
+- MotionData: Motion detection data structure
+- SystemStatus: System status information structure
+- PerformanceMetrics: Performance monitoring data structure
 
-### 3. SensorData.h - 数据结构定义
+## Interaction with Other Modules
 
-定义系统中使用的标准化数据结构：
+### core/
+- Config provides configuration parameters for ApplicationBootstrap and ServiceContainer
+- ErrorHandler integrates into the entire system's error handling mechanism
 
-TemperatureHumidityData ,MotionData ,SystemStatus 
+### sensors/
+- Config provides GPIO configuration and reading parameters for DHT11 sensor
+- SensorData defines standardized structures for sensor data
 
+### detection/
+- Config provides parameter configuration for motion detection algorithms
+- ErrorHandler handles error reporting during motion detection processes
 
-## 在项目中的使用
+### ui/
+- SensorData provides standardized data display structures for MainWindow
+- ErrorHandler handles UI-related errors and status reporting
 
-### 1. 配置管理使用
+### hardware/
+- Config provides configuration parameters for LED controller and other hardware devices
+- ErrorHandler handles errors and status reporting for hardware devices
 
-在各个组件中使用配置常量：
+## Usage
 
+### Configuration Management Usage
 
-### 2. 错误处理使用
+```cpp
+// Use configuration constants in various components
+#include "Config.h"
 
-在系统各组件中报告错误：
+// DHT11 sensor configuration
+auto dht11 = std::make_unique<DHT11Worker>(BabyMonitorConfig::DHT11_PIN_NUMBER);
 
-
-### 3. 数据结构使用
-
-使用标准化数据结构：
-
-
-
-## 设计优势
-
-### 1. 集中配置管理
-
-- **单一配置源**: 所有配置集中在Config.h中
-- **编译时常量**: 使用constexpr确保编译时优化
-- **类型安全**: 强类型配置参数
-- **易于维护**: 修改配置只需更新一个文件
-
-### 2. 统一错误处理
-
-- **标准化接口**: 统一的错误报告方法
-- **分级管理**: 支持不同级别的错误处理
-- **历史追踪**: 完整的错误历史记录
-- **单例模式**: 全局统一的错误处理实例
-
-### 3. 结构化数据
-
-- **类型安全**: 强类型数据结构
-- **数据验证**: 内置数据有效性检查
-- **向后兼容**: 保持公共成员变量的向后兼容性
-- **封装改进**: 提供getter/setter方法
-
-### 4. 模块化设计
-
-- **职责分离**: 每个文件专注特定功能
-- **低耦合**: 最小化模块间依赖
-- **高内聚**: 相关功能集中管理
-- **易于扩展**: 便于添加新的配置和数据类型
-
-
-## 与其他模块的交互
-
-### 系统架构位置
-
-```
-所有模块 → Utils (Config, ErrorHandler, SensorData)
-    ↓              ↓
-配置获取        错误报告 + 数据结构
+// LED controller configuration
+LEDController led(BabyMonitorConfig::LED_CHIP_NUMBER,
+                  BabyMonitorConfig::LED_PIN_NUMBER);
 ```
 
-### 使用模块
+### Error Handling Usage
 
-- **MainWindow**: 使用所有utils组件
-- **Sensors**: 使用Config和SensorData
-- **Hardware**: 使用Config配置GPIO参数
-- **Performance**: 使用Config配置监控参数
-- **Managers**: 使用ErrorHandler和数据结构
+```cpp
+// Report errors in system components
+#include "ErrorHandler.h"
+
+ErrorHandler& errorHandler = ErrorHandler::getInstance();
+
+// Report different levels of errors
+errorHandler.reportError("DHT11 sensor initialization failed", ErrorLevel::Error);
+errorHandler.reportError("Motion detection performance warning", ErrorLevel::Warning);
+```
+
+### Data Structure Usage
+
+```cpp
+// Use standardized data structures
+#include "SensorData.h"
+
+// Temperature and humidity data
+BabyMonitor::TemperatureHumidityData tempHumData;
+tempHumData.temperature = 25.5f;
+tempHumData.humidity = 60.0f;
+tempHumData.timestamp = QDateTime::currentDateTime();
+
+// System status
+BabyMonitor::SystemStatus status;
+status.isRunning = true;
+status.sensorsHealthy = true;
+status.lastUpdate = QDateTime::currentDateTime();
+```
+
+
 

@@ -1,117 +1,97 @@
-# BabyMonitor  
+# Baby Monitor: Real‑Time Embedded Sensor & Monitoring Dashboard
 
-This project is a real-time embedded system that monitors the environment and recognizes target behaviors to detect potential risks for infants and raise alerts.  
-The system is designed to help parents better check their baby’s status, making it suitable for home applications.  
-
----
-
-##  System Overview  
-
-1. **Real-time Video Monitoring**  
-   - The camera captures video (`libcam2opencv`) → The GUI displays frames in real-time (`mainwindow::updateImage`).  
-   - Parents can directly observe the baby’s condition on the interface.  
-
-2. **Motion Detection (Detecting Baby’s Activity or Abnormality)**  
-   - The `motionworker` module compares consecutive frames → Determines whether there is motion.  
-   - When motion is detected:  
-     - GUI displays “On motion”  
-     - LED blinks as a physical indicator  
-     - The system publishes a motion message (via DDS to other systems/mobile devices)  
-   - When no motion is detected for a long time:  
-     - A danger alert is published (e.g., the baby is not moving, or the camera is blocked).  
-
-3. **Environmental Monitoring (Temperature & Humidity)**  
-   - `DHT11Worker` periodically reads temperature and humidity values.  
-   - GUI displays the values and plots them on charts.  
-   - Parents can determine whether the room is too hot/cold/humid and adjust air conditioning or humidifiers accordingly.  
-
-4. **Alerts & Information Publishing (DDS Communication)**  
-   - `AlarmPublisher` periodically checks motion status:  
-     - No motion → Publish alert message `"No motion detected !!!! Dangerous!"`  
-     - Motion detected → Publish `"On motion !!!"`  
-   - These messages can be subscribed to by other devices, e.g.:  
-     - Mobile app receives notifications  
-     - IoT alarm device rings  
-     - Data is uploaded to the cloud  
-
-5. **Local Feedback (LED Indicator)**  
-   - When motion is detected, the LED blinks as an immediate physical reminder.  
+This is our **smart baby monitoring system**, designed to provide comprehensive real-time monitoring for infant safety and environmental conditions. The system combines motion detection, temperature/humidity monitoring, and intelligent alerting to help parents ensure their baby's wellbeing. With integrated camera monitoring, environmental sensors, and network communication capabilities, this platform delivers a complete monitoring solution that can be extended with additional sensors as needed.
 
 ---
 
-## Project Background & Motivation  
+## 📊 System Overview
 
-In modern households, infant safety and health are top concerns for parents. Traditional monitoring methods usually rely on manual supervision or simple video cameras, which face several limitations:  
+### 🎥 **Real-Time Video Monitoring & Motion Analysis**
 
-- **Parental fatigue**: Continuous monitoring is exhausting and prone to lapses.  
-- **Limited monitoring**: Standard cameras only provide visuals without intelligent analysis or timely alerts.  
-- **Environmental neglect**: Babies are sensitive to temperature, humidity, and air quality—factors ignored by conventional devices.  
-- **Lack of alerts & integration**: Existing devices rarely provide proactive alerts or integrate with other systems, leading to delayed notifications.  
+Seamless camera integration via `libcam2opencv` enables continuous video capture with real-time frame processing. Intelligent motion detection, powered by OpenCV frame-difference algorithms, identifies baby movement patterns. The Qt-based GUI provides live video feedback with clear motion status indicators (“On motion” / “No motion”).
+<p align="center">
+  <img src="./img%26demo/mainwindow.png" alt="Subscribe" height="300">
+</p>
 
-To address these issues, we designed and implemented an **intelligent baby monitor system** with the following features:  
+### 🌡️ **Environmental Monitoring**
 
-- **Real-time video monitoring**: Camera integration allows parents to check the baby’s activity in real-time.  
-- **Smart motion detection**: Frame-difference algorithms detect movement; prolonged inactivity triggers alerts.  
-- **Environmental monitoring**: Integrated DHT11 sensor continuously tracks room temperature and humidity, with chart visualization.  
-- **Multi-channel alerts & feedback**:  
-  - Alerts pushed to other devices (e.g., mobile apps or IoT alarms) via DDS communication.  
-  - Local LED indicator provides immediate, visible reminders.  
+Real-time `temperature and humidity monitoring` is enabled by the DHT11 sensor with 3-second update intervals. Data is displayed through dynamic trend charts with configurable data point limits, providing clear visualization of environmental changes.
+
+
+### 🚨 **Multi-Channel Alert System**
+
+When the system detects "no motion" for five consecutive times, it determines that the monitored object is in danger. At this point, the `LED lights` will flash and the `speaker` will play the alarm audio. The system supports real-time data exchange through `DDS`, enabling seamless dissemination of environmental and motion data to subscriber terminals.
+- Here is the feedback information from the subscriber terminal.
+<p align="center">
+  <img src="./img%26demo/Subscribe.png" alt="Subscribe" height="300">
+</p>
+
+- Here is the feedback information from the publisher terminal.
+<p align="center">
+  <img src="./img%26demo/publisher.png" alt="Subscribe" height="300">
+</p>
+
+### 🧠 **Intelligent Performance Management**
+
+The system ensures adaptive processing with dynamic parameter tuning based on load conditions, maintaining real-time responsiveness with motion detection latency under 50 ms. Resource optimization through adaptive quality scaling balances performance and efficiency, while robust error recovery mechanisms provide automatic sensor restoration and continuous health monitoring.
+<p align="center">
+  <img src="./img%26demo/performancewindow.png" alt="Subscribe" height="300">
+</p>
+---
+
+
+##  Demo Preview
+
+- [System Demo Video](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/DEMO.mp4)
+- Also you can see the project at our social media.
+links: https://www.tiktok.com/@gavinzet0?_t=ZN-8zOjntmHSsw&_r=1
 
 ---
 
-##  Demo Preview  
 
-- [System Demo Video](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/DEMO.mp4)  
+## 🏗️ System Architecture
 
----
+<p align="center">
+  <img src="./img%26demo/Architecture.png" alt="Subscribe" height="600">
+</p>
 
-##  Tests Preview  
+### **Module Division & Documentation**
 
-| Test Module              | Description                            | Preview |
-|---------------------------|----------------------------------------|---------|
-| **LED Test**              | `tests/test_led/` LED control demo     | [LED Test](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/LED%20Test.mp4) |
-| **Pub-Sub Test**          | `tests/test_sub_pub/` DDS communication demo | [Sub-Pub Test](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/pub-sub_test.png) |
+Our system consists of **11 different modules**, each performing its own specific task. You can click on the corresponding links to view the specific methods and functions they contain.
 
----
+#### **Core Module** - *System Foundation*
+- **[Core Module](./src/core/README.md)** 
+Provides dependency injection and application bootstrap management, serving as the architectural foundationcontainer
+#### **Interface Module** - *Contract Definitions*
+- **[Interfaces Module](./src/interfaces/README.md)** - Defines standardized interfaces (e.g., for alarms, sensors, display management) to support loose coupling and dependency injection
+#### **Management Module** - *Business Logic Controllers*
+- **[Managers Module](./src/managers/README.md)** - Implements alarm and sensor management, handling business logic and interactions with lower-level components
+#### **UI Module** - *User Interface & Interaction*
+- **[UI Module](./src/ui/README.md)** - Qt-based main interface integrating video display, sensor data, motion detection, alarms, and visualization
+#### **Detection Module** - *Computer Vision & Analysis*
+- **[Detection Module](./src/detection/README.md)** - Performs motion detection using OpenCV’s frame-difference method, with multithreading and adaptive performance optimization
+#### **Sensor Module** - *Environmental Monitoring*
+- **[Sensors Module](./src/sensors/README.md)** - Integrates DHT11 and other sensors, supporting data acquisition and sensor lifecycle management
+#### **Camera Module** - *Environmental Monitoring*
+- **[camera Module](./src/camera/README.md)** - Integrates libcamera for video capture and processing, using the libcamera2opencv library from Professor Bernd Porr's GitHub repository.
+#### **Hardware Module** - *Physical Device Control*
+- **[Hardware Module](./src/hardware/README.md)** - Provides GPIO hardware control, including LED indicators and camera integration
+#### **Communication Module** - *Network & Data Exchange*
+- **[Communication Module](./src/communication\dds/README.md)** - Implements real-time message publishing and subscribing with Fast DDS, enabling alarm and system information transmission, using the Fast DDS library from Professor Bernd Porr's GitHub repository.
+#### **Utility Module** - *Common Services & Tools*
+- **[Utils Module](./src/utils/README.md)** - Offers centralized configuration management, unified error handling, and standardized data structures
+####  **Performance Module** - *System Optimization*
+- **[Performance Module](./src/performance/README.md)** - Monitors system performance metrics with real-time constraint checking and adaptive optimization
 
-##  System Modules  
+###  🎯 **Design Principles & Architecture Benefits**
+- The system follows SOLID principles, with each module focused on a single responsibility and extended through minimal, well-defined interfaces. Dependency injection ensures loose coupling, allowing components to be interchangeable and the architecture to remain modular and maintainable.
 
-- **Camera Module**: Real-time video capture with libcamera & OpenCV  
-- **Motion Detection**: Frame-difference based motion recognition (OpenCV)  
-- **Environment Monitoring**: DHT11 sensor for temperature & humidity tracking  
-- **Alarm & Communication**: DDS-based message publishing for alerts  
-- **LED Feedback**: GPIO-controlled LED blinking on motion detection  
-- **Qt GUI**: Live video stream, motion status, and environmental charts  
+- This layered design provides key advantages: modularity for easier testing and reuse, performance through multi-threading and adaptive optimization, and robustness with error isolation and self-recovery.
 
-[Architecture Diagram](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Architecture%20Diagram.png)  
-[Class](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Class.png)
-[Data Flow](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/Data%20Flow.png)
+- Compared to monolithic systems, this architecture avoids tight coupling and single points of failure. Through separation of concerns, service-oriented design, and integrated monitoring, it ensures the baby monitoring system is reliable, scalable, and future-proof while maintaining the real-time performance essential for infant safety.
 
----
-
-##  How to Run  
-
-### 2.1 Build & Run  
-```bash
-mkdir build && cd build
-cmake ..
-make
-./baby    # main program
-
----
-```
-###  2.2 Test Output  
-
-- Qt GUI launches and displays real-time camera feed  
-- `MotionWorker` detects motion and updates status in the GUI  
-- DHT11 sensor data (temperature & humidity) displayed and plotted  
-- If no motion for a long time → System sends `"No motion detected"` alert  
-- If motion detected → System sends `"On motion"` alert and LED blinks  
-
----
-
-##  Documentation (`/docs`)  
-
+## 📕 Documentation (`/docs`)  
+Here are also some detailed information about the system.
 
 | File | Description |
 |------|-------------|
@@ -121,52 +101,93 @@ make
 
 
 ---
+## �🛠️ Hardware Setup
+---
+### 1. Raspberry Pi (Model 4/5 with 40‑pin GPIO header)
 
-##  Repository Structure  
+### 2. Sensors
 
-- **img&demo/** — Demo images, wiring diagrams, and video demo  
-  - DEMO.mp4 — System demo video  
-  - LED.png — LED control diagram  
-  - Output.png — Program output example  
-  - Subscribe.png — DDS subscription test screenshot  
-  - Wiring.png — Hardware wiring diagram  
-  - dht11.png — DHT11 sensor module diagram  
-  - diagram.png — System architecture/flow diagram  
-  - pub-sub_test.png — DDS pub-sub test result  
-  - window.png — Qt GUI screenshot  
+- **DHT11 Temperature/Humidity Sensor (GPIO 17):** Monitors environmental conditions in real-time, enabling the system to alert parents when room conditions become unsuitable for infant comfort and health.
+<p align="center">
+  <img src="./img%26demo/DHT11.jpg" alt="DHT11" height="300">
+</p>
 
-- **src/** — Main source code of BabyMonitor project  
-  - CMakeLists.txt — CMake build configuration  
-  - LedController.h — GPIO LED control  
-  - libcam2opencv.cpp, libcam2opencv.h — Camera capture & OpenCV bridge  
-  - main.cpp — Program entry point  
-  - mainwindow.cpp, mainwindow.h, mainwindow.ui — Qt main window & GUI logic  
-  - motionworker.cpp, motionworker.h — Motion detection worker  
-  - helloworld — Example test file  
+- **Camera Module (libcamera interface):** Captures continuous video stream for motion detection analysis and provides live visual monitoring of the baby's area.
+<p align="center">
+  <img src="./img%26demo/camera.jpg" alt="camera" height="300">
+</p>
 
-- **tests/** — Unit test or module test folder (currently empty or placeholder)  
-- **.gitignore** — Git exclusion rules (build folders, binaries, temp files)  
-- **Readme.md** — Project overview, usage instructions, and documentation links  
+### 3. Visual Indicators & Alarm Device
+
+- **LED Controller (GPIO 27):** Provides immediate visual feedback through configurable blinking patterns to indicate system status and motion detection events.
+- **Speaker (HDMI):** Since the Raspberry Pi 5 we are using does not have a sound output interface, we used HDMI as the sound output. We also tested using a Bluetooth speaker as the sound output source.
+<p align="center">
+  <img src="./img%26demo/LEDlight.jpg" alt="LEDlight" height="300">
+</p>
+
+#### Wiring
+For the wiring and GPIO use see the following pic
+<p align="center">
+  <img src="./img%26demo/Wiring.png" alt="Wiring" height="300">
+</p>
+
+## 💻 Software Build & Installation
+
+#### Dependencies
+``` bash
+sudo apt update
+sudo apt install libopencv-dev libgpiod-dev libwebsocketpp-dev libboost-all-dev libcamera-dev libfastcdr-dev libfastrtps-dev fastddsgen fastdds-tools
+libqwt-qt5-dev qtdeclarative5-dev qtcharts
+```
+
+#### Build & Run
+``` bash
+git clone https://github.com/Qicoco97/UofG-RTEP-BabyMonitor.git
+cd src
+cmake .
+make
+./baby
+```
+if you want to subscribe the information, you need to following bash
+``` bash
+cd dds_pub-sub
+./DDSAlarmSubscriber
+```
+
+
+
+## 🔧 Tests Preview
+
+| Test Module              | Description                            | Preview |
+|---------------------------|----------------------------------------|---------|
+| **LED Test**              | `tests/test_led/` LED control demo     | [LED Test](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/LED%20Test.mp4) |
+| **Pub-Sub Test**          | `tests/test_sub_pub/` DDS communication demo | [Sub-Pub Test](https://github.com/Qicoco97/UofG-RTEP-BabyMonitor/blob/master/img%26demo/pub-sub_test.png) |
+
 
 ---
 
-##  Third-Party Libraries  
+##  Third-Party Libraries
 
-- **Project Name**: libcamera2opencv  
-- **Author**: Bernd Porr  
-- **Link**: [https://github.com/berndporr/libcamera2opencv](https://github.com/berndporr/libcamera2opencv)  
-- **License**: GPL-2.0 License  
+- **Project Name**: libcamera2opencv
+- **Author**: Bernd Porr
+- **Link**: [https://github.com/berndporr/libcamera2opencv](https://github.com/berndporr/libcamera2opencv)
+- **License**: GPL-2.0 License
 
+- **Project Name**: fastdds_demo
+- **Author**: Bernd Porr
+- **Link**: [https://github.com/berndporr/fastdds_demo](https://github.com/berndporr/fastdds_demo)
+- **License**:  Apache License 2.0
+
+Thanks to my teacher and we learned a lot from this lecture !!! And the Original idea was came up with cribsense project! Thanks all
 ---
 
-##  Important Notice (Resubmission)  
+##  Important Notice (Resubmission)
 
-Due to improper use of third-party libraries in the initial version, the project was deemed academic misconduct.  
-In this resubmission, we have completely removed and discontinued the prior external libraries while retaining the original project focus — a baby monitor — and, with reference to code provided by Dr. Bernd Porr, we have re-implemented and refactored the core functionality from scratch.  
-This decision both avoids controversy and dependency risks and modernizes the previously outdated technology stack, thereby enhancing traceability, compliance, and system stability.  
+Due to improper use of third-party libraries in the initial version, the project was deemed academic misconduct.
+In this resubmission, we have completely removed and discontinued the prior external libraries while retaining the original project focus — a baby monitor — and, with reference to code provided by Dr. Bernd Porr, we have re-implemented and refactored the core functionality from scratch.
+This decision both avoids controversy and dependency risks and modernizes the previously outdated technology stack, thereby enhancing traceability, compliance, and system stability.
 
 ---
+##  License
 
-##  License  
-
-This project is licensed under the MIT License. See `LICENSE` for details.  
+This project is licensed under the MIT License. See `LICENSE` for details.

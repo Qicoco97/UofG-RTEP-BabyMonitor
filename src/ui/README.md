@@ -1,103 +1,52 @@
 # UI Module
 
-## 概述
+## Overview
 
-UI模块是UofG-RTEP-BabyMonitor项目的用户界面层，主要由MainWindow组件构成。MainWindow作为系统的核心控制器，负责协调所有子系统的运行，提供用户交互界面，并实时显示监护数据。
+The UI module is the user interface layer of the UofG-RTEP-BabyMonitor project, primarily composed of the MainWindow component. MainWindow serves as the core controller of the system, responsible for coordinating the operation of all subsystems, providing user interaction interfaces, and displaying monitoring data in real-time.
+
+## Core Components
+
+### 1. MainWindow - Main Window Controller
+
+The core user interface component of the system, integrating all functional modules:
+
+**Main Functions**:
+- Display real-time footage captured by the camera
+- Display temperature and humidity readings
+- Display current motion detection status
+- Real-time plotting of temperature and humidity change curves
+- Display operational status of each component
+
+**Performance Monitoring**:
+- Monitor video frame processing latency
+- Monitor alarm system response time
+- Automatically adjust processing parameters based on performance
+- Provide performance testing hotkeys (P/A/R keys)
+
+## Interaction with Other Modules
+
+### managers/
+- Receives AlarmSystem services through dependency injection to implement alarm publishing functionality
+- Integrates alarm system for processing motion detection results and network publishing
+
+### sensors/
+- Manages DHT11Worker for temperature and humidity data collection and display
+- Coordinates sensor initialization, startup, and data update processes
+
+### detection/
+- Integrates MotionWorker for motion detection analysis
+- Processes motion detection results and triggers corresponding alarms and LED control
+
+### hardware/
+- Controls LED indicator blinking behavior and status display
+- Manages camera startup, shutdown, and frame processing
+
+### core/
+- Receives dependency-injected services through ServiceContainer
+- Integrates ErrorHandler for error handling and status reporting
 
 
-## MainWindow核心作用
 
-### 1. 系统集成中心
 
-MainWindow是整个婴儿监护系统的集成中心，负责：
-
-- **传感器管理**: 初始化和管理DHT11温湿度传感器
-- **摄像头控制**: 管理摄像头的启动、停止和帧处理
-- **运动检测**: 协调运动检测模块的工作
-- **报警系统**: 集成报警发布和音频播放功能
-- **LED控制**: 管理LED指示灯的闪烁行为
-
-### 2. 用户界面管理
-
-提供直观的用户界面显示：
-
-- **实时视频**: 显示摄像头捕获的实时画面
-- **传感器数据**: 显示温度和湿度读数
-- **运动状态**: 显示当前运动检测状态
-- **数据图表**: 实时绘制温湿度变化曲线
-- **系统状态**: 显示各组件的运行状态
-
-### 3. 数据流协调
-
-作为数据流的中央处理器：
-
-```
-摄像头 → MainWindow → 运动检测
-传感器 → MainWindow → UI显示 + 图表更新
-运动检测结果 → MainWindow → 报警系统 + LED控制
-```
-
-### 4. 性能监控
-
-集成性能监控功能：
-
-- **帧处理性能**: 监控视频帧处理延迟
-- **报警响应性能**: 监控报警系统响应时间
-- **自适应调整**: 根据性能自动调整处理参数
-- **调试功能**: 提供性能测试快捷键（P/A/R键）
-
-## 主要功能模块
-
-### 传感器集成
-
-- **DHT11传感器**: 温湿度数据采集和显示
-- **错误处理**: 传感器故障检测和恢复
-- **数据验证**: 传感器数据有效性检查
-
-### 摄像头和运动检测
-
-- **视频流处理**: 实时视频显示和帧分发
-- **运动检测集成**: 与MotionWorker协同工作
-- **性能优化**: 帧跳跃和自适应处理
-
-### 报警和通知
-
-- **DDS报警**: 通过网络发布报警消息
-- **音频报警**: 播放报警声音文件
-- **LED指示**: 控制LED闪烁提供视觉反馈
-- **阈值管理**: 管理无运动报警阈值
-
-### 图表和数据可视化
-
-- **实时图表**: 使用Qt Charts显示温湿度曲线
-- **数据管理**: 管理图表数据点数量和显示范围
-- **时间轴**: 提供时间序列数据展示
-
-## 依赖注入支持
-
-MainWindow支持依赖注入模式：
-
-```cpp
-// 接受外部注入的报警系统
-void setAlarmSystem(std::shared_ptr<BabyMonitor::IAlarmSystem> alarmSystem);
-
-// 提供系统状态访问接口
-const BabyMonitor::SystemStatus& getSystemStatus() const;
-const BabyMonitor::TemperatureHumidityData& getLastTempHumData() const;
-```
-
-## 错误处理和状态管理
-
-- **统一错误处理**: 集成ErrorHandler进行错误报告
-- **系统状态跟踪**: 维护各组件的运行状态
-- **故障恢复**: 处理传感器和组件故障
-- **状态更新**: 实时更新UI显示状态
-
-## 性能特性
-
-- **多线程支持**: 传感器和运动检测在独立线程运行
-- **自适应性能**: 根据系统负载调整处理策略
-- **内存管理**: 使用Qt父子关系自动管理内存
-- **资源优化**: 智能的帧处理和数据管理
 
 
