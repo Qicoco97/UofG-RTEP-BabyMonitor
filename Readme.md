@@ -10,7 +10,7 @@ This is our **smart baby monitoring system**, designed to provide comprehensive 
 
 Seamless camera integration via `libcam2opencv` enables continuous video capture with real-time frame processing. Intelligent motion detection, powered by OpenCV frame-difference algorithms, identifies baby movement patterns. The Qt-based GUI provides live video feedback with clear motion status indicators (“On motion” / “No motion”).
 <p align="center">
-  <img src="./img%26demo/mainwindow.png" alt="Subscribe" height="300">
+  <img src="./img%26demo/mainwindow.png" alt="mainwindow" height="300">
 </p>
 
 ### 🌡️ **Environmental Monitoring**
@@ -28,15 +28,16 @@ When the system detects "no motion" for five consecutive times, it determines th
 
 - Here is the feedback information from the publisher terminal.
 <p align="center">
-  <img src="./img%26demo/publisher.png" alt="Subscribe" height="300">
+  <img src="./img%26demo/publisher.png" alt="publisher" height="300">
 </p>
 
 ### 🧠 **Intelligent Performance Management**
 
 The system ensures adaptive processing with dynamic parameter tuning based on load conditions, maintaining real-time responsiveness with motion detection latency under 50 ms. Resource optimization through adaptive quality scaling balances performance and efficiency, while robust error recovery mechanisms provide automatic sensor restoration and continuous health monitoring.
 <p align="center">
-  <img src="./img%26demo/performancewindow.png" alt="Subscribe" height="300">
+  <img src="./img%26demo/performancewindow.png" alt="performancewindow" height="300">
 </p>
+
 ---
 
 
@@ -101,7 +102,7 @@ Here are also some detailed information about the system.
 
 
 ---
-## �🛠️ Hardware Setup
+## 🛠️ Hardware Setup
 ---
 ### 1. Raspberry Pi (Model 4/5 with 40‑pin GPIO header)
 
