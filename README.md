@@ -137,8 +137,7 @@ For the wiring and GPIO use see the following pic
 #### Dependencies
 ``` bash
 sudo apt update
-sudo apt install libopencv-dev libgpiod-dev libwebsocketpp-dev libboost-all-dev libcamera-dev libfastcdr-dev libfastrtps-dev fastddsgen fastdds-tools
-libqwt-qt5-dev qtdeclarative5-dev qtcharts
+sudo apt install libopencv-dev libgpiod-dev libwebsocketpp-dev libboost-all-dev libcamera-dev libfastcdr-dev libfastrtps-dev fastddsgen fastdds-tools libqwt-qt5-dev qtdeclarative5-dev qtcharts libqt5multimedia5 qtmultimedia5-dev libqt5multimedia5-plugins libqt5multimediawidgets5
 ```
 
 #### Build & Run
