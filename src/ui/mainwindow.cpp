@@ -672,7 +672,7 @@ void MainWindow::initializeAudioPlayer()
 void MainWindow::playAlarmSound()
 {
     errorHandler_.reportInfo("Debug", QString("playAlarmSound called, alarmPlaying_=%1").arg(alarmPlaying_));
-    if (!audioPlayer_ || alarmPlaying_) {
+    if (!audioPlayer_ || alarmPlaying_) && (noMotionCount_ >= 3*BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
         errorHandler_.reportInfo("Debug", "playAlarmSound: already playing or player not initialized");
         return; // Don't play if already playing or player not initialized
     }
