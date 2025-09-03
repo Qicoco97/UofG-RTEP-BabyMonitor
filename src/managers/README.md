@@ -26,20 +26,20 @@ Implements the `ISensorManager` interface, responsible for managing multiple sen
 ## Interaction with Other Modules
 
 ### interfaces/
-- AlarmSystem implements the IAlarmSystem interface, providing standardized alarm services
-- SensorManager implements the ISensorManager interface, providing sensor management services
+- `AlarmSystem` implements the `IAlarmSystem` interface, providing standardized alarm services
+- `SensorManager` implements the `ISensorManager` interface, providing sensor management services
 
 ### ui/
-- MainWindow receives AlarmSystem services through dependency injection, implementing alarm publishing functionality
-- Uniformly manages sensor lifecycle and health status through SensorManager
+- `MainWindow` receives `AlarmSystem` services through dependency injection, implementing alarm publishing functionality
+- Uniformly manages sensor lifecycle and health status through `SensorManager`
 
 ### communication/
-- AlarmSystem uses the DDS communication layer to publish alarm messages to the network
+- `AlarmSystem` uses the DDS communication layer to publish alarm messages to the network
 - Supports real-time message delivery and network communication
 
 ### core/
-- Performs service registration and dependency injection through ServiceContainer
-- Integrates ErrorHandler for unified error handling and log management
+- Performs service registration and dependency injection through `ServiceContainer`
+- Integrates `ErrorHandler` for unified error handling and log management
 
 
 

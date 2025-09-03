@@ -28,32 +28,32 @@ Provides unified error management and reporting mechanisms:
 Defines standardized data structures used in the system:
 
 **Main Data Structures**:
-- TemperatureHumidityData: Temperature and humidity sensor data structure
-- MotionData: Motion detection data structure
-- SystemStatus: System status information structure
-- PerformanceMetrics: Performance monitoring data structure
+- `TemperatureHumidityData`: Temperature and humidity sensor data structure
+- `MotionData`: Motion detection data structure
+- `SystemStatus`: System status information structure
+- `PerformanceMetrics`: Performance monitoring data structure
 
 ## Interaction with Other Modules
 
 ### core/
-- Config provides configuration parameters for ApplicationBootstrap and ServiceContainer
-- ErrorHandler integrates into the entire system's error handling mechanism
+- `Config` provides configuration parameters for `ApplicationBootstrap` and `ServiceContainer`
+- `ErrorHandler` integrates into the entire system's error handling mechanism
 
 ### sensors/
-- Config provides GPIO configuration and reading parameters for DHT11 sensor
-- SensorData defines standardized structures for sensor data
+- `Config` provides GPIO configuration and reading parameters for DHT11 sensor
+- `SensorData` defines standardized structures for sensor data
 
 ### detection/
-- Config provides parameter configuration for motion detection algorithms
-- ErrorHandler handles error reporting during motion detection processes
+- `Config` provides parameter configuration for motion detection algorithms
+- `ErrorHandler` handles error reporting during motion detection processes
 
 ### ui/
-- SensorData provides standardized data display structures for MainWindow
-- ErrorHandler handles UI-related errors and status reporting
+- `SensorData` provides standardized data display structures for `MainWindow`
+- `ErrorHandler` handles UI-related errors and status reporting
 
 ### hardware/
-- Config provides configuration parameters for LED controller and other hardware devices
-- ErrorHandler handles errors and status reporting for hardware devices
+- `Config` provides configuration parameters for LED controller and other hardware devices
+- `ErrorHandler` handles errors and status reporting for hardware devices
 
 ## Usage
 
@@ -102,6 +102,3 @@ status.isRunning = true;
 status.sensorsHealthy = true;
 status.lastUpdate = QDateTime::currentDateTime();
 ```
-
-
-

@@ -26,15 +26,15 @@ The core user interface component of the system, integrating all functional modu
 ## Interaction with Other Modules
 
 ### managers/
-- Receives AlarmSystem services through dependency injection to implement alarm publishing functionality
+- Receives `AlarmSystem` services through dependency injection to implement alarm publishing functionality
 - Integrates alarm system for processing motion detection results and network publishing
 
 ### sensors/
-- Manages DHT11Worker for temperature and humidity data collection and display
+- Manages `DHT11Worker` for temperature and humidity data collection and display
 - Coordinates sensor initialization, startup, and data update processes
 
 ### detection/
-- Integrates MotionWorker for motion detection analysis
+- Integrates `MotionWorker` for motion detection analysis
 - Processes motion detection results and triggers corresponding alarms and LED control
 
 ### hardware/
@@ -42,8 +42,8 @@ The core user interface component of the system, integrating all functional modu
 - Manages camera startup, shutdown, and frame processing
 
 ### core/
-- Receives dependency-injected services through ServiceContainer
-- Integrates ErrorHandler for error handling and status reporting
+- Receives dependency-injected services through `ServiceContainer`
+- Integrates `ErrorHandler` for error handling and status reporting
 
 
 

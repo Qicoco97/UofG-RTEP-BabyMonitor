@@ -21,13 +21,13 @@ The Core module is the architectural foundation of the UofG-RTEP-BabyMonitor sys
 ## Interaction with Other Modules
 
 ### interfaces/
-- Defines standard interfaces such as IComponent, IAlarmSystem, ISensorManager. The Core module manages cross-layer dependencies through these interfaces
+- Defines standard interfaces such as `IComponent`, `IAlarmSystem`, `ISensorManager`. The Core module manages cross-layer dependencies through these interfaces
 
 ### managers/
-- For example, AlarmSystem implements the IAlarmSystem interface. Registered as an injectable service through Core's container, responsible for DDS communication and alarm logic
+- For example, AlarmSystem implements the `IAlarmSystem` interface. Registered as an injectable service through Core's container, responsible for DDS communication and alarm logic
 
 ### ui/
-- MainWindow uses setAlarmSystem() to receive injected alarm services. Achieves complete decoupling between UI and business logic
+- MainWindow uses `setAlarmSystem()` to receive injected alarm services. Achieves complete decoupling between UI and business logic
 
 ### utils/
-- Integrates ErrorHandler to implement unified error handling for startup and runtime. Centralized system log management for debugging and maintenance
+- Integrates `ErrorHandler` to implement unified error handling for startup and runtime. Centralized system log management for debugging and maintenance

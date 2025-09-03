@@ -39,19 +39,19 @@ Abstract interface for camera hardware, responsible for video stream capture and
 ## Interaction with Other Modules
 
 ### ui/
-- LEDController receives control commands from MainWindow to provide visual status feedback
+- `LEDController` receives control commands from `MainWindow` to provide visual status feedback
 - Triggers LED blinking alerts when motion anomalies are detected
 
 ### detection/
-- Libcam2OpenCV provides real-time video frame data for MotionWorker
+- `Libcam2OpenCV` provides real-time video frame data for `MotionWorker`
 - Supports video stream processing requirements for motion detection algorithms
 
 ### managers/
-- Controls LED status indication through AlarmSystem trigger mechanism
+- Controls LED status indication through `AlarmSystem` trigger mechanism
 - Integrates into the overall alarm and notification system
 
 ### core/
-- Reports hardware device status and error information through ErrorHandler
+- Reports hardware device status and error information through `ErrorHandler`
 - Integrates into the system's unified error handling mechanism
 
 

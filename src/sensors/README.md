@@ -38,20 +38,20 @@ Sensor creation factory following the open-closed principle:
 ## Interaction with Other Modules
 
 ### ui/
-- DHT11Worker sends temperature and humidity data to MainWindow, updating UI display and charts
+- `DHT11Worker` sends temperature and humidity data to `MainWindow`, updating UI display and charts
 - Implements real-time data transmission and visualization through signal-slot mechanism
 
 ### managers/
-- Unified sensor lifecycle management through SensorManager
+- Unified sensor lifecycle management through `SensorManager`
 - Integrates sensor health monitoring and error reporting mechanisms
 
 ### core/
-- Sensor service registration and dependency injection through ServiceContainer
-- Integrates ErrorHandler for sensor error handling and logging
+- Sensor service registration and dependency injection through `ServiceContainer`
+- Integrates `ErrorHandler` for sensor error handling and logging
 
 ### utils/
-- Uses Config module for sensor parameter configuration management
-- Integrates SensorData data structures for standardized data transmission
+- Uses `Config` module for sensor parameter configuration management
+- Integrates `SensorData` data structures for standardized data transmission
 
 
 

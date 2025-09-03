@@ -22,7 +22,7 @@ Provides microsecond-level precision performance timing functionality:
 
 **Main Functions**:
 - Microsecond-level precision time measurement
-- start() to begin timing, elapsedMs() to get milliseconds
+- `start()` to begin timing, `elapsedMs()` to get milliseconds
 - Minimize performance overhead
 
 ### 3. PerformanceStats - Performance Statistics

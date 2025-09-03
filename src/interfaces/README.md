@@ -8,32 +8,32 @@ The Interfaces module defines the core interfaces for the UofG-RTEP-BabyMonitor 
 
 ### 1. IComponent - Base Component Interface
 
-The base interface for all system components, defining component lifecycle management:
+The base interface for all system components, defining component lifecycle management
 
 ### 2. ISensorManager - Sensor Management Interface
 
-Interface for managing multiple sensors as a group:
+Interface for managing multiple sensors as a group
 
 ### 3. IAlarmSystem - Alarm System Interface
 
-Interface for handling alarm publishing and management:
+Interface for handling alarm publishing and management
 
 ### 4. IDisplayManager - Display Management Interface
 
-Interface for handling UI updates and chart management:
+Interface for handling UI updates and chart management
 
 
 ## Interaction with Other Modules
 
 ### managers/
-- AlarmSystem implements the IAlarmSystem interface, responsible for DDS communication and alarm logic management
-- SensorManager implements the ISensorManager interface, responsible for sensor group management and health monitoring
+- `AlarmSystem` implements the `IAlarmSystem` interface, responsible for DDS communication and alarm logic management
+- `SensorManager` implements the `ISensorManager` interface, responsible for sensor group management and health monitoring
 
 ### ui/
-- MainWindow receives IAlarmSystem services through dependency injection, achieving decoupling between UI and business logic
+- `MainWindow` receives `IAlarmSystem` services through dependency injection, achieving decoupling between UI and business logic
 
 ### core/
-- ServiceContainer performs service registration and resolution through these interfaces, implementing type-safe dependency management
+- `ServiceContainer` performs service registration and resolution through these interfaces, implementing type-safe dependency management
 
 ## Usage
 
@@ -68,7 +68,3 @@ container.registerService<IAlarmSystem>("AlarmSystem",
 // Resolve service
 auto alarmSystem = container.resolve<IAlarmSystem>("AlarmSystem");
 ```
-
-
-
-
