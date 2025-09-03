@@ -16,6 +16,7 @@ Responsible for low-level GPIO communication of DHT11 temperature and humidity s
 - Parse temperature and humidity data and checksums
 - Handle communication timeouts and data verification errors
 
+
 ### 2. DHT11Worker - DHT11 Worker Thread
 
 Provides asynchronous temperature and humidity data collection services:
@@ -25,6 +26,8 @@ Provides asynchronous temperature and humidity data collection services:
 - Configurable data collection interval (default 3 seconds)
 - Send data through Qt signal-slot mechanism
 - Automatically handle read errors and sensor failures
+
+The minimum reading interval of DHT11 is 1 second. To ensure the security and stability of the hardware, we have appropriately increased the time interval.
 
 ### 3. SensorFactory - Sensor Factory
 

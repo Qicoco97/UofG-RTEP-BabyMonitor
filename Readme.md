@@ -20,7 +20,7 @@ Real-time `temperature and humidity monitoring` is enabled by the DHT11 sensor w
 
 ### 🚨 **Multi-Channel Alert System**
 
-When the system detects "no motion" for five consecutive times, it determines that the monitored object is in danger. At this point, the `LED lights` will flash and the `speaker` will play the alarm audio. The system supports real-time data exchange through `DDS`, enabling seamless dissemination of environmental and motion data to subscriber terminals.
+When the system detects "no motion" for five consecutive times(After conducting tests for several times, it was determined that five times would be a suitable duration.), it determines that the monitored object is in danger. At this point, the `LED lights` will flash and the `speaker` will play the alarm audio. The system supports real-time data exchange through `DDS`, enabling seamless dissemination of environmental and motion data to subscriber terminals.
 - Here is the feedback information from the subscriber terminal.
 <p align="center">
   <img src="./img%26demo/Subscribe.png" alt="Subscribe" height="300">

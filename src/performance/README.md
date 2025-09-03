@@ -45,6 +45,18 @@ Define performance constraint thresholds for various system operations:
 - SensorReading: Sensor reading (≤300ms)
 - UIUpdate: UI update (≤30ms)
 
+**Why These Specific Thresholds? (Hardware Performance Considerations)**
+
+**MotionDetection (≤50ms)**: Raspberry Pi 4 ARM Cortex-A72 CPU can process OpenCV frame difference algorithms in 20-30ms typical. 50ms threshold provides headroom for CPU load variations and memory bandwidth limitations.
+
+**FrameProcessing (≤20ms)**: Camera interface on Raspberry Pi operates at 30 FPS (33ms per frame). 20ms limit ensures sufficient CPU cycles remain for concurrent motion detection and UI rendering without frame drops.
+
+**AlarmResponse (≤100ms)**: DDS message serialization and network stack processing on embedded ARM architecture requires 30-50ms. 100ms accommodates GPIO operations, audio codec initialization, and system call overhead.
+
+**SensorReading (≤300ms)**: DHT11 sensor hardware timing requires 250ms between readings due to internal measurement cycles. Additional 50ms accounts for GPIO bit-banging protocol overhead and potential I/O scheduling delays.
+
+**UIUpdate (≤30ms)**: Qt widget rendering on GPU-less Raspberry Pi relies on CPU framebuffer operations. 30ms ensures smooth UI updates without competing with real-time video processing for memory bandwidth.
+
 ## Interaction with Other Modules
 
 ### detection/
