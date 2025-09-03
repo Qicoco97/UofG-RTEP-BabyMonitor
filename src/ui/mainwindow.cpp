@@ -139,7 +139,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
 
             // Play alarm sound after reaching threshold
-            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
+            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
                 errorHandler_.reportInfo("Debug", "Triggering playAlarmSound and triggerMotionAlert");
                 playAlarmSound();
                 triggerMotionAlert();
