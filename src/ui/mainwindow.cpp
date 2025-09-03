@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     , audioPlayer_(nullptr)
     , noMotionCount_(0)
     , alarmPlaying_(false)
+    , alarmPlayingDuration_(0)
 {
     ui->setupUi(this);
     this->setMinimumSize(800, 1000);
@@ -127,21 +128,38 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     // Start alarm response timing
     alarmTimer_->start();
 
+    // Alarm self-healing mechanism: If the alarm status persists for over 10 seconds, a forced reset will occur.
+    if (alarmPlaying_) {
+        alarmPlayingDuration_++;
+        if (alarmPlayingDuration_ > 10) { // 10 seconds self-healing
+            errorHandler_.reportWarning("AudioPlayer", "Alarm playing too long, force reset.");
+            alarmPlaying_ = false;
+            if (audioPlayer_) audioPlayer_->stop();
+            alarmPlayingDuration_ = 0;
+        }
+    } else {
+        alarmPlayingDuration_ = 0;
+    }
+
+    errorHandler_.reportInfo("Debug", QString("timerEvent: motionDetected_=%1, noMotionCount_=%2, alarmPlaying_=%3")
+        .arg(motionDetected_).arg(noMotionCount_).arg(alarmPlaying_));
+
     // Use injected alarm system
     if (injectedAlarmSystem_) {
         if (!motionDetected_) {
             noMotionCount_++;
+            errorHandler_.reportInfo("Debug", QString("No motion detected, noMotionCount_=%1").arg(noMotionCount_));
             QString message = QString("No motion detected !!!! Dangerous! (Sample #%1, Count: %2)").arg(samplesSent_++).arg(noMotionCount_);
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
 
             // Play alarm sound after reaching threshold
-            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
+            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
+                errorHandler_.reportInfo("Debug", "Triggering playAlarmSound and triggerMotionAlert");
                 playAlarmSound();
                 triggerMotionAlert();
-
-
             }
         } else {
+            errorHandler_.reportInfo("Debug", "Motion detected, reset noMotionCount_");
             noMotionCount_ = 0; // Reset counter when motion is detected
             QString message = QString("On motion !!! (Sample #%1)").arg(samplesSent_++);
             injectedAlarmSystem_->publishAlarm(message, 1); // Low severity
@@ -254,6 +272,7 @@ void MainWindow::initializeLED()
 
 void MainWindow::triggerMotionAlert()
 {
+    errorHandler_.reportInfo("Debug", "triggerMotionAlert called");
     led_.blink(BabyMonitorConfig::LED_BLINK_COUNT,
                BabyMonitorConfig::LED_ON_DURATION_MS,
                BabyMonitorConfig::LED_OFF_DURATION_MS);
@@ -666,7 +685,9 @@ void MainWindow::initializeAudioPlayer()
 
 void MainWindow::playAlarmSound()
 {
+    errorHandler_.reportInfo("Debug", QString("playAlarmSound called, alarmPlaying_=%1").arg(alarmPlaying_));
     if (!audioPlayer_ || alarmPlaying_) {
+        errorHandler_.reportInfo("Debug", "playAlarmSound: already playing or player not initialized");
         return; // Don't play if already playing or player not initialized
     }
 
@@ -677,10 +698,12 @@ void MainWindow::playAlarmSound()
 
 void MainWindow::onAudioPlayerStateChanged(QMediaPlayer::State state)
 {
+    errorHandler_.reportInfo("Debug", QString("onAudioPlayerStateChanged: state=%1").arg(state));
     if (state == QMediaPlayer::StoppedState) {
         alarmPlaying_ = false;
         // Reset the media position for next playback
         audioPlayer_->setPosition(0);
         errorHandler_.reportInfo("AudioPlayer", "Alarm sound playback completed");
+        errorHandler_.reportInfo("Debug", "alarmPlaying_ set to false");
     }
 }

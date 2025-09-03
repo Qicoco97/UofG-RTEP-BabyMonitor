@@ -157,6 +157,7 @@ private:
     QMediaPlayer* audioPlayer_;
     int noMotionCount_;
     bool alarmPlaying_;
+    int alarmPlayingDuration_ = 0;
 
     void setupCharts();
 
