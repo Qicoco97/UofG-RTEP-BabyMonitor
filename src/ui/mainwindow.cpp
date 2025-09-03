@@ -128,10 +128,10 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     // Start alarm response timing
     alarmTimer_->start();
 
-    // 警报自愈机制：如果报警状态持续超过10秒，强制重置
+    // Alarm self-healing mechanism: If the alarm status persists for over 10 seconds, a forced reset will occur.
     if (alarmPlaying_) {
         alarmPlayingDuration_++;
-        if (alarmPlayingDuration_ > 10) { // 10秒自愈
+        if (alarmPlayingDuration_ > 10) { // 10 seconds self-healing
             errorHandler_.reportWarning("AudioPlayer", "Alarm playing too long, force reset.");
             alarmPlaying_ = false;
             if (audioPlayer_) audioPlayer_->stop();
@@ -153,7 +153,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
 
             // Play alarm sound after reaching threshold
-            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
+            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
                 errorHandler_.reportInfo("Debug", "Triggering playAlarmSound and triggerMotionAlert");
                 playAlarmSound();
                 triggerMotionAlert();
