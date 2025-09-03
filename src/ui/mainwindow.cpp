@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     , audioPlayer_(nullptr)
     , noMotionCount_(0)
     , alarmPlaying_(false)
+    , alarmPlayingDuration_(0)
 {
     ui->setupUi(this);
     this->setMinimumSize(800, 1000);
@@ -127,6 +128,19 @@ void MainWindow::timerEvent(QTimerEvent *event) {
     // Start alarm response timing
     alarmTimer_->start();
 
+    // 警报自愈机制：如果报警状态持续超过10秒，强制重置
+    if (alarmPlaying_) {
+        alarmPlayingDuration_++;
+        if (alarmPlayingDuration_ > 10) { // 10秒自愈
+            errorHandler_.reportWarning("AudioPlayer", "Alarm playing too long, force reset.");
+            alarmPlaying_ = false;
+            if (audioPlayer_) audioPlayer_->stop();
+            alarmPlayingDuration_ = 0;
+        }
+    } else {
+        alarmPlayingDuration_ = 0;
+    }
+
     errorHandler_.reportInfo("Debug", QString("timerEvent: motionDetected_=%1, noMotionCount_=%2, alarmPlaying_=%3")
         .arg(motionDetected_).arg(noMotionCount_).arg(alarmPlaying_));
 
@@ -139,7 +153,7 @@ void MainWindow::timerEvent(QTimerEvent *event) {
             injectedAlarmSystem_->publishAlarm(message, 3); // High severity
 
             // Play alarm sound after reaching threshold
-            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
+            if (noMotionCount_ >= BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD && !alarmPlaying_) {
                 errorHandler_.reportInfo("Debug", "Triggering playAlarmSound and triggerMotionAlert");
                 playAlarmSound();
                 triggerMotionAlert();
@@ -672,10 +686,6 @@ void MainWindow::initializeAudioPlayer()
 void MainWindow::playAlarmSound()
 {
     errorHandler_.reportInfo("Debug", QString("playAlarmSound called, alarmPlaying_=%1").arg(alarmPlaying_));
-    if (noMotionCount_ >= 3*BabyMonitorConfig::NO_MOTION_ALARM_THRESHOLD) {
-        // If no motion detected for 3 times the threshold, stop the alarm for recovery
-        alarmPlaying_ = false;
-    }
     if (!audioPlayer_ || alarmPlaying_) {
         errorHandler_.reportInfo("Debug", "playAlarmSound: already playing or player not initialized");
         return; // Don't play if already playing or player not initialized
