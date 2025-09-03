@@ -10,7 +10,7 @@ This is our **smart baby monitoring system**, designed to provide comprehensive 
 
 Seamless camera integration via `libcam2opencv` enables continuous video capture with real-time frame processing. Intelligent motion detection, powered by OpenCV frame-difference algorithms, identifies baby movement patterns. The Qt-based GUI provides live video feedback with clear motion status indicators (“On motion” / “No motion”).
 <p align="center">
-  <img src="./img%26demo/mainwindow.png" alt="mainwindow" height="300">
+  <img src="./img%26demo/mainwindow.png" alt="mainwindow">
 </p>
 
 ### 🌡️ **Environmental Monitoring**
@@ -35,7 +35,7 @@ When the system detects "no motion" for five consecutive times(After conducting 
 
 The system ensures adaptive processing with dynamic parameter tuning based on load conditions, maintaining real-time responsiveness with motion detection latency under 50 ms. Resource optimization through adaptive quality scaling balances performance and efficiency, while robust error recovery mechanisms provide automatic sensor restoration and continuous health monitoring.
 <p align="center">
-  <img src="./img%26demo/performancewindow.png" alt="performancewindow" height="300">
+  <img src="./img%26demo/performancewindow.png" alt="performancewindow">
 </p>
 
 ---
@@ -78,7 +78,7 @@ Provides dependency injection and application bootstrap management, serving as t
 #### **Hardware Module** - *Physical Device Control*
 - **[Hardware Module](./src/hardware/README.md)** - Provides GPIO hardware control, including LED indicators and camera integration
 #### **Communication Module** - *Network & Data Exchange*
-- **[Communication Module](./src/communication\dds/README.md)** - Implements real-time message publishing and subscribing with Fast DDS, enabling alarm and system information transmission, using the Fast DDS library from Professor Bernd Porr's GitHub repository.
+- **[Communication Module](./src/communication/dds/README.md)** - Implements real-time message publishing and subscribing with Fast DDS, enabling alarm and system information transmission, using the Fast DDS library from Professor Bernd Porr's GitHub repository.
 #### **Utility Module** - *Common Services & Tools*
 - **[Utils Module](./src/utils/README.md)** - Offers centralized configuration management, unified error handling, and standardized data structures
 ####  **Performance Module** - *System Optimization*
@@ -151,7 +151,7 @@ make
 ```
 if you want to subscribe the information, you need to following bash
 ``` bash
-cd dds_pub-sub
+cd communication/dds
 ./DDSAlarmSubscriber
 ```
 
@@ -170,14 +170,14 @@ cd dds_pub-sub
 ##  Third-Party Libraries
 
 - **Project Name**: libcamera2opencv
-- **Author**: Bernd Porr
-- **Link**: [https://github.com/berndporr/libcamera2opencv](https://github.com/berndporr/libcamera2opencv)
-- **License**: GPL-2.0 License
+  - **Author**: Bernd Porr
+  - **Link**: [https://github.com/berndporr/libcamera2opencv](https://github.com/berndporr/libcamera2opencv)
+  - **License**: GPL-2.0 License
 
 - **Project Name**: fastdds_demo
-- **Author**: Bernd Porr
-- **Link**: [https://github.com/berndporr/fastdds_demo](https://github.com/berndporr/fastdds_demo)
-- **License**:  Apache License 2.0
+  - **Author**: Bernd Porr
+  - **Link**: [https://github.com/berndporr/fastdds_demo](https://github.com/berndporr/fastdds_demo)
+  - **License**:  Apache License 2.0
 
 Thanks to my teacher and we learned a lot from this lecture !!! And the Original idea was came up with cribsense project! Thanks all
 ---

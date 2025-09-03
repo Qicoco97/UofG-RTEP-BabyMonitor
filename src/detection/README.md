@@ -32,11 +32,11 @@ A worker class inheriting from `QObject`, specifically designed to execute motio
 ## Interaction with Other Modules
 
 ### ui/
-- Sends motion detection results to MainWindow to update UI status display
+- Sends motion detection results to `MainWindow` to update UI status display
 - Implements real-time status updates through signal-slot mechanism ("On motion" / "No motion")
 
 ### managers/
-- Motion detection results are used to trigger AlarmSystem alarm logic
+- Motion detection results are used to trigger `AlarmSystem` alarm logic
 - Triggers alarm publishing after 5 consecutive "no motion" detections
 
 ### hardware/
@@ -44,11 +44,11 @@ A worker class inheriting from `QObject`, specifically designed to execute motio
 - Provides intuitive visual status feedback for users
 
 ### camera/
-- Receives real-time video frames from libcam2opencv
-- Processes BGR image data in cv::Mat format
+- Receives real-time video frames from `libcam2opencv`
+- Processes BGR image data in `cv::Mat` format
 
 ### performance/
-- Integrates PerformanceMonitor for real-time performance monitoring
+- Integrates `PerformanceMonitor` for real-time performance monitoring
 - Records processing latency and triggers adaptive performance adjustments
 
 
